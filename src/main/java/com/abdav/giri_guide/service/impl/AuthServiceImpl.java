@@ -10,13 +10,16 @@ import com.abdav.giri_guide.security.JwtUtil;
 import com.abdav.giri_guide.service.AuthService;
 import com.abdav.giri_guide.service.CustomerService;
 import com.abdav.giri_guide.service.RoleService;
+import com.abdav.giri_guide.util.ValidationUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -30,10 +33,12 @@ public class AuthServiceImpl implements AuthService {
     private final CustomerService customerService;
     private final AuthenticationManager authenticationManager;
     private final UserRepository userRepository;
+    private final ValidationUtil validationUtil;
 
     @Override
     public void register(RegisterRequest registerRequest) {
         try {
+            validationUtil.validate(registerRequest);
             Role role = roleService.getOrSaveRole(Role.builder().role(ERole.ROLE_CUSTOMER).build());
 
             User user = User.builder()
@@ -60,21 +65,26 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public LoginResponse login(LoginRequest loginRequest) {
-        Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
-                loginRequest.getEmail(),
-                loginRequest.getPassword()
-        ));
+        validationUtil.validate(loginRequest);
+        try {
+            Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
+                    loginRequest.getEmail(),
+                    loginRequest.getPassword()
+            ));
 
-        SecurityContextHolder.getContext().setAuthentication(authentication);
+            SecurityContextHolder.getContext().setAuthentication(authentication);
 
-        AppUser appUser = (AppUser) authentication.getPrincipal();
-        String token = jwtUtil.generateToken(appUser);
+            AppUser appUser = (AppUser) authentication.getPrincipal();
+            String token = jwtUtil.generateToken(appUser);
 
-        return LoginResponse.builder()
-                .token(token)
-                .UserId(appUser.getId())
-                .email(appUser.getEmail())
-                .role(appUser.getRole())
-                .build();
+            return LoginResponse.builder()
+                    .token(token)
+                    .UserId(appUser.getId())
+                    .email(appUser.getEmail())
+                    .role(appUser.getRole())
+                    .build();
+        } catch (BadCredentialsException e) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid email or password");
+        }
     }
 }
