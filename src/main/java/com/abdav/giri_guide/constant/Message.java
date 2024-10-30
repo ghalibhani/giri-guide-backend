@@ -10,4 +10,7 @@ public class Message {
     public static final String REQUIRED_NIK = "Required nik";
 
     public static final String INVALID_EMAIL = "Invalid format email";
+
+    public static final String LOGIN_SUCCESS = "Login successful";
+    public static final String USER_CREATED = "User created";
 }

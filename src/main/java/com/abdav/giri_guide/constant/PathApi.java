@@ -5,4 +5,5 @@ public class PathApi {
 
     public static final String AUTH_API = GIRI_GUIDE_APP + "/auth";
     public static final String REGISTER_API = "/register";
+    public static final String LOGIN_API = "/login";
 }

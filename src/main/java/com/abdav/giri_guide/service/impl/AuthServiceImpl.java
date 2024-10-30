@@ -1,7 +1,9 @@
 package com.abdav.giri_guide.service.impl;
 
+import com.abdav.giri_guide.dto.request.LoginRequest;
 import com.abdav.giri_guide.dto.request.RegisterRequest;
 import com.abdav.giri_guide.dto.response.CommonResponse;
+import com.abdav.giri_guide.dto.response.LoginResponse;
 import com.abdav.giri_guide.entity.*;
 import com.abdav.giri_guide.repository.UserRepository;
 import com.abdav.giri_guide.security.JwtUtil;
@@ -12,6 +14,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -51,5 +56,25 @@ public class AuthServiceImpl implements AuthService {
         } catch (DataIntegrityViolationException e) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "User already exists");
         }
+    }
+
+    @Override
+    public LoginResponse login(LoginRequest loginRequest) {
+        Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
+                loginRequest.getEmail(),
+                loginRequest.getPassword()
+        ));
+
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+
+        AppUser appUser = (AppUser) authentication.getPrincipal();
+        String token = jwtUtil.generateToken(appUser);
+
+        return LoginResponse.builder()
+                .token(token)
+                .UserId(appUser.getId())
+                .email(appUser.getEmail())
+                .role(appUser.getRole())
+                .build();
     }
 }

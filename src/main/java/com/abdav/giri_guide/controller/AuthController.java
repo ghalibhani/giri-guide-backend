@@ -1,10 +1,14 @@
 package com.abdav.giri_guide.controller;
 
+import com.abdav.giri_guide.constant.Message;
 import com.abdav.giri_guide.constant.PathApi;
+import com.abdav.giri_guide.dto.request.LoginRequest;
 import com.abdav.giri_guide.dto.request.RegisterRequest;
 import com.abdav.giri_guide.dto.response.CommonResponse;
+import com.abdav.giri_guide.dto.response.LoginResponse;
 import com.abdav.giri_guide.service.AuthService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.boot.actuate.autoconfigure.observation.ObservationProperties;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -22,11 +26,22 @@ public class AuthController {
     @PostMapping(PathApi.REGISTER_API)
     ResponseEntity<?> registerCustomer(@RequestBody RegisterRequest registerRequest) {
         authService.register(registerRequest);
-        message = "User Created";
+        message = Message.USER_CREATED;
         CommonResponse<?> response = new CommonResponse<>(message, null);
 
         return ResponseEntity
                 .status(HttpStatus.CREATED)
+                .body(response);
+    }
+
+    @PostMapping(PathApi.LOGIN_API)
+    ResponseEntity<?> loginCustomer(@RequestBody LoginRequest loginRequest) {
+        LoginResponse loginResponse = authService.login(loginRequest);
+        message = Message.LOGIN_SUCCESS;
+        CommonResponse<?> response = new CommonResponse<>(message, loginResponse);
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
                 .body(response);
     }
 }
