@@ -1,8 +1,10 @@
 package com.abdav.giri_guide.model.request;
 
+import jakarta.validation.constraints.NotBlank;
+
 public record HikingPointRequest(
-        String name,
-        String coordinate
+        @NotBlank String name,
+        @NotBlank String coordinate
 
 ) {
 }

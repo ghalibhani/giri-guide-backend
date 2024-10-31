@@ -86,7 +86,7 @@ public class MountainController {
 
     @PostMapping("{mountainId}/hiking-points")
     public ResponseEntity<?> addHikingPoint(@PathVariable String mountainId,
-            @RequestBody HikingPointRequest request
+            @RequestBody @Validated HikingPointRequest request
 
     ) {
         return ResponseEntity.status(HttpStatus.CREATED)
