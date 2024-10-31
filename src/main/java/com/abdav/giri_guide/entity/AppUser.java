@@ -8,6 +8,8 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import com.abdav.giri_guide.constant.ERole;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;

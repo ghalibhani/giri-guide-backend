@@ -2,6 +2,8 @@ package com.abdav.giri_guide.entity;
 
 import java.util.Date;
 
+import com.abdav.giri_guide.constant.EGender;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;

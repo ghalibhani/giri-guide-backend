@@ -8,6 +8,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.abdav.giri_guide.entity.Mountains;
+import com.abdav.giri_guide.model.request.MountainsRequest;
 import com.abdav.giri_guide.model.response.MountainsDetailResponse;
 import com.abdav.giri_guide.model.response.MountainsListResponse;
 import com.abdav.giri_guide.repository.MountainsRepository;
@@ -22,14 +23,18 @@ public class MountainServiceImpl implements MountainsService {
     private final MountainsRepository repository;
 
     @Override
-    public MountainsDetailResponse createMountain(Mountains mountains) {
-        Mountains savedMountains = repository.save(mountains);
+    public MountainsDetailResponse createMountain(MountainsRequest newMountains) {
+        Mountains mountains = repository.save(newMountains.toMountains());
         return new MountainsDetailResponse(
-                savedMountains.getId(),
-                savedMountains.getName(),
-                savedMountains.getImage(),
-                savedMountains.getCity(),
-                savedMountains.getDescription());
+                mountains.getId(),
+                mountains.getName(),
+                mountains.getImage(),
+                mountains.getCity(),
+                mountains.getDescription(),
+                mountains.getStatus(),
+                mountains.getMessage()
+
+        );
     }
 
     @Override
@@ -47,7 +52,9 @@ public class MountainServiceImpl implements MountainsService {
                 mountain.getName(),
                 mountain.getImage(),
                 mountain.getCity(),
-                mountain.getDescription()
+                mountain.getDescription(),
+                mountain.getStatus(),
+                mountain.getMessage()
 
         );
     }
@@ -62,19 +69,25 @@ public class MountainServiceImpl implements MountainsService {
     }
 
     @Override
-    public MountainsDetailResponse updateMountain(String id, Mountains updatedMountains) {
+    public MountainsDetailResponse updateMountain(String id, MountainsRequest updatedMountains) {
         Mountains mountain = repository.findById(id).orElseThrow(EntityNotFoundException::new);
 
-        if (updatedMountains.getName() != null) {
-            mountain.setName(updatedMountains.getName());
+        if (updatedMountains.name() != null) {
+            mountain.setName(updatedMountains.name());
         }
-        if (updatedMountains.getCity() != null) {
-            mountain.setCity(updatedMountains.getCity());
+        if (updatedMountains.city() != null) {
+            mountain.setCity(updatedMountains.city());
         }
-        if (updatedMountains.getDescription() != null) {
-            mountain.setCity(updatedMountains.getDescription());
+        if (updatedMountains.description() != null) {
+            mountain.setCity(updatedMountains.description());
         }
-        mountain.setLastModifiedDate(LocalDateTime.now());
+        if (updatedMountains.status() != null) {
+            mountain.setStatus(updatedMountains.statusToEnum());
+        }
+        if (updatedMountains.message() != null) {
+            mountain.setMessage(updatedMountains.message());
+        }
+        // mountain.setLastModifiedDate(LocalDateTime.now());
         repository.save(mountain);
 
         return new MountainsDetailResponse(
@@ -82,7 +95,9 @@ public class MountainServiceImpl implements MountainsService {
                 mountain.getName(),
                 mountain.getImage(),
                 mountain.getCity(),
-                mountain.getDescription()
+                mountain.getDescription(),
+                mountain.getStatus(),
+                mountain.getMessage()
 
         );
     }

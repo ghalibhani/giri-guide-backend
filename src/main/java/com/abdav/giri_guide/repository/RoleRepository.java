@@ -1,6 +1,6 @@
 package com.abdav.giri_guide.repository;
 
-import com.abdav.giri_guide.entity.ERole;
+import com.abdav.giri_guide.constant.ERole;
 import com.abdav.giri_guide.entity.Role;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;

@@ -1,5 +1,7 @@
 package com.abdav.giri_guide.entity;
 
+import com.abdav.giri_guide.constant.ERole;
+
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

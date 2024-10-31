@@ -1,4 +1,4 @@
-package com.abdav.giri_guide.entity;
+package com.abdav.giri_guide.constant;
 
 public enum ERole {
     ROLE_CUSTOMER,

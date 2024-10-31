@@ -2,7 +2,7 @@ package com.abdav.giri_guide.service;
 
 import org.springframework.data.domain.Page;
 
-import com.abdav.giri_guide.entity.Mountains;
+import com.abdav.giri_guide.model.request.MountainsRequest;
 import com.abdav.giri_guide.model.response.MountainsDetailResponse;
 import com.abdav.giri_guide.model.response.MountainsListResponse;
 
@@ -11,9 +11,9 @@ public interface MountainsService {
 
     MountainsDetailResponse mountainDetail(String id);
 
-    MountainsDetailResponse updateMountain(String id, Mountains updatedMountains);
+    MountainsDetailResponse updateMountain(String id, MountainsRequest updatedMountains);
 
-    MountainsDetailResponse createMountain(Mountains mountains);
+    MountainsDetailResponse createMountain(MountainsRequest mountains);
 
     void deleteMountain(String id);
 }

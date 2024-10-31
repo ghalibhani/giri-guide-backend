@@ -1,7 +1,5 @@
 package com.abdav.giri_guide.controller;
 
-import java.util.List;
-
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,10 +12,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.abdav.giri_guide.constant.PathApi;
 import com.abdav.giri_guide.model.request.MountainsRequest;
 import com.abdav.giri_guide.model.response.CommonResponse;
 import com.abdav.giri_guide.model.response.CommonResponseWithPage;
-import com.abdav.giri_guide.model.response.MountainsDetailResponse;
 import com.abdav.giri_guide.model.response.MountainsListResponse;
 import com.abdav.giri_guide.model.response.PagingResponse;
 import com.abdav.giri_guide.service.MountainsService;
@@ -26,16 +24,17 @@ import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("api/v1/mountains")
+@RequestMapping(PathApi.MOUNTAINS_API)
 public class MountainController {
     private final MountainsService service;
 
     @GetMapping("")
     public ResponseEntity<CommonResponseWithPage<?>> getMountainList() {
         Page<MountainsListResponse> mountainList = service.mountainList(null, 1, 5);
-        PagingResponse paging = new PagingResponse(1, 5, mountainList.getTotalPages(), mountainList.getTotalElements());
+        PagingResponse paging = new PagingResponse(1, 5, mountainList.getTotalPages(),
+                mountainList.getTotalElements());
         return ResponseEntity.status(HttpStatus.OK)
-                .body(new CommonResponseWithPage<List<MountainsListResponse>>(
+                .body(new CommonResponseWithPage<>(
                         "Data fetched",
                         mountainList.getContent(),
                         paging));
@@ -44,14 +43,14 @@ public class MountainController {
     @PostMapping("")
     public ResponseEntity<CommonResponse<?>> createMountain(@RequestBody MountainsRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(new CommonResponse<MountainsDetailResponse>("Mountain data successfully created",
-                        service.createMountain(request.toMountains())));
+                .body(new CommonResponse<>("Mountain data successfully created",
+                        service.createMountain(request)));
     }
 
     @GetMapping("{id}")
     public ResponseEntity<CommonResponse<?>> getMountainDetail(@PathVariable String id) {
         return ResponseEntity.status(HttpStatus.OK)
-                .body(new CommonResponse<MountainsDetailResponse>("Data fetched successfully",
+                .body(new CommonResponse<>("Data fetched successfully",
                         service.mountainDetail(id)));
     }
 
@@ -61,13 +60,14 @@ public class MountainController {
             @RequestBody MountainsRequest request) {
 
         return ResponseEntity.status(HttpStatus.OK)
-                .body(new CommonResponse<MountainsDetailResponse>("Data updated successfully",
-                        service.updateMountain(id, request.toMountains())));
+                .body(new CommonResponse<>("Data updated successfully",
+                        service.updateMountain(id, request)));
     }
 
     @DeleteMapping("{id}")
     public ResponseEntity<CommonResponse<?>> deleteMountain(@PathVariable String id) {
-        return ResponseEntity.status(HttpStatus.OK).body(new CommonResponse<Object>("Data deleted successfully", null));
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(new CommonResponse<>("Data deleted successfully", null));
     }
 
 }

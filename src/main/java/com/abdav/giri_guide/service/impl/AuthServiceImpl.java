@@ -1,17 +1,5 @@
 package com.abdav.giri_guide.service.impl;
 
-import com.abdav.giri_guide.dto.request.LoginRequest;
-import com.abdav.giri_guide.dto.request.RegisterRequest;
-import com.abdav.giri_guide.dto.response.CommonResponse;
-import com.abdav.giri_guide.dto.response.LoginResponse;
-import com.abdav.giri_guide.entity.*;
-import com.abdav.giri_guide.repository.UserRepository;
-import com.abdav.giri_guide.security.JwtUtil;
-import com.abdav.giri_guide.service.AuthService;
-import com.abdav.giri_guide.service.CustomerService;
-import com.abdav.giri_guide.service.RoleService;
-import com.abdav.giri_guide.util.ValidationUtil;
-import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -19,10 +7,27 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
+
+import com.abdav.giri_guide.constant.EGender;
+import com.abdav.giri_guide.constant.ERole;
+import com.abdav.giri_guide.dto.request.LoginRequest;
+import com.abdav.giri_guide.dto.request.RegisterRequest;
+import com.abdav.giri_guide.dto.response.LoginResponse;
+import com.abdav.giri_guide.entity.AppUser;
+import com.abdav.giri_guide.entity.Customer;
+import com.abdav.giri_guide.entity.Role;
+import com.abdav.giri_guide.entity.User;
+import com.abdav.giri_guide.repository.UserRepository;
+import com.abdav.giri_guide.security.JwtUtil;
+import com.abdav.giri_guide.service.AuthService;
+import com.abdav.giri_guide.service.CustomerService;
+import com.abdav.giri_guide.service.RoleService;
+import com.abdav.giri_guide.util.ValidationUtil;
+
+import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
@@ -69,8 +74,7 @@ public class AuthServiceImpl implements AuthService {
         try {
             Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
                     loginRequest.getEmail(),
-                    loginRequest.getPassword()
-            ));
+                    loginRequest.getPassword()));
 
             SecurityContextHolder.getContext().setAuthentication(authentication);
 

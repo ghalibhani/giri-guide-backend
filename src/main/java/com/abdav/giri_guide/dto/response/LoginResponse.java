@@ -1,6 +1,7 @@
 package com.abdav.giri_guide.dto.response;
 
-import com.abdav.giri_guide.entity.ERole;
+import com.abdav.giri_guide.constant.ERole;
+
 import lombok.Builder;
 import lombok.Data;
 
