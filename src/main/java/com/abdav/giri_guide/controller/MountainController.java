@@ -66,6 +66,7 @@ public class MountainController {
 
     @DeleteMapping("{id}")
     public ResponseEntity<CommonResponse<?>> deleteMountain(@PathVariable String id) {
+        service.deleteMountain(id);
         return ResponseEntity.status(HttpStatus.OK)
                 .body(new CommonResponse<>("Data deleted successfully", null));
     }

@@ -41,6 +41,7 @@ public class MountainServiceImpl implements MountainsService {
     public void deleteMountain(String id) {
         Mountains mountain = repository.findById(id).orElseThrow(EntityNotFoundException::new);
         mountain.setDeletedDate(LocalDateTime.now());
+        repository.save(mountain);
     }
 
     @Override
