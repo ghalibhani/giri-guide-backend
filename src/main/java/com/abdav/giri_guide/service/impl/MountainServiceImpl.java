@@ -2,6 +2,9 @@ package com.abdav.giri_guide.service.impl;
 
 import java.time.LocalDateTime;
 
+import java.util.Optional;
+
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -24,7 +27,14 @@ public class MountainServiceImpl implements MountainsService {
 
     @Override
     public MountainsDetailResponse createMountain(MountainsRequest newMountains) {
+        Optional<Mountains> savedMountain = repository
+                .findByNameIgnoreCaseAndDeletedDateIsNull(newMountains.name().trim());
+        if (savedMountain.isPresent()) {
+            throw new DataIntegrityViolationException("Active data with same name already exist");
+        }
+
         Mountains mountains = repository.save(newMountains.toMountains());
+        System.err.println(mountains);
         return new MountainsDetailResponse(
                 mountains.getId(),
                 mountains.getName(),
@@ -73,22 +83,27 @@ public class MountainServiceImpl implements MountainsService {
     public MountainsDetailResponse updateMountain(String id, MountainsRequest updatedMountains) {
         Mountains mountain = repository.findById(id).orElseThrow(EntityNotFoundException::new);
 
+        Optional<Mountains> savedMountain = repository
+                .findByNameIgnoreCaseAndDeletedDateIsNull(updatedMountains.name().trim());
+        if (savedMountain.isPresent() && !mountain.equals(savedMountain.get())) {
+            throw new DataIntegrityViolationException("Active data with same name already exist");
+        }
+
         if (updatedMountains.name() != null) {
-            mountain.setName(updatedMountains.name());
+            mountain.setName(updatedMountains.name().trim());
         }
         if (updatedMountains.city() != null) {
-            mountain.setCity(updatedMountains.city());
+            mountain.setCity(updatedMountains.city().trim());
         }
         if (updatedMountains.description() != null) {
-            mountain.setCity(updatedMountains.description());
+            mountain.setCity(updatedMountains.description().trim());
         }
         if (updatedMountains.status() != null) {
             mountain.setStatus(updatedMountains.statusToEnum());
         }
         if (updatedMountains.message() != null) {
-            mountain.setMessage(updatedMountains.message());
+            mountain.setMessage(updatedMountains.message().trim());
         }
-        // mountain.setLastModifiedDate(LocalDateTime.now());
         repository.save(mountain);
 
         return new MountainsDetailResponse(

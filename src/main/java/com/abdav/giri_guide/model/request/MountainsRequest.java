@@ -3,9 +3,11 @@ package com.abdav.giri_guide.model.request;
 import com.abdav.giri_guide.constant.EMountainStatus;
 import com.abdav.giri_guide.entity.Mountains;
 
+import jakarta.validation.constraints.NotBlank;
+
 public record MountainsRequest(
-        String name,
-        String city,
+        @NotBlank String name,
+        @NotBlank String city,
         String description,
         String status,
         String message
@@ -13,7 +15,7 @@ public record MountainsRequest(
 ) {
     public EMountainStatus statusToEnum() {
         EMountainStatus mountainStatus;
-        switch (status.toLowerCase()) {
+        switch (status.trim().toLowerCase()) {
             case "normal":
                 mountainStatus = EMountainStatus.NORMAL;
                 break;
@@ -40,11 +42,11 @@ public record MountainsRequest(
     public Mountains toMountains() {
 
         return Mountains.builder()
-                .name(name)
-                .city(city)
-                .description(description)
+                .name(name.trim())
+                .city(city.trim())
+                .description(description.trim())
                 .status(statusToEnum())
-                .message(message)
+                .message(message.trim())
                 .build();
     }
 }
