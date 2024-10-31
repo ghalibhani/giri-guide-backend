@@ -78,13 +78,19 @@ public class MountainController {
                 .body(new CommonResponse<>("Data deleted successfully", null));
     }
 
-    @PostMapping("{mountainId}/hiking-point")
+    @GetMapping("{mountainId}/hiking-points")
+    public ResponseEntity<?> getHikingPoints(@PathVariable String mountainId) {
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(new CommonResponse<>("Data fetched", service.getHikingPoints(mountainId)));
+    }
+
+    @PostMapping("{mountainId}/hiking-points")
     public ResponseEntity<?> addHikingPoint(@PathVariable String mountainId,
             @RequestBody HikingPointRequest request
 
     ) {
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(service.createHikingPoint(mountainId, request));
+                .body(new CommonResponse<>("Data Create", service.createHikingPoint(mountainId, request)));
     }
 
 }

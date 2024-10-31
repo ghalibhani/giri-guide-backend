@@ -64,7 +64,6 @@ public class MountainServiceImpl implements MountainsService {
     @Override
     public MountainsDetailResponse mountainDetail(String id) {
         Mountains mountain = mountainRepository.findById(id).orElseThrow(EntityNotFoundException::new);
-        System.out.println(mountain);
 
         return new MountainsDetailResponse(
                 mountain.getId(),
@@ -145,8 +144,12 @@ public class MountainServiceImpl implements MountainsService {
                 hikingPoint.getCoordinate());
     }
 
+    public Set<HikingPointResponse> getHikingPoints(String mountainId) {
+        Mountains mountain = mountainRepository.findById(mountainId).orElseThrow(EntityNotFoundException::new);
+        return toSetHikingPointResponse(hikingPointRepository.findByMountainAndDeletedDateIsNull(mountain));
+    }
+
     private Set<HikingPointResponse> toSetHikingPointResponse(List<HikingPoint> hikingPoints) {
-        System.out.println(hikingPoints);
         Set<HikingPointResponse> result = new HashSet<>();
         for (HikingPoint hikingPoint : hikingPoints) {
             result.add(new HikingPointResponse(

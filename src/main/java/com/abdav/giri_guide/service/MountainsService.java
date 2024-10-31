@@ -1,5 +1,6 @@
 package com.abdav.giri_guide.service;
 
+import java.util.Set;
 import org.springframework.data.domain.Page;
 
 import com.abdav.giri_guide.model.request.HikingPointRequest;
@@ -20,4 +21,6 @@ public interface MountainsService {
     void deleteMountain(String id);
 
     HikingPointResponse createHikingPoint(String mountainId, HikingPointRequest request);
+
+    Set<HikingPointResponse> getHikingPoints(String mountainId);
 }
