@@ -160,4 +160,41 @@ public class MountainServiceImpl implements MountainsService {
         }
         return result;
     }
+
+    @Override
+    public void deleteHikingPoint(String id) {
+        HikingPoint hikingPoint = hikingPointRepository.findById(id).orElseThrow(EntityNotFoundException::new);
+        hikingPoint.setDeletedDate(LocalDateTime.now());
+        hikingPointRepository.save(hikingPoint);
+    }
+
+    @Override
+    public HikingPointResponse getHikingPoint(String id) {
+        HikingPoint hikingPoint = hikingPointRepository.findById(id).orElseThrow(EntityNotFoundException::new);
+        return new HikingPointResponse(
+                hikingPoint.getId(),
+                hikingPoint.getMountain().getId(),
+                hikingPoint.getName(),
+                hikingPoint.getCoordinate());
+    }
+
+    @Override
+    public HikingPointResponse updateHikingPoint(String id, HikingPointRequest request) {
+        HikingPoint hikingPoint = hikingPointRepository.findById(id).orElseThrow(EntityNotFoundException::new);
+
+        if (request.name() != null) {
+            hikingPoint.setName(request.name().trim());
+        }
+        if (request.coordinate() != null) {
+            hikingPoint.setCoordinate(request.coordinate());
+        }
+        hikingPointRepository.save(hikingPoint);
+
+        return new HikingPointResponse(
+                hikingPoint.getId(),
+                hikingPoint.getMountain().getId(),
+                hikingPoint.getName(),
+                hikingPoint.getCoordinate());
+    }
+
 }

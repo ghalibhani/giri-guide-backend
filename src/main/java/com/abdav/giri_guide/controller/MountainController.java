@@ -93,4 +93,22 @@ public class MountainController {
                 .body(new CommonResponse<>("Data Create", service.createHikingPoint(mountainId, request)));
     }
 
+    @GetMapping("hiking-points/{id}")
+    public ResponseEntity<?> getHikingPoint(@PathVariable String id) {
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(new CommonResponse<>("Data Fetched", service.getHikingPoint(id)));
+    }
+
+    @PutMapping("hiking-points/{id}")
+    public ResponseEntity<?> updateHikingPoint(@PathVariable String id, @RequestBody HikingPointRequest request) {
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(new CommonResponse<>("Data Updated", service.updateHikingPoint(id, request)));
+    }
+
+    @DeleteMapping("hiking-points/{id}")
+    public ResponseEntity<?> deleteHikingPoint(@PathVariable String id) {
+        service.deleteHikingPoint(id);
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(new CommonResponse<>("Data Deleted", null));
+    }
 }

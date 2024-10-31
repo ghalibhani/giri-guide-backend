@@ -23,4 +23,10 @@ public interface MountainsService {
     HikingPointResponse createHikingPoint(String mountainId, HikingPointRequest request);
 
     Set<HikingPointResponse> getHikingPoints(String mountainId);
+
+    HikingPointResponse getHikingPoint(String id);
+
+    HikingPointResponse updateHikingPoint(String id, HikingPointRequest request);
+
+    void deleteHikingPoint(String id);
 }
