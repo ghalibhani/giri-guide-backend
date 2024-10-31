@@ -1,6 +1,7 @@
 package com.abdav.giri_guide.entity;
 
 import io.micrometer.common.lang.Nullable;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -28,5 +29,7 @@ public class Mountains extends AuditEntity {
     @Nullable
     private String image;
     private String city;
+
+    @Column(columnDefinition = "Text")
     private String description;
 }

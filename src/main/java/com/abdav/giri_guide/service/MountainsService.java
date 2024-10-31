@@ -7,7 +7,7 @@ import com.abdav.giri_guide.model.response.MountainsDetailResponse;
 import com.abdav.giri_guide.model.response.MountainsListResponse;
 
 public interface MountainsService {
-    Page<MountainsListResponse> mountainList(String city);
+    Page<MountainsListResponse> mountainList(String city, Integer page, Integer size);
 
     MountainsDetailResponse mountainDetail(String id);
 
