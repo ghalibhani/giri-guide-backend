@@ -1,8 +1,10 @@
 package com.abdav.giri_guide.service.impl;
 
 import java.time.LocalDateTime;
-
 import java.util.Optional;
+import java.util.Set;
+import java.util.HashSet;
+import java.util.List;
 
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
@@ -10,10 +12,14 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import com.abdav.giri_guide.entity.HikingPoint;
 import com.abdav.giri_guide.entity.Mountains;
+import com.abdav.giri_guide.model.request.HikingPointRequest;
 import com.abdav.giri_guide.model.request.MountainsRequest;
+import com.abdav.giri_guide.model.response.HikingPointResponse;
 import com.abdav.giri_guide.model.response.MountainsDetailResponse;
 import com.abdav.giri_guide.model.response.MountainsListResponse;
+import com.abdav.giri_guide.repository.HikingPointRepository;
 import com.abdav.giri_guide.repository.MountainsRepository;
 import com.abdav.giri_guide.service.MountainsService;
 
@@ -23,18 +29,18 @@ import lombok.RequiredArgsConstructor;
 @Service
 @RequiredArgsConstructor
 public class MountainServiceImpl implements MountainsService {
-    private final MountainsRepository repository;
+    private final MountainsRepository mountainRepository;
+    private final HikingPointRepository hikingPointRepository;
 
     @Override
     public MountainsDetailResponse createMountain(MountainsRequest newMountains) {
-        Optional<Mountains> savedMountain = repository
+        Optional<Mountains> savedMountain = mountainRepository
                 .findByNameIgnoreCaseAndDeletedDateIsNull(newMountains.name().trim());
         if (savedMountain.isPresent()) {
             throw new DataIntegrityViolationException("Active data with same name already exist");
         }
 
-        Mountains mountains = repository.save(newMountains.toMountains());
-        System.err.println(mountains);
+        Mountains mountains = mountainRepository.save(newMountains.toMountains());
         return new MountainsDetailResponse(
                 mountains.getId(),
                 mountains.getName(),
@@ -42,21 +48,23 @@ public class MountainServiceImpl implements MountainsService {
                 mountains.getCity(),
                 mountains.getDescription(),
                 mountains.getStatus(),
-                mountains.getMessage()
+                mountains.getMessage(),
+                toSetHikingPointResponse(hikingPointRepository.findByMountainAndDeletedDateIsNull(mountains))
 
         );
     }
 
     @Override
     public void deleteMountain(String id) {
-        Mountains mountain = repository.findById(id).orElseThrow(EntityNotFoundException::new);
+        Mountains mountain = mountainRepository.findById(id).orElseThrow(EntityNotFoundException::new);
         mountain.setDeletedDate(LocalDateTime.now());
-        repository.save(mountain);
+        mountainRepository.save(mountain);
     }
 
     @Override
     public MountainsDetailResponse mountainDetail(String id) {
-        Mountains mountain = repository.findById(id).orElseThrow(EntityNotFoundException::new);
+        Mountains mountain = mountainRepository.findById(id).orElseThrow(EntityNotFoundException::new);
+        System.out.println(mountain);
 
         return new MountainsDetailResponse(
                 mountain.getId(),
@@ -65,7 +73,8 @@ public class MountainServiceImpl implements MountainsService {
                 mountain.getCity(),
                 mountain.getDescription(),
                 mountain.getStatus(),
-                mountain.getMessage()
+                mountain.getMessage(),
+                toSetHikingPointResponse(hikingPointRepository.findByMountainAndDeletedDateIsNull(mountain))
 
         );
     }
@@ -76,14 +85,14 @@ public class MountainServiceImpl implements MountainsService {
             page = 1;
         }
         Pageable pageable = PageRequest.of(page - 1, size);
-        return repository.findAllByDeletedDateIsNull(pageable);
+        return mountainRepository.findAllByDeletedDateIsNull(pageable);
     }
 
     @Override
     public MountainsDetailResponse updateMountain(String id, MountainsRequest updatedMountains) {
-        Mountains mountain = repository.findById(id).orElseThrow(EntityNotFoundException::new);
+        Mountains mountain = mountainRepository.findById(id).orElseThrow(EntityNotFoundException::new);
 
-        Optional<Mountains> savedMountain = repository
+        Optional<Mountains> savedMountain = mountainRepository
                 .findByNameIgnoreCaseAndDeletedDateIsNull(updatedMountains.name().trim());
         if (savedMountain.isPresent() && !mountain.equals(savedMountain.get())) {
             throw new DataIntegrityViolationException("Active data with same name already exist");
@@ -104,7 +113,7 @@ public class MountainServiceImpl implements MountainsService {
         if (updatedMountains.message() != null) {
             mountain.setMessage(updatedMountains.message().trim());
         }
-        repository.save(mountain);
+        mountainRepository.save(mountain);
 
         return new MountainsDetailResponse(
                 mountain.getId(),
@@ -113,8 +122,39 @@ public class MountainServiceImpl implements MountainsService {
                 mountain.getCity(),
                 mountain.getDescription(),
                 mountain.getStatus(),
-                mountain.getMessage()
+                mountain.getMessage(),
+                toSetHikingPointResponse(hikingPointRepository.findByMountainAndDeletedDateIsNull(mountain))
 
         );
+    }
+
+    public HikingPointResponse createHikingPoint(String mountainId, HikingPointRequest request) {
+        Mountains mountain = mountainRepository.findById(mountainId).orElseThrow(EntityNotFoundException::new);
+        HikingPoint hikingPoint = HikingPoint.builder()
+                .mountain(mountain)
+                .name(request.name().trim())
+                .coordinate(request.coordinate())
+                .build();
+
+        hikingPoint = hikingPointRepository.save(hikingPoint);
+
+        return new HikingPointResponse(
+                hikingPoint.getId(),
+                hikingPoint.getMountain().getId(),
+                hikingPoint.getName(),
+                hikingPoint.getCoordinate());
+    }
+
+    private Set<HikingPointResponse> toSetHikingPointResponse(List<HikingPoint> hikingPoints) {
+        System.out.println(hikingPoints);
+        Set<HikingPointResponse> result = new HashSet<>();
+        for (HikingPoint hikingPoint : hikingPoints) {
+            result.add(new HikingPointResponse(
+                    hikingPoint.getId(),
+                    hikingPoint.getMountain().getId(),
+                    hikingPoint.getName(),
+                    hikingPoint.getCoordinate()));
+        }
+        return result;
     }
 }

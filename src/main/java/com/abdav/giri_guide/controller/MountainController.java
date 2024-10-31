@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.abdav.giri_guide.constant.PathApi;
+import com.abdav.giri_guide.model.request.HikingPointRequest;
 import com.abdav.giri_guide.model.request.MountainsRequest;
 import com.abdav.giri_guide.model.response.CommonResponse;
 import com.abdav.giri_guide.model.response.CommonResponseWithPage;
@@ -75,6 +76,15 @@ public class MountainController {
         service.deleteMountain(id);
         return ResponseEntity.status(HttpStatus.OK)
                 .body(new CommonResponse<>("Data deleted successfully", null));
+    }
+
+    @PostMapping("{mountainId}/hiking-point")
+    public ResponseEntity<?> addHikingPoint(@PathVariable String mountainId,
+            @RequestBody HikingPointRequest request
+
+    ) {
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(service.createHikingPoint(mountainId, request));
     }
 
 }

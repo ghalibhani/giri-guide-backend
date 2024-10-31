@@ -1,5 +1,7 @@
 package com.abdav.giri_guide.model.response;
 
+import java.util.Set;
+
 import com.abdav.giri_guide.constant.EMountainStatus;
 
 public record MountainsDetailResponse(
@@ -9,7 +11,8 @@ public record MountainsDetailResponse(
         String city,
         String description,
         EMountainStatus status,
-        String message
+        String message,
+        Set<HikingPointResponse> hikingPoints
 
 ) {
 }

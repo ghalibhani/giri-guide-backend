@@ -1,5 +1,8 @@
 package com.abdav.giri_guide.entity;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import com.abdav.giri_guide.constant.EMountainStatus;
 
 import io.micrometer.common.lang.Nullable;
@@ -7,9 +10,11 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -45,4 +50,8 @@ public class Mountains extends AuditEntity {
     @Nullable
     @Column(columnDefinition = "Text")
     private String message;
+
+    @OneToMany(mappedBy = "mountain", targetEntity = HikingPoint.class, fetch = FetchType.EAGER)
+    @Builder.Default
+    private Set<HikingPoint> hikingPoints = new HashSet<>();
 }
