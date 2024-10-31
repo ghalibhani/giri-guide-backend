@@ -6,20 +6,22 @@ import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedBy;
 import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import io.micrometer.common.lang.Nullable;
+import jakarta.annotation.Nullable;
 import jakarta.persistence.Column;
+import jakarta.persistence.EntityListeners;
 import jakarta.persistence.MappedSuperclass;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
+@MappedSuperclass
+@EntityListeners(AuditingEntityListener.class)
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@MappedSuperclass
 @SuperBuilder
 public class AuditEntity {
     @CreatedBy
@@ -27,9 +29,8 @@ public class AuditEntity {
     private String createdBy;
 
     @CreatedDate
-    @Column(name = "created_date")
-    @Builder.Default
-    private LocalDateTime createdDate = LocalDateTime.now();
+    @Column(updatable = false)
+    private LocalDateTime createdDate;
 
     @LastModifiedBy
     @Column(name = "last_modified_by")
