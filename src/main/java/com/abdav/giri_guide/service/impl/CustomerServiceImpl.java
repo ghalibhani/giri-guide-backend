@@ -3,6 +3,7 @@ package com.abdav.giri_guide.service.impl;
 import com.abdav.giri_guide.constant.Message;
 import com.abdav.giri_guide.entity.Customer;
 import com.abdav.giri_guide.mapper.CustomerMapper;
+import com.abdav.giri_guide.model.request.CustomerRequest;
 import com.abdav.giri_guide.model.response.CustomerResponse;
 import com.abdav.giri_guide.repository.CustomerRepository;
 import com.abdav.giri_guide.service.CustomerService;
@@ -57,6 +58,18 @@ public class CustomerServiceImpl implements CustomerService {
     @Override
     public CustomerResponse getCustomerByUserId(String userId) {
         Customer customer = getCustomerByUserIdOrNotFound(userId);
+        return CustomerMapper.customerToCustomerResponse(customer);
+    }
+
+    @Override
+    public CustomerResponse updateCustomer(String id ,CustomerRequest customerRequest) {
+        Customer customer = getCustomerByIdOrThrowNotFound(id);
+        customer.setFullName(customerRequest.fullName());
+        customer.setAddress(customerRequest.address());
+        customer.setGender(customerRequest.gender());
+
+        customerRepository.saveAndFlush(customer);
+
         return CustomerMapper.customerToCustomerResponse(customer);
     }
 
