@@ -46,7 +46,7 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     private Customer getCustomerByIdOrThrowNotFound(String id) {
-        Optional<Customer> customer = customerRepository.findById(id);
+        Optional<Customer> customer = customerRepository.findByIdAndDeletedDateIsNull(id);
         return customer.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Customer Not Found"));
     }
 }
