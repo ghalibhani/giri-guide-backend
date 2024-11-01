@@ -1,26 +1,32 @@
 package com.abdav.giri_guide.service.impl;
 
 import java.time.LocalDateTime;
-import java.util.Optional;
-import java.util.Set;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.abdav.giri_guide.entity.HikingPoint;
+import com.abdav.giri_guide.entity.ImageEntity;
 import com.abdav.giri_guide.entity.Mountains;
 import com.abdav.giri_guide.model.request.HikingPointRequest;
 import com.abdav.giri_guide.model.request.MountainsRequest;
+import com.abdav.giri_guide.model.response.CommonResponseWithPage;
 import com.abdav.giri_guide.model.response.HikingPointResponse;
 import com.abdav.giri_guide.model.response.MountainsDetailResponse;
 import com.abdav.giri_guide.model.response.MountainsListResponse;
+import com.abdav.giri_guide.model.response.PagingResponse;
 import com.abdav.giri_guide.repository.HikingPointRepository;
 import com.abdav.giri_guide.repository.MountainsRepository;
+import com.abdav.giri_guide.service.ImageService;
 import com.abdav.giri_guide.service.MountainsService;
 
 import jakarta.persistence.EntityNotFoundException;
@@ -32,19 +38,25 @@ public class MountainServiceImpl implements MountainsService {
     private final MountainsRepository mountainRepository;
     private final HikingPointRepository hikingPointRepository;
 
+    private final ImageService imageService;
+
     @Override
-    public MountainsDetailResponse createMountain(MountainsRequest newMountains) {
+    public MountainsDetailResponse createMountain(MountainsRequest newMountains, MultipartFile requestImage) {
         Optional<Mountains> savedMountain = mountainRepository
                 .findByNameIgnoreCaseAndDeletedDateIsNull(newMountains.name().trim());
+
         if (savedMountain.isPresent()) {
             throw new DataIntegrityViolationException("Active data with same name already exist");
         }
 
-        Mountains mountains = mountainRepository.save(newMountains.toMountains());
+        ImageEntity image = imageService.create(requestImage, "/images/mountain", newMountains.name());
+        Mountains mountains = newMountains.toMountains();
+        mountains.setImage(image);
+        mountainRepository.save(mountains);
         return new MountainsDetailResponse(
                 mountains.getId(),
                 mountains.getName(),
-                mountains.getImage(),
+                mountains.getImage() == null ? null : mountains.getImage().getPath(),
                 mountains.getCity(),
                 mountains.getDescription(),
                 mountains.getStatus(),
@@ -68,7 +80,7 @@ public class MountainServiceImpl implements MountainsService {
         return new MountainsDetailResponse(
                 mountain.getId(),
                 mountain.getName(),
-                mountain.getImage(),
+                mountain.getImage() == null ? null : mountain.getImage().getPath(),
                 mountain.getCity(),
                 mountain.getDescription(),
                 mountain.getStatus(),
@@ -79,12 +91,29 @@ public class MountainServiceImpl implements MountainsService {
     }
 
     @Override
-    public Page<MountainsListResponse> mountainList(String city, Integer page, Integer size) {
+    public CommonResponseWithPage<List<MountainsListResponse>> mountainList(String city, Integer page, Integer size) {
         if (page <= 0) {
             page = 1;
         }
         Pageable pageable = PageRequest.of(page - 1, size);
-        return mountainRepository.findAllByDeletedDateIsNull(pageable);
+        Page<Mountains> mountainsPage = mountainRepository.findAllByDeletedDateIsNull(pageable);
+
+        PagingResponse paging = new PagingResponse(
+                page,
+                size,
+                mountainsPage.getTotalPages(),
+                mountainsPage.getTotalElements());
+
+        List<MountainsListResponse> mountainList = new ArrayList<>();
+        for (Mountains mountain : mountainsPage.getContent()) {
+            mountainList.add(new MountainsListResponse(
+                    mountain.getId(),
+                    mountain.getName(),
+                    mountain.getImage() == null ? null : mountain.getImage().getPath(),
+                    mountain.getCity(),
+                    mountain.getStatus()));
+        }
+        return new CommonResponseWithPage<>("Data Fetched", mountainList, paging);
     }
 
     @Override
@@ -117,7 +146,7 @@ public class MountainServiceImpl implements MountainsService {
         return new MountainsDetailResponse(
                 mountain.getId(),
                 mountain.getName(),
-                mountain.getImage(),
+                mountain.getImage() == null ? null : mountain.getImage().getPath(),
                 mountain.getCity(),
                 mountain.getDescription(),
                 mountain.getStatus(),

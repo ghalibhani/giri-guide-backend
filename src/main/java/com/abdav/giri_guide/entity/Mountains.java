@@ -14,7 +14,9 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -37,7 +39,9 @@ public class Mountains extends AuditEntity {
     private String name;
 
     @Nullable
-    private String image;
+    @OneToOne
+    @JoinColumn(name = "image_id", referencedColumnName = "id")
+    private ImageEntity image;
     private String city;
 
     @Column(columnDefinition = "Text")
