@@ -24,7 +24,7 @@ public class ProfileController {
 
     @GetMapping("/{id}")
     ResponseEntity<?> getProfile(@PathVariable String id){
-        CustomerResponse customer = customerService.getCustomerById(id);
+        CustomerResponse customer = customerService.getCustomerByUserId(id);
         message = Message.SUCCESS_FETCH;
         CommonResponse<?> response = new CommonResponse<>(message, customer);
 

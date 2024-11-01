@@ -54,6 +54,17 @@ public class CustomerServiceImpl implements CustomerService {
         customerRepository.saveAndFlush(customer);
     }
 
+    @Override
+    public CustomerResponse getCustomerByUserId(String userId) {
+        Customer customer = getCustomerByUserIdOrNotFound(userId);
+        return CustomerMapper.customerToCustomerResponse(customer);
+    }
+
+    private Customer getCustomerByUserIdOrNotFound(String userId) {
+        Optional<Customer> customer = customerRepository.findByUserIdAndDeletedDateIsNull(userId);
+        return customer.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, Message.DATA_NOT_FOUND));
+    }
+
     private Customer getCustomerByIdOrThrowNotFound(String id) {
         Optional<Customer> customer = customerRepository.findByIdAndDeletedDateIsNull(id);
         return customer.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, Message.DATA_NOT_FOUND));

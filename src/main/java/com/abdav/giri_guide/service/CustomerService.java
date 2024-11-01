@@ -9,4 +9,5 @@ public interface CustomerService {
     Page<CustomerResponse> customerList(Integer page, Integer size);
     CustomerResponse getCustomerById(String id);
     void deleteCustomerById(String id);
+    CustomerResponse getCustomerByUserId(String userId);
 }
