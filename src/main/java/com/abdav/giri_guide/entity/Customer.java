@@ -46,6 +46,10 @@ public class Customer extends AuditEntity {
     private EGender gender;
 
     @OneToOne
+    @JoinColumn(name = "image_id")
+    private ImageEntity image;
+
+    @OneToOne
     @JoinColumn(name = "m_user_id", nullable = false, unique = true)
     private User user;
 }

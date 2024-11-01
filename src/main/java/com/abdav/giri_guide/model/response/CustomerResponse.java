@@ -11,6 +11,7 @@ public record CustomerResponse(
         String nik,
         String address,
         EGender gender,
-        String email
+        String email,
+        String imageId
 ) {
 }

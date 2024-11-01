@@ -1,12 +1,15 @@
 package com.abdav.giri_guide.service.impl;
 
 import com.abdav.giri_guide.constant.Message;
+import com.abdav.giri_guide.constant.PathImage;
 import com.abdav.giri_guide.entity.Customer;
+import com.abdav.giri_guide.entity.ImageEntity;
 import com.abdav.giri_guide.mapper.CustomerMapper;
 import com.abdav.giri_guide.model.request.CustomerRequest;
 import com.abdav.giri_guide.model.response.CustomerResponse;
 import com.abdav.giri_guide.repository.CustomerRepository;
 import com.abdav.giri_guide.service.CustomerService;
+import com.abdav.giri_guide.service.ImageService;
 import com.abdav.giri_guide.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -14,6 +17,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
@@ -24,6 +28,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class CustomerServiceImpl implements CustomerService {
     private final CustomerRepository customerRepository;
+    private final ImageService imageService;
 
     @Override
     public void createCustomer(Customer customer) {
@@ -68,6 +73,17 @@ public class CustomerServiceImpl implements CustomerService {
         customer.setAddress(customerRequest.address());
         customer.setGender(customerRequest.gender());
 
+        customerRepository.saveAndFlush(customer);
+
+        return CustomerMapper.customerToCustomerResponse(customer);
+    }
+
+    @Override
+    public CustomerResponse uploadProfileImage(String id, MultipartFile file) {
+        Customer customer = getCustomerByIdOrThrowNotFound(id);
+
+        ImageEntity img = imageService.create(file, PathImage.PROFILE_PICTURE, customer.getFullName());
+        customer.setImage(img);
         customerRepository.saveAndFlush(customer);
 
         return CustomerMapper.customerToCustomerResponse(customer);
