@@ -1,7 +1,12 @@
 package com.abdav.giri_guide.service;
 
 import com.abdav.giri_guide.entity.Customer;
+import com.abdav.giri_guide.model.response.CustomerResponse;
+import org.springframework.data.domain.Page;
+
+import java.util.List;
 
 public interface CustomerService {
-    Customer createCustomer(Customer customer);
+    void createCustomer(Customer customer);
+    Page<CustomerResponse> customerList(Integer page, Integer size);
 }
