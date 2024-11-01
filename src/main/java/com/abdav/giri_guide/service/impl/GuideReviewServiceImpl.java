@@ -11,11 +11,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.abdav.giri_guide.entity.GuideReview;
-import com.abdav.giri_guide.entity.Mountains;
 import com.abdav.giri_guide.model.request.GuideReviewRequest;
 import com.abdav.giri_guide.model.response.CommonResponseWithPage;
 import com.abdav.giri_guide.model.response.GuideReviewResponse;
-import com.abdav.giri_guide.model.response.MountainsListResponse;
 import com.abdav.giri_guide.model.response.PagingResponse;
 import com.abdav.giri_guide.repository.GuideReviewRepository;
 import com.abdav.giri_guide.service.GuideReviewService;
