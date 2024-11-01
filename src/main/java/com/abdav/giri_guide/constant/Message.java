@@ -13,4 +13,7 @@ public class Message {
     public static final String USER_CREATED = "User created";
 
     public static final String SUCCESS_FETCH = "Data Fetched";
+    public static final String SUCCESS_DELETE = "Successfully deleted";
+
+    public static final String DATA_NOT_FOUND = "Data Not Found";
 }

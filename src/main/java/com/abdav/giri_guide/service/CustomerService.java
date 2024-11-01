@@ -8,4 +8,5 @@ public interface CustomerService {
     void createCustomer(Customer customer);
     Page<CustomerResponse> customerList(Integer page, Integer size);
     CustomerResponse getCustomerById(String id);
+    void deleteCustomerById(String id);
 }

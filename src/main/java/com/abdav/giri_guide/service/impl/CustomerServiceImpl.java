@@ -1,5 +1,6 @@
 package com.abdav.giri_guide.service.impl;
 
+import com.abdav.giri_guide.constant.Message;
 import com.abdav.giri_guide.entity.Customer;
 import com.abdav.giri_guide.mapper.CustomerMapper;
 import com.abdav.giri_guide.model.response.CustomerResponse;
@@ -14,6 +15,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -24,7 +26,7 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     public void createCustomer(Customer customer) {
-        customerRepository.save(customer);
+        customerRepository.saveAndFlush(customer);
     }
 
     @Override
@@ -45,8 +47,15 @@ public class CustomerServiceImpl implements CustomerService {
         return CustomerMapper.customerToCustomerResponse(customer);
     }
 
+    @Override
+    public void deleteCustomerById(String id) {
+        Customer customer = getCustomerByIdOrThrowNotFound(id);
+        customer.setDeletedDate(LocalDateTime.now());
+        customerRepository.saveAndFlush(customer);
+    }
+
     private Customer getCustomerByIdOrThrowNotFound(String id) {
         Optional<Customer> customer = customerRepository.findByIdAndDeletedDateIsNull(id);
-        return customer.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Customer Not Found"));
+        return customer.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, Message.DATA_NOT_FOUND));
     }
 }
