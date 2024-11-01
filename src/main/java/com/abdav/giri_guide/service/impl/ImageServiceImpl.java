@@ -5,6 +5,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -24,6 +26,8 @@ public class ImageServiceImpl implements ImageService {
 
     private final Path rootPath = Paths.get(System.getenv("IMAGE_LOCATION"));
 
+    private final List<String> validDataType = new ArrayList<>(List.of("jpeg", "png"));
+
     @Override
     public ImageEntity create(MultipartFile multipartFile, String location, String name) {
         if (multipartFile.isEmpty()) {
@@ -34,7 +38,13 @@ public class ImageServiceImpl implements ImageService {
             Path directoryPath = Paths.get(rootPath.toString(), location);
             Files.createDirectories(directoryPath);
             String extension = multipartFile.getContentType().split("/")[1];
-            String filename = String.format("%d-%s.%s", System.currentTimeMillis(), name, extension);
+            if (!validDataType.contains(extension)) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Only support jpg/png image");
+            }
+
+            String filename = String.format("%d-%s.%s", System.currentTimeMillis(), name, extension)
+                    .trim().replace(" ", "-").toLowerCase();
+
             Path filePath = directoryPath.resolve(filename);
             Files.copy(multipartFile.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
 
