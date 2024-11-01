@@ -6,6 +6,7 @@ import com.abdav.giri_guide.model.response.CommonResponseWithPage;
 import com.abdav.giri_guide.model.response.CustomerResponse;
 import com.abdav.giri_guide.model.response.PagingResponse;
 import com.abdav.giri_guide.service.CustomerService;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping(PathApi.CUSTOMER_API)
+@SecurityRequirement(name = "bearerAuth")
 public class CustomerController {
     private final CustomerService customerService;
     private static String message;
@@ -29,7 +31,7 @@ public class CustomerController {
     ){
         Page<CustomerResponse> customerList = customerService.customerList(page, size);
         PagingResponse paging = new PagingResponse(page, size, customerList.getTotalPages(), customerList.getTotalElements());
-        message = "Customer list" + Message.SUCCESS_FETCH;
+        message = "Customer list " + Message.SUCCESS_FETCH;
 
         CommonResponseWithPage<?> response = new CommonResponseWithPage<>(message, customerList.getContent(), paging);
 

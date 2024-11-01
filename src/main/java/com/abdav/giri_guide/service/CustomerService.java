@@ -4,9 +4,8 @@ import com.abdav.giri_guide.entity.Customer;
 import com.abdav.giri_guide.model.response.CustomerResponse;
 import org.springframework.data.domain.Page;
 
-import java.util.List;
-
 public interface CustomerService {
     void createCustomer(Customer customer);
     Page<CustomerResponse> customerList(Integer page, Integer size);
+    CustomerResponse getCustomerById(String id);
 }
