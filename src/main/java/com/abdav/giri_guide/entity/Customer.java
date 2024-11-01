@@ -4,6 +4,7 @@ import java.util.Date;
 
 import com.abdav.giri_guide.constant.EGender;
 
+import com.abdav.giri_guide.constant.PathDb;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -21,7 +22,7 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
 @Entity
-@Table
+@Table(name = PathDb.CUSTOMER)
 @Data
 @EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor

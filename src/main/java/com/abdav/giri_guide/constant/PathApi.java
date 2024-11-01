@@ -11,4 +11,8 @@ public class PathApi {
     public static final String LOGIN_API = "/login";
 
     public static final String MOUNTAINS_API = GIRI_GUIDE_APP + "/mountains";
+
+    public static final String CUSTOMER_API = GIRI_GUIDE_APP + "/customers";
+
+    public static final String PROFILE_API = GIRI_GUIDE_APP + "/profile";
 }

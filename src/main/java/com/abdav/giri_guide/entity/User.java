@@ -1,5 +1,6 @@
 package com.abdav.giri_guide.entity;
 
+import com.abdav.giri_guide.constant.PathDb;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -15,7 +16,7 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
 @Entity
-@Table(name = "m_user")
+@Table(name = PathDb.USER)
 @Data
 @AllArgsConstructor
 @NoArgsConstructor

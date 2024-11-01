@@ -5,9 +5,11 @@ import com.abdav.giri_guide.entity.User;
 import com.abdav.giri_guide.repository.UserRepository;
 import com.abdav.giri_guide.service.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 @Service
 @RequiredArgsConstructor

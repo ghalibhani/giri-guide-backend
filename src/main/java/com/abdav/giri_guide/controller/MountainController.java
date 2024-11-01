@@ -1,5 +1,6 @@
 package com.abdav.giri_guide.controller;
 
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -33,6 +34,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @RestController
 @RequestMapping(PathApi.MOUNTAINS_API)
+@SecurityRequirement(name = "bearerAuth")
 public class MountainController {
     private final MountainsService service;
 
