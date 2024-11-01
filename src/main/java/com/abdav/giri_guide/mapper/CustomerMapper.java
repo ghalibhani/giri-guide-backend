@@ -12,7 +12,8 @@ public class CustomerMapper {
                 customer.getNik(),
                 customer.getAddress(),
                 customer.getGender(),
-                customer.getUser().getEmail()
+                customer.getUser().getEmail(),
+                customer.getImage() == null ? null : customer.getImage().getPath()
         );
     }
 }

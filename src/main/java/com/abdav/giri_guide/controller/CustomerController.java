@@ -39,10 +39,10 @@ public class CustomerController {
                 .body(response);
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteCustomer(@PathVariable String id) {
-        customerService.deleteCustomerById(id);
-        message = "Customer with id " + id + " " +Message.SUCCESS_DELETE;
+    @DeleteMapping("/{customerId}")
+    public ResponseEntity<?> deleteCustomer(@PathVariable String customerId) {
+        customerService.deleteCustomerById(customerId);
+        message = "Customer with id " + customerId + " " +Message.SUCCESS_DELETE;
         CommonResponse<?> response = new CommonResponse<>(message, null);
 
         return ResponseEntity
