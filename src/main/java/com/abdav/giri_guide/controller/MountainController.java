@@ -1,5 +1,6 @@
 package com.abdav.giri_guide.controller;
 
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -28,6 +29,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @RestController
 @RequestMapping(PathApi.MOUNTAINS_API)
+@SecurityRequirement(name = "bearerAuth")
 public class MountainController {
     private final MountainsService service;
 
