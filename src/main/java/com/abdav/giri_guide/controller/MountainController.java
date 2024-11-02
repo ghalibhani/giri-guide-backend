@@ -1,10 +1,5 @@
 package com.abdav.giri_guide.controller;
 
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
-import java.util.ArrayList;
-import java.util.List;
-
-import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -24,11 +19,9 @@ import com.abdav.giri_guide.constant.PathApi;
 import com.abdav.giri_guide.model.request.HikingPointRequest;
 import com.abdav.giri_guide.model.request.MountainsRequest;
 import com.abdav.giri_guide.model.response.CommonResponse;
-import com.abdav.giri_guide.model.response.CommonResponseWithPage;
-import com.abdav.giri_guide.model.response.MountainsListResponse;
-import com.abdav.giri_guide.model.response.PagingResponse;
 import com.abdav.giri_guide.service.MountainsService;
 
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
