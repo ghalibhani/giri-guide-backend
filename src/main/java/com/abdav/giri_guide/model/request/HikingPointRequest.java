@@ -4,7 +4,7 @@ import jakarta.validation.constraints.NotBlank;
 
 public record HikingPointRequest(
         @NotBlank String name,
-        @NotBlank String coordinate
-
+        @NotBlank String coordinate,
+        Double price
 ) {
 }

@@ -1,0 +1,36 @@
+package com.abdav.giri_guide.controller;
+
+import com.abdav.giri_guide.constant.Message;
+import com.abdav.giri_guide.constant.PathApi;
+import com.abdav.giri_guide.model.request.TransactionRequest;
+import com.abdav.giri_guide.model.response.CommonResponse;
+import com.abdav.giri_guide.model.response.TransactionResponse;
+import com.abdav.giri_guide.service.TransactionService;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+@RequiredArgsConstructor
+@RequestMapping(PathApi.TRANSACTIONS_API)
+@SecurityRequirement(name = "bearerAuth")
+public class TransactionController {
+    private final TransactionService transactionService;
+    private static String message;
+
+    @PostMapping(PathApi.PAYMENTS_API)
+    ResponseEntity<?> createTransaction(@RequestBody TransactionRequest transactionRequest) {
+        TransactionResponse transactionResponse = transactionService.createTransaction(transactionRequest);
+        message = Message.DATA_CREATED;
+        CommonResponse<?> response = new CommonResponse<>(message, transactionResponse);
+
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(response);
+    }
+}

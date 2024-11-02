@@ -162,6 +162,7 @@ public class MountainServiceImpl implements MountainsService {
                 .mountain(mountain)
                 .name(request.name().trim())
                 .coordinate(request.coordinate())
+                .price(request.price())
                 .build();
 
         hikingPoint = hikingPointRepository.save(hikingPoint);
