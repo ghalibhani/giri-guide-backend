@@ -55,10 +55,15 @@ public class MountainController {
             @RequestParam String description,
             @RequestParam String status,
             @RequestParam String message,
+            @RequestParam boolean useSimaksi,
+            @RequestParam Integer priceSimaksi,
             @RequestParam MultipartFile image
 
     ) {
-        MountainsRequest request = new MountainsRequest(name, city, description, status, message);
+        MountainsRequest request = new MountainsRequest(
+                name, city, description, status, message, useSimaksi, priceSimaksi
+
+        );
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(new CommonResponse<>("Mountain data successfully created",
                         service.createMountain(request, image)));
