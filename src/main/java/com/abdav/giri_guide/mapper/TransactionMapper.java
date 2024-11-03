@@ -41,6 +41,7 @@ public class TransactionMapper {
         )).toList();
 
         return new TransactionDetailResponse(
+                transaction.getId(),
                 transaction.getStatus().toString(),
                 transaction.getHikingPoint().getMountain().getName(),
                 transaction.getHikingPoint().getName(),

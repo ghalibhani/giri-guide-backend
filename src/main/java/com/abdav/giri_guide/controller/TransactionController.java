@@ -32,7 +32,7 @@ public class TransactionController {
     }
 
     @PutMapping("/{id}")
-    ResponseEntity<?> approveTourGuide(@PathVariable String id, @RequestParam String status){
+    ResponseEntity<?> updateTransactionStatus(@PathVariable String id, @RequestParam String status){
         TransactionStatusResponse transactionStatusResponse = transactionService.updateTransactionStatus(id, status);
         message = Message.DATA_UPDATED;
         CommonResponse<?> response = new CommonResponse<>(message, transactionStatusResponse);
@@ -51,6 +51,17 @@ public class TransactionController {
         PagingResponse paging = new PagingResponse(page, size, transactionList.getTotalPages(), transactionList.getTotalElements());
         message = Message.SUCCESS_FETCH;
         CommonResponseWithPage<?> response = new CommonResponseWithPage<>(message, transactionList.getContent(), paging);
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(response);
+    }
+
+    @GetMapping("/{id}")
+    ResponseEntity<?> getTransactionById(@PathVariable String id){
+        TransactionDetailResponse transactionDetailResponse = transactionService.getTransactionById(id);
+        message = Message.SUCCESS_FETCH;
+        CommonResponse<?> response = new CommonResponse<>(message, transactionDetailResponse);
 
         return ResponseEntity
                 .status(HttpStatus.OK)

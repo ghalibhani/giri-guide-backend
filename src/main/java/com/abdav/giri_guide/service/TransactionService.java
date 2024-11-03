@@ -9,5 +9,6 @@ public interface TransactionService {
     TransactionStatusResponse createTransaction(TransactionRequest transactionRequest);
     TransactionStatusResponse updateTransactionStatus(String id, String status);
     Page<TransactionDetailResponse> transactionList(Integer page, Integer size);
+    TransactionDetailResponse getTransactionById(String id);
 }
 

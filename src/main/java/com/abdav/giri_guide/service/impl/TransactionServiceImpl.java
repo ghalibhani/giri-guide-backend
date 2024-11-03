@@ -91,13 +91,17 @@ public class TransactionServiceImpl implements TransactionService {
 
     @Override
     public TransactionStatusResponse updateTransactionStatus(String id, String status) {
-        Transaction transaction = transactionRepository.findById(id).orElseThrow(() -> new EntityNotFoundException(Message.DATA_NOT_FOUND));
+        Transaction transaction = getTransactionOrThrowNotFound(id);
         ETransactionStatus transactionStatus = ETransactionStatus.valueOf(status.toUpperCase());
 
         transaction.setStatus(transactionStatus);
         transactionRepository.saveAndFlush(transaction);
 
         return new TransactionStatusResponse(transaction.getStatus().toString());
+    }
+
+    private Transaction getTransactionOrThrowNotFound(String id) {
+        return transactionRepository.findById(id).orElseThrow(() -> new EntityNotFoundException(Message.DATA_NOT_FOUND));
     }
 
     @Override
@@ -110,6 +114,12 @@ public class TransactionServiceImpl implements TransactionService {
         Page<Transaction> transactions = transactionRepository.findAllByDeletedDateIsNull(pageable);
 
         return transactions.map(TransactionMapper::transactionToAdminResponse);
+    }
+
+    @Override
+    public TransactionDetailResponse getTransactionById(String id) {
+        Transaction transaction = getTransactionOrThrowNotFound(id);
+        return TransactionMapper.transactionToAdminResponse(transaction);
     }
 
 
