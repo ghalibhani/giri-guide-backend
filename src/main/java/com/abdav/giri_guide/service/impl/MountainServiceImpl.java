@@ -44,7 +44,6 @@ public class MountainServiceImpl implements MountainsService {
     public MountainsDetailResponse createMountain(MountainsRequest newMountains, MultipartFile requestImage) {
         Optional<Mountains> savedMountain = mountainRepository
                 .findByNameIgnoreCaseAndDeletedDateIsNull(newMountains.name().trim());
-
         if (savedMountain.isPresent()) {
             throw new DataIntegrityViolationException("Active data with same name already exist");
         }
@@ -122,6 +121,7 @@ public class MountainServiceImpl implements MountainsService {
 
     @Override
     public MountainsDetailResponse updateMountain(String id, MountainsRequest updatedMountains) {
+        // TODO check mountain checker for new data
         Mountains mountain = mountainRepository.findById(id).orElseThrow(EntityNotFoundException::new);
 
         Optional<Mountains> savedMountain = mountainRepository
