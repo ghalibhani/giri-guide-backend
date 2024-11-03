@@ -6,4 +6,6 @@ import com.abdav.giri_guide.model.response.TransactionStatusResponse;
 
 public interface TransactionService {
     TransactionStatusResponse createTransaction(TransactionRequest transactionRequest);
+    TransactionStatusResponse approveTourGuide(String id);
 }
+

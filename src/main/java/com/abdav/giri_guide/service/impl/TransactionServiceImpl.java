@@ -1,11 +1,10 @@
 package com.abdav.giri_guide.service.impl;
 
 import com.abdav.giri_guide.constant.ETransactionStatus;
+import com.abdav.giri_guide.constant.Message;
 import com.abdav.giri_guide.entity.*;
-import com.abdav.giri_guide.mapper.TransactionMapper;
 import com.abdav.giri_guide.model.request.HikerDetailRequest;
 import com.abdav.giri_guide.model.request.TransactionRequest;
-import com.abdav.giri_guide.model.response.TransactionResponse;
 import com.abdav.giri_guide.model.response.TransactionStatusResponse;
 import com.abdav.giri_guide.repository.*;
 import com.abdav.giri_guide.service.TransactionService;
@@ -91,6 +90,17 @@ public class TransactionServiceImpl implements TransactionService {
 
         return new TransactionStatusResponse(transaction.getStatus().toString());
     }
+
+    @Override
+    public TransactionStatusResponse approveTourGuide(String id) {
+        Transaction transaction = transactionRepository.findById(id).orElseThrow(() -> new EntityNotFoundException(Message.DATA_NOT_FOUND));
+        transaction.setStatus(ETransactionStatus.WAITING_PAY);
+        transactionRepository.saveAndFlush(transaction);
+
+        return new TransactionStatusResponse(transaction.getStatus().toString());
+    }
+
+
 
     private Double calculatePorterPrice(Double porterRate, Integer porterQty, Long days){
         return porterRate * porterQty * days;

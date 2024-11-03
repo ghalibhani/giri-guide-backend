@@ -11,10 +11,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -24,7 +21,7 @@ public class TransactionController {
     private final TransactionService transactionService;
     private static String message;
 
-    @PostMapping(PathApi.PAYMENTS_API)
+    @PostMapping()
     ResponseEntity<?> createTransaction(@RequestBody TransactionRequest transactionRequest) {
         TransactionStatusResponse transactionStatusResponse = transactionService.createTransaction(transactionRequest);
         message = Message.DATA_CREATED;
@@ -32,6 +29,17 @@ public class TransactionController {
 
         return ResponseEntity
                 .status(HttpStatus.CREATED)
+                .body(response);
+    }
+
+    @PutMapping("/{id}")
+    ResponseEntity<?> approveTourGuide(@PathVariable String id){
+        TransactionStatusResponse transactionStatusResponse = transactionService.approveTourGuide(id);
+        message = Message.DATA_UPDATED;
+        CommonResponse<?> response = new CommonResponse<>(message, transactionStatusResponse);
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
                 .body(response);
     }
 }
