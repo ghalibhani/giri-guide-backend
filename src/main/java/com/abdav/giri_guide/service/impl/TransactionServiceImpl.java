@@ -3,14 +3,19 @@ package com.abdav.giri_guide.service.impl;
 import com.abdav.giri_guide.constant.ETransactionStatus;
 import com.abdav.giri_guide.constant.Message;
 import com.abdav.giri_guide.entity.*;
+import com.abdav.giri_guide.mapper.TransactionMapper;
 import com.abdav.giri_guide.model.request.HikerDetailRequest;
 import com.abdav.giri_guide.model.request.TransactionRequest;
+import com.abdav.giri_guide.model.response.TransactionDetailResponse;
 import com.abdav.giri_guide.model.response.TransactionStatusResponse;
 import com.abdav.giri_guide.repository.*;
 import com.abdav.giri_guide.service.TransactionService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -71,13 +76,6 @@ public class TransactionServiceImpl implements TransactionService {
         Double totalEntryPrice = hikingPointReq.getPrice() * hikers.size() * days;
         Double totalPrice = totalPorterPrice + totalTourguidePrice + totalAdditionalPrice + totalEntryPrice + totalSimaksiPrice + adminCost;
 
-        System.out.println("Total price porter = " + totalPorterPrice);
-        System.out.println("Price tourGuide = " + totalTourguidePrice);
-        System.out.println("Total additionalPrice = " + totalAdditionalPrice);
-        System.out.println("TotalSimaksiPrice = " + totalSimaksiPrice);
-        System.out.println("Total entryPrice = " + totalEntryPrice);
-        System.out.println("Total Price = " + totalPrice);
-
 
         transaction.setTotalPorterPrice(totalPorterPrice);
         transaction.setTotalTourGuidePrice(totalTourguidePrice);
@@ -100,6 +98,17 @@ public class TransactionServiceImpl implements TransactionService {
         return new TransactionStatusResponse(transaction.getStatus().toString());
     }
 
+    @Override
+    public Page<TransactionDetailResponse> transactionList(Integer page, Integer size) {
+        if(page <= 0){
+            page = 1;
+        }
+
+        Pageable pageable = PageRequest.of(page-1, size);
+        Page<Transaction> transactions = transactionRepository.findAllByDeletedDateIsNull(pageable);
+
+        return transactions.map(TransactionMapper::transactionToAdminResponse);
+    }
 
 
     private Double calculatePorterPrice(Double porterRate, Integer porterQty, Long days){

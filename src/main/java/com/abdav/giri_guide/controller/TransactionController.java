@@ -3,12 +3,11 @@ package com.abdav.giri_guide.controller;
 import com.abdav.giri_guide.constant.Message;
 import com.abdav.giri_guide.constant.PathApi;
 import com.abdav.giri_guide.model.request.TransactionRequest;
-import com.abdav.giri_guide.model.response.CommonResponse;
-import com.abdav.giri_guide.model.response.TransactionResponse;
-import com.abdav.giri_guide.model.response.TransactionStatusResponse;
+import com.abdav.giri_guide.model.response.*;
 import com.abdav.giri_guide.service.TransactionService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -37,6 +36,21 @@ public class TransactionController {
         TransactionStatusResponse transactionStatusResponse = transactionService.approveTourGuide(id);
         message = Message.DATA_UPDATED;
         CommonResponse<?> response = new CommonResponse<>(message, transactionStatusResponse);
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(response);
+    }
+
+    @GetMapping
+    ResponseEntity<?> transactionResponseCustomer(
+            @RequestParam(required = false, defaultValue = "1") Integer page,
+            @RequestParam(required = false, defaultValue = "5") Integer size
+    ){
+        Page<TransactionDetailResponse> transactionList = transactionService.transactionList(page, size);
+        PagingResponse paging = new PagingResponse(page, size, transactionList.getTotalPages(), transactionList.getTotalElements());
+        message = Message.SUCCESS_FETCH;
+        CommonResponseWithPage<?> response = new CommonResponseWithPage<>(message, transactionList.getContent(), paging);
 
         return ResponseEntity
                 .status(HttpStatus.OK)
