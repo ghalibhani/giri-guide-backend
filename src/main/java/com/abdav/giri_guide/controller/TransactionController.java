@@ -5,6 +5,7 @@ import com.abdav.giri_guide.constant.PathApi;
 import com.abdav.giri_guide.model.request.TransactionRequest;
 import com.abdav.giri_guide.model.response.CommonResponse;
 import com.abdav.giri_guide.model.response.TransactionResponse;
+import com.abdav.giri_guide.model.response.TransactionStatusResponse;
 import com.abdav.giri_guide.service.TransactionService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
@@ -25,9 +26,9 @@ public class TransactionController {
 
     @PostMapping(PathApi.PAYMENTS_API)
     ResponseEntity<?> createTransaction(@RequestBody TransactionRequest transactionRequest) {
-        TransactionResponse transactionResponse = transactionService.createTransaction(transactionRequest);
+        TransactionStatusResponse transactionStatusResponse = transactionService.createTransaction(transactionRequest);
         message = Message.DATA_CREATED;
-        CommonResponse<?> response = new CommonResponse<>(message, transactionResponse);
+        CommonResponse<?> response = new CommonResponse<>(message, transactionStatusResponse);
 
         return ResponseEntity
                 .status(HttpStatus.CREATED)

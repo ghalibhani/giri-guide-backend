@@ -8,14 +8,19 @@ public class TransactionMapper {
         return new TransactionResponse(
                 transaction.getId(),
                 transaction.getStatus().toString(),
-                transaction.getSchedule(),
+                transaction.getHikingPoint().getId(),
+                transaction.getStartDate(),
+                transaction.getEndDate(),
                 transaction.getCustomer().getId(),
-                transaction.getGuide(),
+                transaction.getTourGuide().getId(),
                 transaction.getPorterQty(),
                 transaction.getTransactionHikers().size(),
-                transaction.getPricePorter(),
-                transaction.getSimaksiPrice(),
-                transaction.getEntryPrice(),
+                transaction.getTotalPorterPrice(),
+                transaction.getTotalTourGuidePrice(),
+                transaction.getAdditionalPriceTourGuide(),
+                transaction.getTotalSimaksiPrice(),
+                transaction.getTotalEntryPrice(),
+                transaction.getAdminCost(),
                 transaction.getTotalPrice()
         );
     }

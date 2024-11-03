@@ -8,7 +8,8 @@ public record TransactionRequest(
         String guideId,
         Integer porterQty,
         String hikingPointId,
-        LocalDateTime schedule,
+        LocalDateTime startDate,
+        LocalDateTime endDate,
         List<HikerDetailRequest> hikerDetails
 ) {
 }

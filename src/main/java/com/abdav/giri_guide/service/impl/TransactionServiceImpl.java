@@ -5,18 +5,17 @@ import com.abdav.giri_guide.entity.*;
 import com.abdav.giri_guide.mapper.TransactionMapper;
 import com.abdav.giri_guide.model.request.HikerDetailRequest;
 import com.abdav.giri_guide.model.request.TransactionRequest;
-import com.abdav.giri_guide.model.response.HikingPointResponse;
-import com.abdav.giri_guide.model.response.MountainsDetailResponse;
 import com.abdav.giri_guide.model.response.TransactionResponse;
+import com.abdav.giri_guide.model.response.TransactionStatusResponse;
 import com.abdav.giri_guide.repository.*;
-import com.abdav.giri_guide.service.CustomerService;
-import com.abdav.giri_guide.service.MountainsService;
 import com.abdav.giri_guide.service.TransactionService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,27 +24,30 @@ import java.util.List;
 public class TransactionServiceImpl implements TransactionService {
     private final TransactionRepository transactionRepository;
     private final MountainsRepository mountainsRepository;
-    private final CustomerService customerService;
     private final CustomerRepository customerRepository;
     private final HikingPointRepository hikingPointRepository;
     private final TransactionHikerRepository transactionHikerRepository;
+    private final TourGuideRepository tourGuideRepository;
+    @Value("${app.giri-guide.admin-cost}")
+    private Double adminCost;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public TransactionResponse createTransaction(TransactionRequest transactionRequest) {
-//        Customer customer = customerService.getCustomerByIdOrThrowNotFound(transactionRequest.customerId());
+    public TransactionStatusResponse createTransaction(TransactionRequest transactionRequest) {
         Customer customer = customerRepository.findById(transactionRequest.customerId()).orElseThrow(EntityNotFoundException::new);
         HikingPoint hikingPointReq = hikingPointRepository.findByIdAndDeletedDateIsNull(transactionRequest.hikingPointId()).orElseThrow(EntityNotFoundException::new);
         Mountains mountain = mountainsRepository.findById(hikingPointReq.getMountain().getId()).orElseThrow(EntityNotFoundException::new);
+        TourGuide tourGuide = tourGuideRepository.findById(transactionRequest.guideId()).orElseThrow(() -> new EntityNotFoundException("Tour Guide not found"));
 
         Transaction transaction = Transaction.builder()
                 .customer(customer)
-                .guide(transactionRequest.guideId())
-                .schedule(transactionRequest.schedule())
+                .tourGuide(tourGuide)
+                .hikingPoint(hikingPointReq)
+                .startDate(transactionRequest.startDate())
+                .endDate(transactionRequest.endDate())
                 .status(ETransactionStatus.WAITING_APPROVE)
                 .porterQty(transactionRequest.porterQty())
-                .entryPrice(hikingPointReq.getPrice())
-                .hikingPoint(hikingPointReq)
+                .adminCost(adminCost)
                 .build();
         transactionRepository.saveAndFlush(transaction);
 
@@ -61,24 +63,48 @@ public class TransactionServiceImpl implements TransactionService {
         }
         transactionHikerRepository.saveAllAndFlush(hikers);
         transaction.setTransactionHikers(hikers);
+        Long days = ChronoUnit.DAYS.between(transaction.getStartDate(), transaction.getEndDate());
 
-        //Dummy Hard Code Price porter, additional dan tourguide
-        Double totalPricePorter = 50000.0 * transactionRequest.porterQty();
-        Double priceTourGuide = 200000.0;
-        Double additionalPrice = 30000.0;
-        Double totalSimaksiPrice = mountain.getPriceSimaksi() * hikers.size();
-        Double totalEntryPrice = hikingPointReq.getPrice() * hikers.size();
-        Double totalPrice = totalPricePorter + additionalPrice + totalSimaksiPrice + totalEntryPrice;
+        Double totalTourguidePrice = tourGuide.getPrice() * days;
+        Double totalPorterPrice = calculatePorterPrice(tourGuide.getPricePorter(), transactionRequest.porterQty(), days);
+        Double totalAdditionalPrice = calculateAdditionalPrice(tourGuide, hikers.size(), days);
+        Double totalSimaksiPrice = calculateSimaksiPrice(mountain, hikers.size());
+        Double totalEntryPrice = hikingPointReq.getPrice() * hikers.size() * days;
+        Double totalPrice = totalPorterPrice + totalTourguidePrice + totalAdditionalPrice + totalEntryPrice + totalSimaksiPrice + adminCost;
 
-        transaction.setPricePorter(totalPricePorter);
-        transaction.setPriceTourGuide(priceTourGuide);
-        transaction.setAdditionalPriceTourGuide(hikers.size() <= 5 ? 0.0 : hikers.size() * additionalPrice);
-        transaction.setSimaksiPrice(totalSimaksiPrice);
-        transaction.setEntryPrice(totalEntryPrice);
+        System.out.println("Total price porter = " + totalPorterPrice);
+        System.out.println("Price tourGuide = " + totalTourguidePrice);
+        System.out.println("Total additionalPrice = " + totalAdditionalPrice);
+        System.out.println("TotalSimaksiPrice = " + totalSimaksiPrice);
+        System.out.println("Total entryPrice = " + totalEntryPrice);
+        System.out.println("Total Price = " + totalPrice);
+
+
+        transaction.setTotalPorterPrice(totalPorterPrice);
+        transaction.setTotalTourGuidePrice(totalTourguidePrice);
+        transaction.setAdditionalPriceTourGuide(totalAdditionalPrice);
+        transaction.setTotalSimaksiPrice(totalSimaksiPrice);
+        transaction.setTotalEntryPrice(totalEntryPrice);
         transaction.setTotalPrice(totalPrice);
 
         transactionRepository.saveAndFlush(transaction);
 
-        return TransactionMapper.transactionToTransactionResponse(transaction);
+        return new TransactionStatusResponse(transaction.getStatus().toString());
+    }
+
+    private Double calculatePorterPrice(Double porterRate, Integer porterQty, Long days){
+        return porterRate * porterQty * days;
+    }
+
+    private Double calculateSimaksiPrice(Mountains mountains, int hikerQty){
+        return mountains.isUseSimaksi() ? mountains.getPriceSimaksi() * hikerQty : 0.0;
+    }
+
+    private Double calculateAdditionalPrice(TourGuide tourGuide, int hikerQty, Long days){
+        if(hikerQty > tourGuide.getMaxHiker()){
+            int additionalHiker = hikerQty - tourGuide.getMaxHiker();
+            return tourGuide.getAdditionalPrice() * additionalHiker * days;
+        }
+        return 0.0;
     }
 }

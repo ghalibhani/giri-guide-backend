@@ -29,29 +29,36 @@ public class Transaction extends AuditEntity{
     @JoinColumn(name = "customer_id")
     private Customer customer;
 
-    private String guide;
+    @ManyToOne
+    @JoinColumn(name = "tourguide_id")
+    private TourGuide tourGuide;
 
-    private LocalDateTime schedule;
+    @ManyToOne
+    private HikingPoint hikingPoint;
+
+    private LocalDateTime startDate;
+
+    private LocalDateTime endDate;
 
     @Enumerated(EnumType.STRING)
     private ETransactionStatus status;
 
     private Integer porterQty;
 
-    private Double pricePorter;
+    private Double totalPorterPrice;
 
-    private Double priceTourGuide;
+    private Double totalTourGuidePrice;
 
     private Double additionalPriceTourGuide;
 
-    private Double simaksiPrice;
+    private Double totalSimaksiPrice;
 
-    private Double entryPrice;
+    private Double totalEntryPrice;
+
+    private Double adminCost;
 
     private Double totalPrice;
 
-    @ManyToOne
-    private HikingPoint hikingPoint;
 
     @OneToMany(mappedBy = "transaction", targetEntity = TransactionHiker.class)
     @JsonManagedReference
