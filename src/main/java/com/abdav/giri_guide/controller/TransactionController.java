@@ -32,8 +32,8 @@ public class TransactionController {
     }
 
     @PutMapping("/{id}")
-    ResponseEntity<?> approveTourGuide(@PathVariable String id){
-        TransactionStatusResponse transactionStatusResponse = transactionService.approveTourGuide(id);
+    ResponseEntity<?> approveTourGuide(@PathVariable String id, @RequestParam String status){
+        TransactionStatusResponse transactionStatusResponse = transactionService.updateTransactionStatus(id, status);
         message = Message.DATA_UPDATED;
         CommonResponse<?> response = new CommonResponse<>(message, transactionStatusResponse);
 

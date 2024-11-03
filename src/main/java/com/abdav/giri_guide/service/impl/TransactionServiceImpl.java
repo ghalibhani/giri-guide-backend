@@ -90,9 +90,11 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     @Override
-    public TransactionStatusResponse approveTourGuide(String id) {
+    public TransactionStatusResponse updateTransactionStatus(String id, String status) {
         Transaction transaction = transactionRepository.findById(id).orElseThrow(() -> new EntityNotFoundException(Message.DATA_NOT_FOUND));
-        transaction.setStatus(ETransactionStatus.WAITING_PAY);
+        ETransactionStatus transactionStatus = ETransactionStatus.valueOf(status.toUpperCase());
+
+        transaction.setStatus(transactionStatus);
         transactionRepository.saveAndFlush(transaction);
 
         return new TransactionStatusResponse(transaction.getStatus().toString());

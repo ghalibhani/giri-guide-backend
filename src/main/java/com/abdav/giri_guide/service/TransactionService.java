@@ -7,7 +7,7 @@ import org.springframework.data.domain.Page;
 
 public interface TransactionService {
     TransactionStatusResponse createTransaction(TransactionRequest transactionRequest);
-    TransactionStatusResponse approveTourGuide(String id);
+    TransactionStatusResponse updateTransactionStatus(String id, String status);
     Page<TransactionDetailResponse> transactionList(Integer page, Integer size);
 }
 
