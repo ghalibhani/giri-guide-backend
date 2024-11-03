@@ -4,6 +4,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -17,6 +18,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.abdav.giri_guide.constant.Message;
 import com.abdav.giri_guide.constant.PathApi;
+import com.abdav.giri_guide.model.request.TourGuideAddHikingPointRequest;
 import com.abdav.giri_guide.model.request.TourGuideRequest;
 import com.abdav.giri_guide.model.response.CommonResponse;
 import com.abdav.giri_guide.service.TourGuideService;
@@ -93,6 +95,27 @@ public class TourGuideController {
                 .body(new CommonResponse<>(
                         Message.DATA_UPDATED,
                         tourGuideService.updateTourGuideImage(id, image)));
+    }
+
+    @DeleteMapping("{id}")
+    public ResponseEntity<?> deleteTourGuide(@PathVariable String id) {
+        tourGuideService.softDeleteTourGuide(id);
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(new CommonResponse<>(
+                        Message.SUCCESS_DELETE,
+                        null));
+    }
+
+    @PostMapping("{id}/hiking-points")
+    public ResponseEntity<?> addTourGuideHikingPoint(
+            @PathVariable String id,
+            @RequestBody TourGuideAddHikingPointRequest request
+
+    ) {
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(new CommonResponse<>(
+                        Message.DATA_UPDATED,
+                        tourGuideService.addHikingPoint(id, request)));
     }
 
 }

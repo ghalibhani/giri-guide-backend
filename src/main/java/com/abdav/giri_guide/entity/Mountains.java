@@ -63,5 +63,5 @@ public class Mountains extends AuditEntity {
     private boolean useSimaksi = false;
 
     @Builder.Default
-    private Integer priceSimaksi = 0;
+    private Double priceSimaksi = 0.0;
 }

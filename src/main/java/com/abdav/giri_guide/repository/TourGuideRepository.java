@@ -8,4 +8,6 @@ import com.abdav.giri_guide.entity.TourGuide;
 
 public interface TourGuideRepository extends JpaRepository<TourGuide, String> {
     Optional<TourGuide> findByNikAndDeletedDateIsNull(String nik);
+
+    Optional<TourGuide> findByIdAndDeletedDateIsNull(String id);
 }

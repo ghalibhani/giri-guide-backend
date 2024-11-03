@@ -8,6 +8,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -17,19 +18,22 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 @NoArgsConstructor
 @SuperBuilder
-@Table(name = "m_hiking_point")
+@Table(name = "t_tour_guid_hiking_point")
 @EqualsAndHashCode(callSuper = true)
 @Entity
-public class HikingPoint extends AuditEntity {
+public class TourGuideHikingPoint extends AuditEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
 
-    @ManyToOne(targetEntity = Mountains.class)
-    @JoinColumn(name = "mountain_id", nullable = false)
-    private Mountains mountain;
+    @ManyToOne
+    @JoinColumn(name = "tour_guide_id", referencedColumnName = "id")
+    private TourGuide tourGuide;
 
-    private String name;
-    private String coordinate;
-    private Double price;
+    @ManyToOne
+    @JoinColumn(name = "hiking_point_id", referencedColumnName = "id")
+    private HikingPoint hikingPoint;
+
+    @Builder.Default
+    private boolean isActive = true;
 }
