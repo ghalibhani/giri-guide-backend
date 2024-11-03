@@ -56,7 +56,7 @@ public class MountainController {
             @RequestParam String status,
             @RequestParam String message,
             @RequestParam boolean useSimaksi,
-            @RequestParam Integer priceSimaksi,
+            @RequestParam Double priceSimaksi,
             @RequestParam MultipartFile image
 
     ) {

@@ -6,7 +6,7 @@ import jakarta.validation.constraints.NotNull;
 public record HikingPointRequest(
         @NotBlank String name,
         @NotBlank String coordinate,
-        @NotNull Integer price
+        @NotNull Double price
 
 ) {
 }

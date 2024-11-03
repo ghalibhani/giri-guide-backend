@@ -13,7 +13,7 @@ public record MountainsDetailResponse(
         EMountainStatus status,
         String message,
         boolean useSimaksi,
-        Integer priceSimaksi,
+        Double priceSimaksi,
         Set<HikingPointResponse> hikingPoints
 
 ) {

@@ -12,7 +12,7 @@ public record MountainsRequest(
         String status,
         String message,
         boolean useSimaksi,
-        Integer priceSimaksi
+        Double priceSimaksi
 
 ) {
     public EMountainStatus statusToEnum() {

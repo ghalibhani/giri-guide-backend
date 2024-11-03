@@ -9,8 +9,10 @@ public record TransactionResponse(
         String customerId,
         String guideId,
         Integer porter,
-        Double pricePorter,
         Integer hikerQty,
+        Double pricePorter,
+        Double totalSimaksiPrice,
+        Double totalEntryPrice,
         Double totalPrice
 ) {
 }

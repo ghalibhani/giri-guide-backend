@@ -12,8 +12,10 @@ public class TransactionMapper {
                 transaction.getCustomer().getId(),
                 transaction.getGuide(),
                 transaction.getPorterQty(),
-                transaction.getPricePorter(),
                 transaction.getTransactionHikers().size(),
+                transaction.getPricePorter(),
+                transaction.getSimaksiPrice(),
+                transaction.getEntryPrice(),
                 transaction.getTotalPrice()
         );
     }

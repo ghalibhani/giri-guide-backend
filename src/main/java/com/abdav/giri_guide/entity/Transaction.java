@@ -33,6 +33,7 @@ public class Transaction extends AuditEntity{
 
     private LocalDateTime schedule;
 
+    @Enumerated(EnumType.STRING)
     private ETransactionStatus status;
 
     private Integer porterQty;

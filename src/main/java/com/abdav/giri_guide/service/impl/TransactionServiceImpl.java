@@ -60,19 +60,22 @@ public class TransactionServiceImpl implements TransactionService {
             hikers.add(transactionHiker);
         }
         transactionHikerRepository.saveAllAndFlush(hikers);
+        transaction.setTransactionHikers(hikers);
 
-        //Hard Code Price porter, additional dan tourguide
+        //Dummy Hard Code Price porter, additional dan tourguide
         Double totalPricePorter = 50000.0 * transactionRequest.porterQty();
         Double priceTourGuide = 200000.0;
-        Double additionalPrice = 30000.0 * (hikers.size() - 5);
+        Double additionalPrice = 30000.0;
         Double totalSimaksiPrice = mountain.getPriceSimaksi() * hikers.size();
-        Double totalEntryPrice = hikingPointReq.getPrice() *hikers.size();
+        Double totalEntryPrice = hikingPointReq.getPrice() * hikers.size();
+        Double totalPrice = totalPricePorter + additionalPrice + totalSimaksiPrice + totalEntryPrice;
 
         transaction.setPricePorter(totalPricePorter);
         transaction.setPriceTourGuide(priceTourGuide);
-        transaction.setAdditionalPriceTourGuide(hikers.size() == 5 ? 0.0 : hikers.size() * additionalPrice);
+        transaction.setAdditionalPriceTourGuide(hikers.size() <= 5 ? 0.0 : hikers.size() * additionalPrice);
         transaction.setSimaksiPrice(totalSimaksiPrice);
         transaction.setEntryPrice(totalEntryPrice);
+        transaction.setTotalPrice(totalPrice);
 
         transactionRepository.saveAndFlush(transaction);
 
