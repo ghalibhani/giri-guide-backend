@@ -26,7 +26,7 @@ public class HikingPoint extends AuditEntity {
     private String id;
 
     @ManyToOne(targetEntity = Mountains.class)
-    @JoinColumn(name = "mountain_id", nullable = false)
+    @JoinColumn(name = "mountain_id", referencedColumnName = "id", nullable = false)
     private Mountains mountain;
 
     private String name;
