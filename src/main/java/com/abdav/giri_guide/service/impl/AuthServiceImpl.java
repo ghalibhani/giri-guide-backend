@@ -1,5 +1,6 @@
 package com.abdav.giri_guide.service.impl;
 
+import com.abdav.giri_guide.constant.Message;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -90,5 +91,17 @@ public class AuthServiceImpl implements AuthService {
         } catch (BadCredentialsException e) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid email or password");
         }
+    }
+
+    @Override
+    public void changePassword(String userId, String oldPassword, String newPassword) {
+        User user = userRepository.findById(userId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, Message.DATA_NOT_FOUND));
+        if(!passwordEncoder.matches(oldPassword, user.getPassword())){
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Password lama salah");
+        }
+
+        String encodedPassword = passwordEncoder.encode(newPassword);
+        user.setPassword(encodedPassword);
+        userRepository.saveAndFlush(user);
     }
 }
