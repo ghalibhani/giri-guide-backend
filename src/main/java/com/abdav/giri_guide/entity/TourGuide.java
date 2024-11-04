@@ -1,8 +1,11 @@
 package com.abdav.giri_guide.entity;
 
-import java.time.LocalDate;
+import java.util.Date;
+
+import com.abdav.giri_guide.constant.EGender;
 
 import jakarta.annotation.Nullable;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -34,9 +37,15 @@ public class TourGuide extends AuditEntity {
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     private User users;
     private String name;
+    private EGender gender;
     private String nik;
-    private LocalDate birthDate;
+    private Date birthDate;
+
+    @Column(columnDefinition = "Text")
     private String description;
+
+    @Column(columnDefinition = "Text")
+    private String address;
 
     @Nullable
     @OneToOne
@@ -51,6 +60,6 @@ public class TourGuide extends AuditEntity {
     private Double pricePorter;
 
     @Builder.Default
-    private boolean isActive = false;
+    private boolean isActive = true;
 
 }

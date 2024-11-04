@@ -14,6 +14,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.abdav.giri_guide.constant.PathImage;
 import com.abdav.giri_guide.entity.HikingPoint;
 import com.abdav.giri_guide.entity.ImageEntity;
 import com.abdav.giri_guide.entity.Mountains;
@@ -52,7 +53,7 @@ public class MountainServiceImpl implements MountainsService {
             throw new DataIntegrityViolationException("Active data with same name already exist");
         }
 
-        ImageEntity image = imageService.create(requestImage, "/images/mountain", newMountains.name());
+        ImageEntity image = imageService.create(requestImage, PathImage.MOUNTAINS_PICTURE, newMountains.name());
         Mountains mountains = newMountains.toMountains();
         mountains.setImage(image);
         mountainRepository.save(mountains);

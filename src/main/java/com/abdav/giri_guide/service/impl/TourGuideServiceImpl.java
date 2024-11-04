@@ -5,27 +5,36 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.abdav.giri_guide.constant.ERole;
 import com.abdav.giri_guide.constant.PathImage;
 import com.abdav.giri_guide.entity.HikingPoint;
 import com.abdav.giri_guide.entity.ImageEntity;
+import com.abdav.giri_guide.entity.Role;
 import com.abdav.giri_guide.entity.TourGuide;
 import com.abdav.giri_guide.entity.TourGuideHikingPoint;
+import com.abdav.giri_guide.entity.User;
 import com.abdav.giri_guide.mapper.TourGuideMapper;
 import com.abdav.giri_guide.model.request.TourGuideAddHikingPointRequest;
 import com.abdav.giri_guide.model.request.TourGuideRequest;
+import com.abdav.giri_guide.model.request.UserIdRequest;
 import com.abdav.giri_guide.model.response.CommonResponseWithPage;
 import com.abdav.giri_guide.model.response.TourGuideDetailResponse;
 import com.abdav.giri_guide.model.response.TourGuideListResponse;
+import com.abdav.giri_guide.model.response.TourGuideProfileResponse;
 import com.abdav.giri_guide.repository.HikingPointRepository;
 import com.abdav.giri_guide.repository.TourGuideHikingPointRepository;
 import com.abdav.giri_guide.repository.TourGuideRepository;
+import com.abdav.giri_guide.repository.UserRepository;
 import com.abdav.giri_guide.service.ImageService;
+import com.abdav.giri_guide.service.RoleService;
 import com.abdav.giri_guide.service.TourGuideService;
 
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -34,8 +43,12 @@ public class TourGuideServiceImpl implements TourGuideService {
     private final TourGuideRepository tourGuideRepository;
     private final TourGuideHikingPointRepository tourGuideHikingPointRepository;
     private final HikingPointRepository hikingPointRepository;
+    private final UserRepository userRepository;
 
+    private final RoleService roleService;
     private final ImageService imageService;
+
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     public TourGuideDetailResponse addHikingPoint(String tourGuideId, TourGuideAddHikingPointRequest request) {
@@ -56,18 +69,36 @@ public class TourGuideServiceImpl implements TourGuideService {
     }
 
     @Override
-    public TourGuideDetailResponse createTourGuide(MultipartFile image, TourGuideRequest request) {
-        // TODO check UserID before create tour guide account
+    public TourGuideProfileResponse createTourGuide(
+            MultipartFile image, TourGuideRequest request, HttpServletRequest httpReq) {
+
+        Optional<User> savedUser = userRepository.findByEmail(request.email().trim().toLowerCase());
+        if (savedUser.isPresent()) {
+            throw new DataIntegrityViolationException("Email Already Registered");
+        }
+
         Optional<TourGuide> savedTourGuide = tourGuideRepository.findByNikAndDeletedDateIsNull(request.nik());
         if (savedTourGuide.isPresent()) {
-            throw new DataIntegrityViolationException("Active data already exist");
+            throw new DataIntegrityViolationException("NIK Already Registered");
         }
 
         ImageEntity imageEntity = imageService.create(image, PathImage.PROFILE_PICTURE, request.name());
+        Role role = roleService.getOrSaveRole(Role.builder().role(ERole.ROLE_GUIDE).build());
+        User user = User.builder()
+                .email(request.email().trim().toLowerCase())
+                .password(passwordEncoder.encode(request.password()))
+                .role(role)
+                .build();
+        userRepository.saveAndFlush(user);
+
         TourGuide tourGuide = TourGuide.builder()
-                .name(request.name())
+                .users(user)
+                .name(request.name().trim())
+                .gender(request.gender())
                 .nik(request.nik())
-                .description(request.description())
+                .birthDate(request.birthDate())
+                .description(request.description().trim())
+                .address(request.address())
                 .image(imageEntity)
                 .maxHiker(request.maxHiker())
                 .price(request.price())
@@ -77,10 +108,17 @@ public class TourGuideServiceImpl implements TourGuideService {
                 .build();
 
         tourGuide = tourGuideRepository.save(tourGuide);
-        List<TourGuideHikingPoint> hikingPoints = tourGuideHikingPointRepository
-                .findByTourGuideAndDeletedDateIsNull(tourGuide);
 
-        return TourGuideMapper.toTourGuideDetailResponse(tourGuide, hikingPoints);
+        return TourGuideMapper.toTourGuideProfileResponse(tourGuide, httpReq);
+    }
+
+    @Override
+    public TourGuideProfileResponse getTourGuideProfile(UserIdRequest request, HttpServletRequest httpReq) {
+        User users = userRepository.findById(request.userId()).orElseThrow(EntityNotFoundException::new);
+        TourGuide tourGuide = tourGuideRepository.findByUsersAndDeletedDateIsNull(users)
+                .orElseThrow(EntityNotFoundException::new);
+
+        return TourGuideMapper.toTourGuideProfileResponse(tourGuide, httpReq);
     }
 
     @Override

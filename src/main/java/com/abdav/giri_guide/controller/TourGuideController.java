@@ -1,5 +1,9 @@
 package com.abdav.giri_guide.controller;
 
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.util.Date;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -16,13 +20,16 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.abdav.giri_guide.constant.EGender;
 import com.abdav.giri_guide.constant.Message;
 import com.abdav.giri_guide.constant.PathApi;
 import com.abdav.giri_guide.model.request.TourGuideAddHikingPointRequest;
 import com.abdav.giri_guide.model.request.TourGuideRequest;
+import com.abdav.giri_guide.model.request.UserIdRequest;
 import com.abdav.giri_guide.model.response.CommonResponse;
 import com.abdav.giri_guide.service.TourGuideService;
 
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -35,24 +42,35 @@ public class TourGuideController {
     @Validated
     public ResponseEntity<?> registerTourGuide(
             @RequestParam MultipartFile image,
-            @RequestParam String userId,
+
+            @RequestParam String email,
+            @RequestParam String password,
+
             @RequestParam String name,
+            @RequestParam EGender gender,
             @RequestParam String nik,
+            @RequestParam String birthDate,
             @RequestParam String description,
+            @RequestParam String address,
 
             @RequestParam Integer maxHiker,
             @RequestParam Double price,
             @RequestParam Double additionalPrice,
 
             @RequestParam Integer totalPorter,
-            @RequestParam Double pricePorter
+            @RequestParam Double pricePorter,
+            HttpServletRequest httpReq
 
     ) {
         TourGuideRequest request = new TourGuideRequest(
-                userId,
+                email,
+                password,
                 name,
+                gender,
                 nik,
+                Date.from(LocalDate.parse(birthDate).atStartOfDay(ZoneId.systemDefault()).toInstant()),
                 description,
+                address,
                 maxHiker,
                 price,
                 additionalPrice,
@@ -62,7 +80,12 @@ public class TourGuideController {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(new CommonResponse<>(
                         Message.DATA_CREATED,
-                        tourGuideService.createTourGuide(image, request)));
+                        tourGuideService.createTourGuide(image, request, httpReq)));
+    }
+
+    @GetMapping("profile")
+    public ResponseEntity<?> getMethodName(@Validated @RequestBody UserIdRequest request, HttpServletRequest httpReq) {
+        return ResponseEntity.status(HttpStatus.OK).body(tourGuideService.getTourGuideProfile(request, httpReq));
     }
 
     @GetMapping("{id}")
