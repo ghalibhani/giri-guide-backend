@@ -1,10 +1,12 @@
 package com.abdav.giri_guide.mapper;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import com.abdav.giri_guide.entity.TourGuide;
 import com.abdav.giri_guide.entity.TourGuideHikingPoint;
 import com.abdav.giri_guide.model.response.TourGuideDetailResponse;
+import com.abdav.giri_guide.model.response.TourGuideListResponse;
 import com.abdav.giri_guide.model.response.TourGuideProfileResponse;
 import com.abdav.giri_guide.util.UrlUtil;
 
@@ -56,5 +58,21 @@ public class TourGuideMapper {
                 TourGuideHikingPointMapper.toListMountainListHikingPoint(tourGuideHikingPoint)
 
         );
+    }
+
+    public static List<TourGuideListResponse> toListOfTourGuideListResponse(
+            List<TourGuide> tourGuides, HttpServletRequest httpReq) {
+
+        List<TourGuideListResponse> result = new ArrayList<>();
+        for (TourGuide tourGuide : tourGuides) {
+            result.add(new TourGuideListResponse(
+                    tourGuide.getId(),
+                    tourGuide.getName(),
+                    (tourGuide.getImage() == null) ? null : UrlUtil.resolveImageUrl(tourGuide.getImage(), httpReq),
+                    tourGuide.getDescription(),
+                    5.0,
+                    10));
+        }
+        return result;
     }
 }

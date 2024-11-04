@@ -1,15 +1,20 @@
 package com.abdav.giri_guide.service.impl;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.abdav.giri_guide.constant.ERole;
+import com.abdav.giri_guide.constant.Message;
 import com.abdav.giri_guide.constant.PathImage;
 import com.abdav.giri_guide.entity.HikingPoint;
 import com.abdav.giri_guide.entity.ImageEntity;
@@ -17,11 +22,13 @@ import com.abdav.giri_guide.entity.Role;
 import com.abdav.giri_guide.entity.TourGuide;
 import com.abdav.giri_guide.entity.TourGuideHikingPoint;
 import com.abdav.giri_guide.entity.User;
+import com.abdav.giri_guide.mapper.TourGuideHikingPointMapper;
 import com.abdav.giri_guide.mapper.TourGuideMapper;
 import com.abdav.giri_guide.model.request.TourGuideAddHikingPointRequest;
 import com.abdav.giri_guide.model.request.TourGuideRequest;
 import com.abdav.giri_guide.model.request.UserIdRequest;
 import com.abdav.giri_guide.model.response.CommonResponseWithPage;
+import com.abdav.giri_guide.model.response.PagingResponse;
 import com.abdav.giri_guide.model.response.TourGuideDetailResponse;
 import com.abdav.giri_guide.model.response.TourGuideListResponse;
 import com.abdav.giri_guide.model.response.TourGuideProfileResponse;
@@ -52,7 +59,6 @@ public class TourGuideServiceImpl implements TourGuideService {
 
     @Override
     public TourGuideDetailResponse addHikingPoint(String tourGuideId, TourGuideAddHikingPointRequest request) {
-        // TODO Check User before create
         TourGuide tourGuide = tourGuideRepository.findById(tourGuideId).orElseThrow(EntityNotFoundException::new);
         HikingPoint hikingPoint = hikingPointRepository.findById(request.hikingPointId())
                 .orElseThrow(EntityNotFoundException::new);
@@ -130,9 +136,42 @@ public class TourGuideServiceImpl implements TourGuideService {
     }
 
     @Override
-    public CommonResponseWithPage<List<TourGuideListResponse>> getTourGuideList(String hikingPointId) {
-        // TODO Auto-generated method stub
-        return null;
+    public CommonResponseWithPage<List<TourGuideListResponse>> getTourGuideList(
+            String hikingPointId, Integer size, Integer page, HttpServletRequest httpReq) {
+        if (page <= 0) {
+            page = 1;
+        }
+
+        Pageable pageable = PageRequest.of(page - 1, size);
+        if (hikingPointId.equals("")) {
+            Page<TourGuide> tourGuidePage = tourGuideRepository.findAllByDeletedDateIsNull(pageable);
+            PagingResponse paging = new PagingResponse(
+                    page,
+                    size,
+                    tourGuidePage.getTotalPages(),
+                    tourGuidePage.getTotalElements());
+
+            return new CommonResponseWithPage<>(
+                    Message.SUCCESS_FETCH,
+                    TourGuideMapper.toListOfTourGuideListResponse(tourGuidePage.getContent(), httpReq),
+                    paging);
+
+        } else {
+            HikingPoint hikingPoint = hikingPointRepository.findById(hikingPointId).orElse(null);
+            Page<TourGuideHikingPoint> tourGuidePage = tourGuideHikingPointRepository
+                    .findByHikingPointAndDeletedDateIsNull(hikingPoint, pageable);
+            PagingResponse paging = new PagingResponse(
+                    page,
+                    size,
+                    tourGuidePage.getTotalPages(),
+                    tourGuidePage.getTotalElements());
+
+            return new CommonResponseWithPage<>(
+                    Message.SUCCESS_FETCH,
+                    TourGuideHikingPointMapper.toListOfTourGuideListResponse(tourGuidePage.getContent(), httpReq),
+                    paging);
+
+        }
     }
 
     @Override

@@ -141,4 +141,16 @@ public class TourGuideController {
                         tourGuideService.addHikingPoint(id, request)));
     }
 
+    @GetMapping("")
+    public ResponseEntity<?> getTourGuideList(
+            @RequestParam(required = false, defaultValue = "") String hikingPoint,
+            @RequestParam(required = false, defaultValue = "1") Integer page,
+            @RequestParam(required = false, defaultValue = "10") Integer size,
+            HttpServletRequest httpReq
+
+    ) {
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(tourGuideService.getTourGuideList(hikingPoint, size, page, httpReq));
+    }
+
 }

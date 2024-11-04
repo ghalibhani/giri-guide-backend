@@ -29,7 +29,8 @@ public interface TourGuideService {
 
     void softDeleteTourGuide(String id);
 
-    CommonResponseWithPage<List<TourGuideListResponse>> getTourGuideList(String hikingPointId);
+    CommonResponseWithPage<List<TourGuideListResponse>> getTourGuideList(
+            String hikingPointId, Integer size, Integer page, HttpServletRequest httpReq);
 
     TourGuideDetailResponse addHikingPoint(String tourGuideId, TourGuideAddHikingPointRequest request);
 }
