@@ -17,6 +17,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.abdav.giri_guide.entity.HikingPoint;
 import com.abdav.giri_guide.entity.ImageEntity;
 import com.abdav.giri_guide.entity.Mountains;
+import com.abdav.giri_guide.mapper.MountainsMapper;
 import com.abdav.giri_guide.model.request.HikingPointRequest;
 import com.abdav.giri_guide.model.request.MountainsRequest;
 import com.abdav.giri_guide.model.response.CommonResponseWithPage;
@@ -30,6 +31,7 @@ import com.abdav.giri_guide.service.ImageService;
 import com.abdav.giri_guide.service.MountainsService;
 
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -41,10 +43,11 @@ public class MountainServiceImpl implements MountainsService {
     private final ImageService imageService;
 
     @Override
-    public MountainsDetailResponse createMountain(MountainsRequest newMountains, MultipartFile requestImage) {
+    public MountainsDetailResponse createMountain(
+            MountainsRequest newMountains, MultipartFile requestImage, HttpServletRequest httpReq) {
+
         Optional<Mountains> savedMountain = mountainRepository
                 .findByNameIgnoreCaseAndDeletedDateIsNull(newMountains.name().trim());
-
         if (savedMountain.isPresent()) {
             throw new DataIntegrityViolationException("Active data with same name already exist");
         }
@@ -53,17 +56,7 @@ public class MountainServiceImpl implements MountainsService {
         Mountains mountains = newMountains.toMountains();
         mountains.setImage(image);
         mountainRepository.save(mountains);
-        return new MountainsDetailResponse(
-                mountains.getId(),
-                mountains.getName(),
-                mountains.getImage() == null ? null : mountains.getImage().getPath(),
-                mountains.getCity(),
-                mountains.getDescription(),
-                mountains.getStatus(),
-                mountains.getMessage(),
-                toSetHikingPointResponse(hikingPointRepository.findByMountainAndDeletedDateIsNull(mountains))
-
-        );
+        return MountainsMapper.toMountainsDetailResponse(mountains, httpReq);
     }
 
     @Override
@@ -74,29 +67,21 @@ public class MountainServiceImpl implements MountainsService {
     }
 
     @Override
-    public MountainsDetailResponse mountainDetail(String id) {
+    public MountainsDetailResponse mountainDetail(String id, HttpServletRequest httpReq) {
         Mountains mountain = mountainRepository.findById(id).orElseThrow(EntityNotFoundException::new);
-
-        return new MountainsDetailResponse(
-                mountain.getId(),
-                mountain.getName(),
-                mountain.getImage() == null ? null : mountain.getImage().getPath(),
-                mountain.getCity(),
-                mountain.getDescription(),
-                mountain.getStatus(),
-                mountain.getMessage(),
-                toSetHikingPointResponse(hikingPointRepository.findByMountainAndDeletedDateIsNull(mountain))
-
-        );
+        return MountainsMapper.toMountainsDetailResponse(mountain, httpReq);
     }
 
     @Override
-    public CommonResponseWithPage<List<MountainsListResponse>> mountainList(String city, Integer page, Integer size) {
+    public CommonResponseWithPage<List<MountainsListResponse>> mountainList(
+            String name, String city, Integer page, Integer size, HttpServletRequest httpReq) {
+
         if (page <= 0) {
             page = 1;
         }
         Pageable pageable = PageRequest.of(page - 1, size);
-        Page<Mountains> mountainsPage = mountainRepository.findAllByDeletedDateIsNull(pageable);
+        Page<Mountains> mountainsPage = mountainRepository
+                .findAllByNameContainingIgnoreCaseAndCityContainingIgnoreCaseAndDeletedDateIsNull(name, city, pageable);
 
         PagingResponse paging = new PagingResponse(
                 page,
@@ -104,20 +89,15 @@ public class MountainServiceImpl implements MountainsService {
                 mountainsPage.getTotalPages(),
                 mountainsPage.getTotalElements());
 
-        List<MountainsListResponse> mountainList = new ArrayList<>();
-        for (Mountains mountain : mountainsPage.getContent()) {
-            mountainList.add(new MountainsListResponse(
-                    mountain.getId(),
-                    mountain.getName(),
-                    mountain.getImage() == null ? null : mountain.getImage().getPath(),
-                    mountain.getCity(),
-                    mountain.getStatus()));
-        }
+        List<MountainsListResponse> mountainList = MountainsMapper.toListOfMountain(mountainsPage, httpReq);
         return new CommonResponseWithPage<>("Data Fetched", mountainList, paging);
     }
 
     @Override
-    public MountainsDetailResponse updateMountain(String id, MountainsRequest updatedMountains) {
+    public MountainsDetailResponse updateMountain(
+            String id, MountainsRequest updatedMountains, HttpServletRequest httpReq) {
+
+        // TODO check mountain checker for new data
         Mountains mountain = mountainRepository.findById(id).orElseThrow(EntityNotFoundException::new);
 
         Optional<Mountains> savedMountain = mountainRepository
@@ -141,19 +121,12 @@ public class MountainServiceImpl implements MountainsService {
         if (updatedMountains.message() != null) {
             mountain.setMessage(updatedMountains.message().trim());
         }
+        if (updatedMountains.priceSimaksi() != null) {
+            mountain.setPriceSimaksi(updatedMountains.priceSimaksi());
+        }
         mountainRepository.save(mountain);
 
-        return new MountainsDetailResponse(
-                mountain.getId(),
-                mountain.getName(),
-                mountain.getImage() == null ? null : mountain.getImage().getPath(),
-                mountain.getCity(),
-                mountain.getDescription(),
-                mountain.getStatus(),
-                mountain.getMessage(),
-                toSetHikingPointResponse(hikingPointRepository.findByMountainAndDeletedDateIsNull(mountain))
-
-        );
+        return MountainsMapper.toMountainsDetailResponse(mountain, httpReq);
     }
 
     public HikingPointResponse createHikingPoint(String mountainId, HikingPointRequest request) {
@@ -162,6 +135,7 @@ public class MountainServiceImpl implements MountainsService {
                 .mountain(mountain)
                 .name(request.name().trim())
                 .coordinate(request.coordinate())
+                .price(request.price())
                 .build();
 
         hikingPoint = hikingPointRepository.save(hikingPoint);
@@ -170,7 +144,8 @@ public class MountainServiceImpl implements MountainsService {
                 hikingPoint.getId(),
                 hikingPoint.getMountain().getId(),
                 hikingPoint.getName(),
-                hikingPoint.getCoordinate());
+                hikingPoint.getCoordinate(),
+                hikingPoint.getPrice());
     }
 
     public Set<HikingPointResponse> getHikingPoints(String mountainId) {
@@ -185,7 +160,8 @@ public class MountainServiceImpl implements MountainsService {
                     hikingPoint.getId(),
                     hikingPoint.getMountain().getId(),
                     hikingPoint.getName(),
-                    hikingPoint.getCoordinate()));
+                    hikingPoint.getCoordinate(),
+                    hikingPoint.getPrice()));
         }
         return result;
     }
@@ -204,7 +180,8 @@ public class MountainServiceImpl implements MountainsService {
                 hikingPoint.getId(),
                 hikingPoint.getMountain().getId(),
                 hikingPoint.getName(),
-                hikingPoint.getCoordinate());
+                hikingPoint.getCoordinate(),
+                hikingPoint.getPrice());
     }
 
     @Override
@@ -223,7 +200,8 @@ public class MountainServiceImpl implements MountainsService {
                 hikingPoint.getId(),
                 hikingPoint.getMountain().getId(),
                 hikingPoint.getName(),
-                hikingPoint.getCoordinate());
+                hikingPoint.getCoordinate(),
+                hikingPoint.getPrice());
     }
 
 }

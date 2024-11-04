@@ -16,4 +16,5 @@ public class Message {
     public static final String SUCCESS_DELETE = "Successfully deleted";
     public static final String DATA_NOT_FOUND = "Data Not Found";
     public static final String DATA_UPDATED = "Data Updated";
+    public static final String DATA_CREATED = "Data Created";
 }

@@ -1,10 +1,5 @@
 package com.abdav.giri_guide.controller;
 
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
-import java.util.ArrayList;
-import java.util.List;
-
-import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -24,11 +19,10 @@ import com.abdav.giri_guide.constant.PathApi;
 import com.abdav.giri_guide.model.request.HikingPointRequest;
 import com.abdav.giri_guide.model.request.MountainsRequest;
 import com.abdav.giri_guide.model.response.CommonResponse;
-import com.abdav.giri_guide.model.response.CommonResponseWithPage;
-import com.abdav.giri_guide.model.response.MountainsListResponse;
-import com.abdav.giri_guide.model.response.PagingResponse;
 import com.abdav.giri_guide.service.MountainsService;
 
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
@@ -40,45 +34,57 @@ public class MountainController {
 
     @GetMapping("")
     public ResponseEntity<?> getMountainList(
+            @RequestParam(required = false, defaultValue = "") String name,
+            @RequestParam(required = false, defaultValue = "") String city,
             @RequestParam(required = false, defaultValue = "1") Integer page,
-            @RequestParam(required = false, defaultValue = "5") Integer size
+            @RequestParam(required = false, defaultValue = "5") Integer size,
+            HttpServletRequest httpReq
 
     ) {
         return ResponseEntity.status(HttpStatus.OK)
-                .body(service.mountainList(null, page, size));
+                .body(service.mountainList(name, city, page, size, httpReq));
     }
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<CommonResponse<?>> createMountain(
+    public ResponseEntity<?> createMountain(
             @RequestParam String name,
             @RequestParam String city,
             @RequestParam String description,
             @RequestParam String status,
             @RequestParam String message,
-            @RequestParam MultipartFile image
+            @RequestParam boolean useSimaksi,
+            @RequestParam Double priceSimaksi,
+            @RequestParam MultipartFile image,
+            HttpServletRequest httpReq
 
     ) {
-        MountainsRequest request = new MountainsRequest(name, city, description, status, message);
+        MountainsRequest request = new MountainsRequest(
+                name, city, description, status, message, useSimaksi, priceSimaksi
+
+        );
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(new CommonResponse<>("Mountain data successfully created",
-                        service.createMountain(request, image)));
+                        service.createMountain(request, image, httpReq)));
     }
 
     @GetMapping("{id}")
-    public ResponseEntity<CommonResponse<?>> getMountainDetail(@PathVariable String id) {
+    public ResponseEntity<CommonResponse<?>> getMountainDetail(@PathVariable String id, HttpServletRequest httpReq) {
         return ResponseEntity.status(HttpStatus.OK)
                 .body(new CommonResponse<>("Data fetched successfully",
-                        service.mountainDetail(id)));
+                        service.mountainDetail(id, httpReq)));
     }
 
     @PutMapping("{id}")
     public ResponseEntity<CommonResponse<?>> updateMountain(
             @PathVariable String id,
-            @RequestBody MountainsRequest request) {
+            @RequestBody MountainsRequest request,
+            HttpServletRequest httpReq
+
+    ) {
 
         return ResponseEntity.status(HttpStatus.OK)
                 .body(new CommonResponse<>("Data updated successfully",
-                        service.updateMountain(id, request)));
+                        service.updateMountain(id, request, httpReq)));
     }
 
     @DeleteMapping("{id}")
