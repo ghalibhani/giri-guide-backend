@@ -35,3 +35,4 @@ build/
 *.session.sql
 
 src/main/resources/static/
+src/main/resources/public/
