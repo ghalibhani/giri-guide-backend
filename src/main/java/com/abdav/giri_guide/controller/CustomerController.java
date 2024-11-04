@@ -8,6 +8,7 @@ import com.abdav.giri_guide.model.response.CustomerResponse;
 import com.abdav.giri_guide.model.response.PagingResponse;
 import com.abdav.giri_guide.service.CustomerService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.actuate.autoconfigure.observation.ObservationProperties;
 import org.springframework.data.domain.Page;
@@ -26,9 +27,10 @@ public class CustomerController {
     @GetMapping
     public ResponseEntity<CommonResponseWithPage<?>> getCustomerList(
             @RequestParam(required = false, defaultValue = "1") Integer page,
-            @RequestParam(required = false, defaultValue = "5") Integer size
+            @RequestParam(required = false, defaultValue = "5") Integer size,
+            HttpServletRequest httpReq
     ){
-        Page<CustomerResponse> customerList = customerService.customerList(page, size);
+        Page<CustomerResponse> customerList = customerService.customerList(page, size, httpReq);
         PagingResponse paging = new PagingResponse(page, size, customerList.getTotalPages(), customerList.getTotalElements());
         message = Message.SUCCESS_FETCH;
 

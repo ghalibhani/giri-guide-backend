@@ -2,10 +2,7 @@ package com.abdav.giri_guide.controller;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.abdav.giri_guide.constant.Message;
 import com.abdav.giri_guide.constant.PathApi;
@@ -40,6 +37,21 @@ public class AuthController {
         LoginResponse loginResponse = authService.login(loginRequest);
         message = Message.LOGIN_SUCCESS;
         CommonResponse<?> response = new CommonResponse<>(message, loginResponse);
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(response);
+    }
+
+    @PutMapping("/{userId}")
+    ResponseEntity<?> changePassword(
+            @PathVariable String userId,
+            @RequestParam String oldPassword,
+            @RequestParam String newPassword
+    ){
+        authService.changePassword(userId, oldPassword, newPassword);
+        message = Message.DATA_UPDATED;
+        CommonResponse<?> response = new CommonResponse<>(message, null);
 
         return ResponseEntity
                 .status(HttpStatus.OK)
