@@ -34,13 +34,15 @@ public class MountainController {
 
     @GetMapping("")
     public ResponseEntity<?> getMountainList(
+            @RequestParam(required = false, defaultValue = "") String name,
+            @RequestParam(required = false, defaultValue = "") String city,
             @RequestParam(required = false, defaultValue = "1") Integer page,
             @RequestParam(required = false, defaultValue = "5") Integer size,
             HttpServletRequest httpReq
 
     ) {
         return ResponseEntity.status(HttpStatus.OK)
-                .body(service.mountainList(null, page, size, httpReq));
+                .body(service.mountainList(name, city, page, size, httpReq));
     }
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)

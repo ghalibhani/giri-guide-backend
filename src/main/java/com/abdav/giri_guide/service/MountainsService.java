@@ -16,7 +16,7 @@ import jakarta.servlet.http.HttpServletRequest;
 
 public interface MountainsService {
     CommonResponseWithPage<List<MountainsListResponse>> mountainList(
-            String city, Integer page, Integer size, HttpServletRequest httpReq);
+            String name, String city, Integer page, Integer size, HttpServletRequest httpReq);
 
     MountainsDetailResponse mountainDetail(String id, HttpServletRequest httpReq);
 

@@ -74,13 +74,14 @@ public class MountainServiceImpl implements MountainsService {
 
     @Override
     public CommonResponseWithPage<List<MountainsListResponse>> mountainList(
-            String city, Integer page, Integer size, HttpServletRequest httpReq) {
+            String name, String city, Integer page, Integer size, HttpServletRequest httpReq) {
 
         if (page <= 0) {
             page = 1;
         }
         Pageable pageable = PageRequest.of(page - 1, size);
-        Page<Mountains> mountainsPage = mountainRepository.findAllByDeletedDateIsNull(pageable);
+        Page<Mountains> mountainsPage = mountainRepository
+                .findAllByNameContainingIgnoreCaseAndCityContainingIgnoreCaseAndDeletedDateIsNull(name, city, pageable);
 
         PagingResponse paging = new PagingResponse(
                 page,

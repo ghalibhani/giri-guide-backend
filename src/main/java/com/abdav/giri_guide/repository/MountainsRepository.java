@@ -14,7 +14,8 @@ public interface MountainsRepository extends JpaRepository<Mountains, String> {
 
     Optional<Mountains> findByNameIgnoreCaseAndDeletedDateIsNull(String name);
 
-    Page<Mountains> findAllByCityIgnoreCaseAndDeletedDateIsNull(String city, Pageable page);
+    Page<Mountains> findAllByNameContainingIgnoreCaseAndCityContainingIgnoreCaseAndDeletedDateIsNull(
+            String name, String city, Pageable page);
 
     Page<Mountains> findAllByDeletedDateIsNull(Pageable page);
 
