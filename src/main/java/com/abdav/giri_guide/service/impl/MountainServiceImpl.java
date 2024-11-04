@@ -121,6 +121,9 @@ public class MountainServiceImpl implements MountainsService {
         if (updatedMountains.message() != null) {
             mountain.setMessage(updatedMountains.message().trim());
         }
+        if (updatedMountains.priceSimaksi() != null) {
+            mountain.setPriceSimaksi(updatedMountains.priceSimaksi());
+        }
         mountainRepository.save(mountain);
 
         return MountainsMapper.toMountainsDetailResponse(mountain, httpReq);

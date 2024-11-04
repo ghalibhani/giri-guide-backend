@@ -15,6 +15,10 @@ public class PathApi {
     public static final String CUSTOMER_API = GIRI_GUIDE_APP + "/customers";
 
     public static final String PROFILE_API = GIRI_GUIDE_APP + "/profile";
+
+    public static final String TRANSACTIONS_API = GIRI_GUIDE_APP + "/transactions";
+    public static final String PAYMENTS_API = "/payment";
+
     public static final String PROFILE_IMAGE_API = "/{id}/image";
 
     public static final String TOUR_GUIDE_API = GIRI_GUIDE_APP + "/tour-guide";
