@@ -1,13 +1,20 @@
 package com.abdav.giri_guide.mapper;
 
+import java.util.List;
+
 import com.abdav.giri_guide.entity.TourGuide;
+import com.abdav.giri_guide.entity.TourGuideHikingPoint;
 import com.abdav.giri_guide.model.response.TourGuideDetailResponse;
 
 public class TourGuideMapper {
     private TourGuideMapper() {
     }
 
-    public static TourGuideDetailResponse toTourGuideDetailResponse(TourGuide tourGuide) {
+    public static TourGuideDetailResponse toTourGuideDetailResponse(
+            TourGuide tourGuide,
+            List<TourGuideHikingPoint> tourGuideHikingPoint
+
+    ) {
         return new TourGuideDetailResponse(
                 tourGuide.getId(),
                 tourGuide.getName(),
@@ -21,7 +28,8 @@ public class TourGuideMapper {
                 tourGuide.getPrice(),
                 tourGuide.getAdditionalPrice(),
                 tourGuide.getTotalPorter(),
-                tourGuide.getPricePorter()
+                tourGuide.getPricePorter(),
+                TourGuideHikingPointMapper.toListMountainListHikingPoint(tourGuideHikingPoint)
 
         );
     }

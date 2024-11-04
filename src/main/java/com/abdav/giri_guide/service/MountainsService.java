@@ -12,14 +12,17 @@ import com.abdav.giri_guide.model.response.HikingPointResponse;
 import com.abdav.giri_guide.model.response.MountainsDetailResponse;
 import com.abdav.giri_guide.model.response.MountainsListResponse;
 
+import jakarta.servlet.http.HttpServletRequest;
+
 public interface MountainsService {
-    CommonResponseWithPage<List<MountainsListResponse>> mountainList(String city, Integer page, Integer size);
+    CommonResponseWithPage<List<MountainsListResponse>> mountainList(
+            String name, String city, Integer page, Integer size, HttpServletRequest httpReq);
 
-    MountainsDetailResponse mountainDetail(String id);
+    MountainsDetailResponse mountainDetail(String id, HttpServletRequest httpReq);
 
-    MountainsDetailResponse updateMountain(String id, MountainsRequest updatedMountains);
+    MountainsDetailResponse updateMountain(String id, MountainsRequest updatedMountains, HttpServletRequest httpReq);
 
-    MountainsDetailResponse createMountain(MountainsRequest mountains, MultipartFile image);
+    MountainsDetailResponse createMountain(MountainsRequest mountains, MultipartFile image, HttpServletRequest httpReq);
 
     void deleteMountain(String id);
 

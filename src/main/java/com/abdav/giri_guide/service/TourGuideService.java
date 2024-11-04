@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.web.multipart.MultipartFile;
 
+import com.abdav.giri_guide.model.request.TourGuideAddHikingPointRequest;
 import com.abdav.giri_guide.model.request.TourGuideRequest;
 import com.abdav.giri_guide.model.response.CommonResponseWithPage;
 import com.abdav.giri_guide.model.response.TourGuideDetailResponse;
@@ -20,7 +21,9 @@ public interface TourGuideService {
 
     TourGuideDetailResponse toggleTourGuideActiveStatus(String id);
 
+    void softDeleteTourGuide(String id);
+
     CommonResponseWithPage<List<TourGuideListResponse>> getTourGuideList(String hikingPointId);
 
-    TourGuideDetailResponse addHikingPoint(String tourGuideId, String hikingPointId);
+    TourGuideDetailResponse addHikingPoint(String tourGuideId, TourGuideAddHikingPointRequest request);
 }

@@ -1,6 +1,8 @@
 package com.abdav.giri_guide.entity;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import com.abdav.giri_guide.constant.EMountainStatus;
@@ -55,9 +57,9 @@ public class Mountains extends AuditEntity {
     @Column(columnDefinition = "Text")
     private String message;
 
-    @OneToMany(mappedBy = "mountain", targetEntity = HikingPoint.class, fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "mountain")
     @Builder.Default
-    private Set<HikingPoint> hikingPoints = new HashSet<>();
+    private List<HikingPoint> hikingPoints = new ArrayList<>();
 
     @Builder.Default
     private boolean useSimaksi = false;

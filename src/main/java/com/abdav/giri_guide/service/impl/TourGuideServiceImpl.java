@@ -1,5 +1,6 @@
 package com.abdav.giri_guide.service.impl;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -8,13 +9,18 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.abdav.giri_guide.constant.PathImage;
+import com.abdav.giri_guide.entity.HikingPoint;
 import com.abdav.giri_guide.entity.ImageEntity;
 import com.abdav.giri_guide.entity.TourGuide;
+import com.abdav.giri_guide.entity.TourGuideHikingPoint;
 import com.abdav.giri_guide.mapper.TourGuideMapper;
+import com.abdav.giri_guide.model.request.TourGuideAddHikingPointRequest;
 import com.abdav.giri_guide.model.request.TourGuideRequest;
 import com.abdav.giri_guide.model.response.CommonResponseWithPage;
 import com.abdav.giri_guide.model.response.TourGuideDetailResponse;
 import com.abdav.giri_guide.model.response.TourGuideListResponse;
+import com.abdav.giri_guide.repository.HikingPointRepository;
+import com.abdav.giri_guide.repository.TourGuideHikingPointRepository;
 import com.abdav.giri_guide.repository.TourGuideRepository;
 import com.abdav.giri_guide.service.ImageService;
 import com.abdav.giri_guide.service.TourGuideService;
@@ -26,13 +32,27 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class TourGuideServiceImpl implements TourGuideService {
     private final TourGuideRepository tourGuideRepository;
+    private final TourGuideHikingPointRepository tourGuideHikingPointRepository;
+    private final HikingPointRepository hikingPointRepository;
 
     private final ImageService imageService;
 
     @Override
-    public TourGuideDetailResponse addHikingPoint(String tourGuideId, String hikingPointId) {
-        // TODO Auto-generated method stub
-        return null;
+    public TourGuideDetailResponse addHikingPoint(String tourGuideId, TourGuideAddHikingPointRequest request) {
+        // TODO Check User before create
+        TourGuide tourGuide = tourGuideRepository.findById(tourGuideId).orElseThrow(EntityNotFoundException::new);
+        HikingPoint hikingPoint = hikingPointRepository.findById(request.hikingPointId())
+                .orElseThrow(EntityNotFoundException::new);
+
+        TourGuideHikingPoint tourGuideHikingPoint = TourGuideHikingPoint.builder()
+                .tourGuide(tourGuide)
+                .hikingPoint(hikingPoint)
+                .build();
+        tourGuideHikingPointRepository.save(tourGuideHikingPoint);
+        List<TourGuideHikingPoint> hikingPoints = tourGuideHikingPointRepository
+                .findByTourGuideAndDeletedDateIsNull(tourGuide);
+
+        return TourGuideMapper.toTourGuideDetailResponse(tourGuide, hikingPoints);
     }
 
     @Override
@@ -57,14 +77,18 @@ public class TourGuideServiceImpl implements TourGuideService {
                 .build();
 
         tourGuide = tourGuideRepository.save(tourGuide);
+        List<TourGuideHikingPoint> hikingPoints = tourGuideHikingPointRepository
+                .findByTourGuideAndDeletedDateIsNull(tourGuide);
 
-        return TourGuideMapper.toTourGuideDetailResponse(tourGuide);
+        return TourGuideMapper.toTourGuideDetailResponse(tourGuide, hikingPoints);
     }
 
     @Override
     public TourGuideDetailResponse getTourGuide(String id) {
         TourGuide tourGuide = tourGuideRepository.findById(id).orElseThrow(EntityNotFoundException::new);
-        return TourGuideMapper.toTourGuideDetailResponse(tourGuide);
+        List<TourGuideHikingPoint> hikingPoints = tourGuideHikingPointRepository
+                .findByTourGuideAndDeletedDateIsNull(tourGuide);
+        return TourGuideMapper.toTourGuideDetailResponse(tourGuide, hikingPoints);
     }
 
     @Override
@@ -102,7 +126,9 @@ public class TourGuideServiceImpl implements TourGuideService {
         }
 
         tourGuide = tourGuideRepository.save(tourGuide);
-        return TourGuideMapper.toTourGuideDetailResponse(tourGuide);
+        List<TourGuideHikingPoint> hikingPoints = tourGuideHikingPointRepository
+                .findByTourGuideAndDeletedDateIsNull(tourGuide);
+        return TourGuideMapper.toTourGuideDetailResponse(tourGuide, hikingPoints);
     }
 
     @Override
@@ -110,7 +136,9 @@ public class TourGuideServiceImpl implements TourGuideService {
         TourGuide tourGuide = tourGuideRepository.findById(id).orElseThrow(EntityNotFoundException::new);
         tourGuide.setActive(!tourGuide.isActive());
         tourGuide = tourGuideRepository.save(tourGuide);
-        return TourGuideMapper.toTourGuideDetailResponse(tourGuide);
+        List<TourGuideHikingPoint> hikingPoints = tourGuideHikingPointRepository
+                .findByTourGuideAndDeletedDateIsNull(tourGuide);
+        return TourGuideMapper.toTourGuideDetailResponse(tourGuide, hikingPoints);
     }
 
     @Override
@@ -119,8 +147,17 @@ public class TourGuideServiceImpl implements TourGuideService {
         ImageEntity imageEntity = imageService.create(image, PathImage.PROFILE_PICTURE, tourGuide.getName());
         tourGuide.setImage(imageEntity);
         tourGuide = tourGuideRepository.save(tourGuide);
+        List<TourGuideHikingPoint> hikingPoints = tourGuideHikingPointRepository
+                .findByTourGuideAndDeletedDateIsNull(tourGuide);
 
-        return TourGuideMapper.toTourGuideDetailResponse(tourGuide);
+        return TourGuideMapper.toTourGuideDetailResponse(tourGuide, hikingPoints);
+    }
+
+    @Override
+    public void softDeleteTourGuide(String id) {
+        TourGuide tourGuide = tourGuideRepository.findById(id).orElseThrow(EntityNotFoundException::new);
+        tourGuide.setDeletedDate(LocalDateTime.now());
+        tourGuideRepository.save(tourGuide);
     }
 
 }
