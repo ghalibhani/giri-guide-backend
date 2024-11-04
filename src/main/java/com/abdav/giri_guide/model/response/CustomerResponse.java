@@ -2,6 +2,7 @@ package com.abdav.giri_guide.model.response;
 
 import com.abdav.giri_guide.constant.EGender;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 
 public record CustomerResponse(
@@ -12,6 +13,7 @@ public record CustomerResponse(
         String address,
         EGender gender,
         String email,
-        String imageId
+        String imageId,
+        LocalDateTime createdAt
 ) {
 }
