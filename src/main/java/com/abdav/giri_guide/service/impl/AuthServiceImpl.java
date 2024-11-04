@@ -64,7 +64,7 @@ public class AuthServiceImpl implements AuthService {
             customerService.createCustomer(customer);
 
         } catch (DataIntegrityViolationException e) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "User already exists");
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Email atau nik sudah terdaftar");
         }
     }
 
