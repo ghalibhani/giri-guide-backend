@@ -42,4 +42,19 @@ public class AuthController {
                 .status(HttpStatus.OK)
                 .body(response);
     }
+
+    @PutMapping("/{userId}")
+    ResponseEntity<?> changePassword(
+            @PathVariable String userId,
+            @RequestParam String oldPassword,
+            @RequestParam String newPassword
+    ){
+        authService.changePassword(userId, oldPassword, newPassword);
+        message = Message.DATA_UPDATED;
+        CommonResponse<?> response = new CommonResponse<>(message, null);
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(response);
+    }
 }
