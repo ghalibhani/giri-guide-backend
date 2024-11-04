@@ -10,7 +10,9 @@ public record MountainsRequest(
         @NotBlank String city,
         String description,
         String status,
-        String message
+        String message,
+        boolean useSimaksi,
+        Double priceSimaksi
 
 ) {
     public EMountainStatus statusToEnum() {
@@ -47,6 +49,8 @@ public record MountainsRequest(
                 .description(description.trim())
                 .status(statusToEnum())
                 .message(message.trim())
+                .useSimaksi(useSimaksi)
+                .priceSimaksi(priceSimaksi)
                 .build();
     }
 }

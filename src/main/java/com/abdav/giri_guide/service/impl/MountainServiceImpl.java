@@ -44,7 +44,6 @@ public class MountainServiceImpl implements MountainsService {
     public MountainsDetailResponse createMountain(MountainsRequest newMountains, MultipartFile requestImage) {
         Optional<Mountains> savedMountain = mountainRepository
                 .findByNameIgnoreCaseAndDeletedDateIsNull(newMountains.name().trim());
-
         if (savedMountain.isPresent()) {
             throw new DataIntegrityViolationException("Active data with same name already exist");
         }
@@ -61,6 +60,8 @@ public class MountainServiceImpl implements MountainsService {
                 mountains.getDescription(),
                 mountains.getStatus(),
                 mountains.getMessage(),
+                mountains.isUseSimaksi(),
+                mountains.getPriceSimaksi(),
                 toSetHikingPointResponse(hikingPointRepository.findByMountainAndDeletedDateIsNull(mountains))
 
         );
@@ -85,6 +86,8 @@ public class MountainServiceImpl implements MountainsService {
                 mountain.getDescription(),
                 mountain.getStatus(),
                 mountain.getMessage(),
+                mountain.isUseSimaksi(),
+                mountain.getPriceSimaksi(),
                 toSetHikingPointResponse(hikingPointRepository.findByMountainAndDeletedDateIsNull(mountain))
 
         );
@@ -118,6 +121,7 @@ public class MountainServiceImpl implements MountainsService {
 
     @Override
     public MountainsDetailResponse updateMountain(String id, MountainsRequest updatedMountains) {
+        // TODO check mountain checker for new data
         Mountains mountain = mountainRepository.findById(id).orElseThrow(EntityNotFoundException::new);
 
         Optional<Mountains> savedMountain = mountainRepository
@@ -141,6 +145,9 @@ public class MountainServiceImpl implements MountainsService {
         if (updatedMountains.message() != null) {
             mountain.setMessage(updatedMountains.message().trim());
         }
+        if (updatedMountains.priceSimaksi() != null) {
+            mountain.setPriceSimaksi(updatedMountains.priceSimaksi());
+        }
         mountainRepository.save(mountain);
 
         return new MountainsDetailResponse(
@@ -151,6 +158,8 @@ public class MountainServiceImpl implements MountainsService {
                 mountain.getDescription(),
                 mountain.getStatus(),
                 mountain.getMessage(),
+                mountain.isUseSimaksi(),
+                mountain.getPriceSimaksi(),
                 toSetHikingPointResponse(hikingPointRepository.findByMountainAndDeletedDateIsNull(mountain))
 
         );
@@ -162,6 +171,7 @@ public class MountainServiceImpl implements MountainsService {
                 .mountain(mountain)
                 .name(request.name().trim())
                 .coordinate(request.coordinate())
+                .price(request.price())
                 .build();
 
         hikingPoint = hikingPointRepository.save(hikingPoint);
@@ -170,7 +180,8 @@ public class MountainServiceImpl implements MountainsService {
                 hikingPoint.getId(),
                 hikingPoint.getMountain().getId(),
                 hikingPoint.getName(),
-                hikingPoint.getCoordinate());
+                hikingPoint.getCoordinate(),
+                hikingPoint.getPrice());
     }
 
     public Set<HikingPointResponse> getHikingPoints(String mountainId) {
@@ -185,7 +196,8 @@ public class MountainServiceImpl implements MountainsService {
                     hikingPoint.getId(),
                     hikingPoint.getMountain().getId(),
                     hikingPoint.getName(),
-                    hikingPoint.getCoordinate()));
+                    hikingPoint.getCoordinate(),
+                    hikingPoint.getPrice()));
         }
         return result;
     }
@@ -204,7 +216,8 @@ public class MountainServiceImpl implements MountainsService {
                 hikingPoint.getId(),
                 hikingPoint.getMountain().getId(),
                 hikingPoint.getName(),
-                hikingPoint.getCoordinate());
+                hikingPoint.getCoordinate(),
+                hikingPoint.getPrice());
     }
 
     @Override
@@ -223,7 +236,8 @@ public class MountainServiceImpl implements MountainsService {
                 hikingPoint.getId(),
                 hikingPoint.getMountain().getId(),
                 hikingPoint.getName(),
-                hikingPoint.getCoordinate());
+                hikingPoint.getCoordinate(),
+                hikingPoint.getPrice());
     }
 
 }

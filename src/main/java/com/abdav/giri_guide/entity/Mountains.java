@@ -58,4 +58,10 @@ public class Mountains extends AuditEntity {
     @OneToMany(mappedBy = "mountain", targetEntity = HikingPoint.class, fetch = FetchType.EAGER)
     @Builder.Default
     private Set<HikingPoint> hikingPoints = new HashSet<>();
+
+    @Builder.Default
+    private boolean useSimaksi = false;
+
+    @Builder.Default
+    private Double priceSimaksi = 0.0;
 }

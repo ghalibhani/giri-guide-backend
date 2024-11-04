@@ -31,4 +31,5 @@ public class HikingPoint extends AuditEntity {
 
     private String name;
     private String coordinate;
+    private Double price;
 }
