@@ -10,6 +10,10 @@ import com.abdav.giri_guide.entity.Mountains;
 import com.abdav.giri_guide.entity.TourGuideHikingPoint;
 import com.abdav.giri_guide.model.response.HikingPointResponse;
 import com.abdav.giri_guide.model.response.MountainListHikingPointResponse;
+import com.abdav.giri_guide.model.response.TourGuideListResponse;
+import com.abdav.giri_guide.util.UrlUtil;
+
+import jakarta.servlet.http.HttpServletRequest;
 
 public class TourGuideHikingPointMapper {
     private TourGuideHikingPointMapper() {
@@ -45,6 +49,23 @@ public class TourGuideHikingPointMapper {
                     hikingPoints));
         }
 
+        return result;
+    }
+
+    public static List<TourGuideListResponse> toListOfTourGuideListResponse(
+            List<TourGuideHikingPoint> listData, HttpServletRequest httpReq) {
+
+        List<TourGuideListResponse> result = new ArrayList<>();
+        for (TourGuideHikingPoint data : listData) {
+            result.add(new TourGuideListResponse(
+                    data.getTourGuide().getId(),
+                    data.getTourGuide().getName(),
+                    (data.getTourGuide().getImage() == null) ? null
+                            : UrlUtil.resolveImageUrl(data.getTourGuide().getImage(), httpReq),
+                    data.getTourGuide().getDescription(),
+                    5.0,
+                    10));
+        }
         return result;
     }
 }
