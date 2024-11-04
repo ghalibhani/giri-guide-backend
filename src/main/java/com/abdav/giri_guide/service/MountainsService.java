@@ -24,6 +24,8 @@ public interface MountainsService {
 
     MountainsDetailResponse createMountain(MountainsRequest mountains, MultipartFile image, HttpServletRequest httpReq);
 
+    MountainsDetailResponse updateMountainImage(String id, MultipartFile image, HttpServletRequest httpRequest);
+
     void deleteMountain(String id);
 
     HikingPointResponse createHikingPoint(String mountainId, HikingPointRequest request);

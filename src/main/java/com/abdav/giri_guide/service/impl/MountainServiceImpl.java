@@ -136,6 +136,18 @@ public class MountainServiceImpl implements MountainsService {
         return MountainsMapper.toMountainsDetailResponse(mountain, httpReq);
     }
 
+    @Override
+    public MountainsDetailResponse updateMountainImage(String id, MultipartFile image, HttpServletRequest httpRequest) {
+        Mountains mountain = mountainRepository.findById(id).orElseThrow(EntityNotFoundException::new);
+        ImageEntity imageEntity = imageService.create(image, PathImage.MOUNTAINS_PICTURE, mountain.getName());
+        ImageEntity oldImage = mountain.getImage();
+        mountain.setImage(imageEntity);
+        mountain = mountainRepository.save(mountain);
+        imageService.delete(oldImage);
+
+        return MountainsMapper.toMountainsDetailResponse(mountain, httpRequest);
+    }
+
     public HikingPointResponse createHikingPoint(String mountainId, HikingPointRequest request) {
         Mountains mountain = mountainRepository.findById(mountainId).orElseThrow(EntityNotFoundException::new);
         HikingPoint hikingPoint = HikingPoint.builder()
