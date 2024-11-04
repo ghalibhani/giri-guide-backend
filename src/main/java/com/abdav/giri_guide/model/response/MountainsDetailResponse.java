@@ -14,6 +14,8 @@ public record MountainsDetailResponse(
         String message,
         boolean useSimaksi,
         Double priceSimaksi,
+        String tips,
+        String bestTime,
         Set<HikingPointResponse> hikingPoints
 
 ) {

@@ -30,102 +30,104 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping(PathApi.MOUNTAINS_API)
 @SecurityRequirement(name = "bearerAuth")
 public class MountainController {
-    private final MountainsService service;
+        private final MountainsService service;
 
-    @GetMapping("")
-    public ResponseEntity<?> getMountainList(
-            @RequestParam(required = false, defaultValue = "") String name,
-            @RequestParam(required = false, defaultValue = "") String city,
-            @RequestParam(required = false, defaultValue = "1") Integer page,
-            @RequestParam(required = false, defaultValue = "5") Integer size,
-            HttpServletRequest httpReq
+        @GetMapping("")
+        public ResponseEntity<?> getMountainList(
+                        @RequestParam(required = false, defaultValue = "") String name,
+                        @RequestParam(required = false, defaultValue = "") String city,
+                        @RequestParam(required = false, defaultValue = "1") Integer page,
+                        @RequestParam(required = false, defaultValue = "5") Integer size,
+                        HttpServletRequest httpReq
 
-    ) {
-        return ResponseEntity.status(HttpStatus.OK)
-                .body(service.mountainList(name, city, page, size, httpReq));
-    }
+        ) {
+                return ResponseEntity.status(HttpStatus.OK)
+                                .body(service.mountainList(name, city, page, size, httpReq));
+        }
 
-    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<?> createMountain(
-            @RequestParam String name,
-            @RequestParam String city,
-            @RequestParam String description,
-            @RequestParam String status,
-            @RequestParam String message,
-            @RequestParam boolean useSimaksi,
-            @RequestParam Double priceSimaksi,
-            @RequestParam MultipartFile image,
-            HttpServletRequest httpReq
+        @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+        public ResponseEntity<?> createMountain(
+                        @RequestParam String name,
+                        @RequestParam String city,
+                        @RequestParam String description,
+                        @RequestParam String status,
+                        @RequestParam String message,
+                        @RequestParam boolean useSimaksi,
+                        @RequestParam Double priceSimaksi,
+                        @RequestParam MultipartFile image,
+                        @RequestParam String tips,
+                        @RequestParam String bestTime,
+                        HttpServletRequest httpReq
 
-    ) {
-        MountainsRequest request = new MountainsRequest(
-                name, city, description, status, message, useSimaksi, priceSimaksi
+        ) {
+                MountainsRequest request = new MountainsRequest(
+                                name, city, description, status, message, useSimaksi, priceSimaksi, tips, bestTime);
 
-        );
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body(new CommonResponse<>("Mountain data successfully created",
-                        service.createMountain(request, image, httpReq)));
-    }
+                return ResponseEntity.status(HttpStatus.CREATED)
+                                .body(new CommonResponse<>("Mountain data successfully created",
+                                                service.createMountain(request, image, httpReq)));
+        }
 
-    @GetMapping("{id}")
-    public ResponseEntity<CommonResponse<?>> getMountainDetail(@PathVariable String id, HttpServletRequest httpReq) {
-        return ResponseEntity.status(HttpStatus.OK)
-                .body(new CommonResponse<>("Data fetched successfully",
-                        service.mountainDetail(id, httpReq)));
-    }
+        @GetMapping("{id}")
+        public ResponseEntity<CommonResponse<?>> getMountainDetail(@PathVariable String id,
+                        HttpServletRequest httpReq) {
+                return ResponseEntity.status(HttpStatus.OK)
+                                .body(new CommonResponse<>("Data fetched successfully",
+                                                service.mountainDetail(id, httpReq)));
+        }
 
-    @PutMapping("{id}")
-    public ResponseEntity<CommonResponse<?>> updateMountain(
-            @PathVariable String id,
-            @RequestBody MountainsRequest request,
-            HttpServletRequest httpReq
+        @PutMapping("{id}")
+        public ResponseEntity<CommonResponse<?>> updateMountain(
+                        @PathVariable String id,
+                        @RequestBody MountainsRequest request,
+                        HttpServletRequest httpReq
 
-    ) {
+        ) {
 
-        return ResponseEntity.status(HttpStatus.OK)
-                .body(new CommonResponse<>("Data updated successfully",
-                        service.updateMountain(id, request, httpReq)));
-    }
+                return ResponseEntity.status(HttpStatus.OK)
+                                .body(new CommonResponse<>("Data updated successfully",
+                                                service.updateMountain(id, request, httpReq)));
+        }
 
-    @DeleteMapping("{id}")
-    public ResponseEntity<CommonResponse<?>> deleteMountain(@PathVariable String id) {
-        service.deleteMountain(id);
-        return ResponseEntity.status(HttpStatus.OK)
-                .body(new CommonResponse<>("Data deleted successfully", null));
-    }
+        @DeleteMapping("{id}")
+        public ResponseEntity<CommonResponse<?>> deleteMountain(@PathVariable String id) {
+                service.deleteMountain(id);
+                return ResponseEntity.status(HttpStatus.OK)
+                                .body(new CommonResponse<>("Data deleted successfully", null));
+        }
 
-    @GetMapping("{mountainId}/hiking-points")
-    public ResponseEntity<?> getHikingPoints(@PathVariable String mountainId) {
-        return ResponseEntity.status(HttpStatus.OK)
-                .body(new CommonResponse<>("Data fetched", service.getHikingPoints(mountainId)));
-    }
+        @GetMapping("{mountainId}/hiking-points")
+        public ResponseEntity<?> getHikingPoints(@PathVariable String mountainId) {
+                return ResponseEntity.status(HttpStatus.OK)
+                                .body(new CommonResponse<>("Data fetched", service.getHikingPoints(mountainId)));
+        }
 
-    @PostMapping("{mountainId}/hiking-points")
-    public ResponseEntity<?> addHikingPoint(@PathVariable String mountainId,
-            @RequestBody @Validated HikingPointRequest request
+        @PostMapping("{mountainId}/hiking-points")
+        public ResponseEntity<?> addHikingPoint(@PathVariable String mountainId,
+                        @RequestBody @Validated HikingPointRequest request
 
-    ) {
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body(new CommonResponse<>("Data Create",
-                        service.createHikingPoint(mountainId, request)));
-    }
+        ) {
+                return ResponseEntity.status(HttpStatus.CREATED)
+                                .body(new CommonResponse<>("Data Create",
+                                                service.createHikingPoint(mountainId, request)));
+        }
 
-    @GetMapping("hiking-points/{id}")
-    public ResponseEntity<?> getHikingPoint(@PathVariable String id) {
-        return ResponseEntity.status(HttpStatus.OK)
-                .body(new CommonResponse<>("Data Fetched", service.getHikingPoint(id)));
-    }
+        @GetMapping("hiking-points/{id}")
+        public ResponseEntity<?> getHikingPoint(@PathVariable String id) {
+                return ResponseEntity.status(HttpStatus.OK)
+                                .body(new CommonResponse<>("Data Fetched", service.getHikingPoint(id)));
+        }
 
-    @PutMapping("hiking-points/{id}")
-    public ResponseEntity<?> updateHikingPoint(@PathVariable String id, @RequestBody HikingPointRequest request) {
-        return ResponseEntity.status(HttpStatus.OK)
-                .body(new CommonResponse<>("Data Updated", service.updateHikingPoint(id, request)));
-    }
+        @PutMapping("hiking-points/{id}")
+        public ResponseEntity<?> updateHikingPoint(@PathVariable String id, @RequestBody HikingPointRequest request) {
+                return ResponseEntity.status(HttpStatus.OK)
+                                .body(new CommonResponse<>("Data Updated", service.updateHikingPoint(id, request)));
+        }
 
-    @DeleteMapping("hiking-points/{id}")
-    public ResponseEntity<?> deleteHikingPoint(@PathVariable String id) {
-        service.deleteHikingPoint(id);
-        return ResponseEntity.status(HttpStatus.OK)
-                .body(new CommonResponse<>("Data Deleted", null));
-    }
+        @DeleteMapping("hiking-points/{id}")
+        public ResponseEntity<?> deleteHikingPoint(@PathVariable String id) {
+                service.deleteHikingPoint(id);
+                return ResponseEntity.status(HttpStatus.OK)
+                                .body(new CommonResponse<>("Data Deleted", null));
+        }
 }

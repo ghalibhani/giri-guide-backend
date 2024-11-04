@@ -1,9 +1,7 @@
 package com.abdav.giri_guide.entity;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import com.abdav.giri_guide.constant.EMountainStatus;
 
@@ -12,7 +10,6 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -66,4 +63,12 @@ public class Mountains extends AuditEntity {
 
     @Builder.Default
     private Double priceSimaksi = 0.0;
+
+    @Nullable
+    @Column(columnDefinition = "Text")
+    private String tips;
+
+    @Nullable
+    @Column(columnDefinition = "Text")
+    private String bestTime;
 }
