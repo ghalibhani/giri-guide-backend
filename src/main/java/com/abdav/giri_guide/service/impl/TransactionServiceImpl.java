@@ -8,7 +8,6 @@ import com.abdav.giri_guide.mapper.TransactionMapper;
 import com.abdav.giri_guide.model.request.HikerDetailRequest;
 import com.abdav.giri_guide.model.request.TransactionRequest;
 import com.abdav.giri_guide.model.response.TransactionDetailResponse;
-import com.abdav.giri_guide.model.response.TransactionDetailResponseUser;
 import com.abdav.giri_guide.model.response.TransactionResponse;
 import com.abdav.giri_guide.model.response.TransactionStatusResponse;
 import com.abdav.giri_guide.repository.*;
@@ -140,13 +139,6 @@ public class TransactionServiceImpl implements TransactionService {
         Page<Transaction> transactions = transactionRepository.findAllByStatusInAndDeletedDateIsNull(eStatus,pageable);
 
         return transactions.map(TransactionMapper::transactionToTransactionResponse);
-    }
-
-    @Override
-    public TransactionDetailResponseUser getByIdTransactionDetailResponseUser(String id) {
-        Transaction transaction = getTransactionOrThrowNotFound(id);
-
-        return TransactionMapper.transactionToDetailResponseUser(transaction);
     }
 
     @Override
