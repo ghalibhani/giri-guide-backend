@@ -2,6 +2,7 @@ package com.abdav.giri_guide.controller;
 
 import com.abdav.giri_guide.constant.Message;
 import com.abdav.giri_guide.constant.PathApi;
+import com.abdav.giri_guide.model.request.TransactionByStatusRequest;
 import com.abdav.giri_guide.model.request.TransactionRequest;
 import com.abdav.giri_guide.model.response.*;
 import com.abdav.giri_guide.service.TransactionService;
@@ -63,6 +64,22 @@ public class TransactionController {
         TransactionDetailResponse transactionDetailResponse = transactionService.getTransactionById(id);
         message = Message.SUCCESS_FETCH;
         CommonResponse<?> response = new CommonResponse<>(message, transactionDetailResponse);
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(response);
+    }
+
+    @GetMapping(PathApi.HISTORY_TRANSACTION)
+    ResponseEntity<?> transactionByStatus(
+            @RequestParam(required = false, defaultValue = "1") Integer page,
+            @RequestParam(required = false, defaultValue = "5") Integer size,
+            @RequestBody TransactionByStatusRequest request
+    ){
+        Page<TransactionResponse> transaction = transactionService.findAllByStatus(request, page, size);
+        PagingResponse paging = new PagingResponse(page, size, transaction.getTotalPages(), transaction.getTotalElements());
+        message = Message.SUCCESS_FETCH;
+        CommonResponseWithPage<?> response = new CommonResponseWithPage<>(message, transaction.getContent(), paging);
 
         return ResponseEntity
                 .status(HttpStatus.OK)
