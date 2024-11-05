@@ -54,11 +54,11 @@ public class TourGuideController {
             @RequestParam String address,
 
             @RequestParam Integer maxHiker,
-            @RequestParam Double price,
-            @RequestParam Double additionalPrice,
+            @RequestParam Long price,
+            @RequestParam Long additionalPrice,
 
             @RequestParam Integer totalPorter,
-            @RequestParam Double pricePorter,
+            @RequestParam Long pricePorter,
             HttpServletRequest httpReq
 
     ) {

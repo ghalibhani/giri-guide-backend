@@ -54,10 +54,10 @@ public class TourGuide extends AuditEntity {
 
     @Builder.Default
     private Integer maxHiker = 5;
-    private Double price;
-    private Double additionalPrice;
+    private Long price;
+    private Long additionalPrice;
     private Integer totalPorter;
-    private Double pricePorter;
+    private Long pricePorter;
 
     @Builder.Default
     private boolean isActive = true;
