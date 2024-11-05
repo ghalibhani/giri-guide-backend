@@ -58,7 +58,11 @@ public class TourGuideServiceImpl implements TourGuideService {
     private final PasswordEncoder passwordEncoder;
 
     @Override
-    public TourGuideDetailResponse addHikingPoint(String tourGuideId, TourGuideAddHikingPointRequest request) {
+    public TourGuideDetailResponse addHikingPoint(
+            String tourGuideId,
+            TourGuideAddHikingPointRequest request,
+            HttpServletRequest httpReq) {
+
         TourGuide tourGuide = tourGuideRepository.findById(tourGuideId).orElseThrow(EntityNotFoundException::new);
         HikingPoint hikingPoint = hikingPointRepository.findById(request.hikingPointId())
                 .orElseThrow(EntityNotFoundException::new);
@@ -71,7 +75,7 @@ public class TourGuideServiceImpl implements TourGuideService {
         List<TourGuideHikingPoint> hikingPoints = tourGuideHikingPointRepository
                 .findByTourGuideAndDeletedDateIsNull(tourGuide);
 
-        return TourGuideMapper.toTourGuideDetailResponse(tourGuide, hikingPoints);
+        return TourGuideMapper.toTourGuideDetailResponse(tourGuide, hikingPoints, httpReq);
     }
 
     @Override
@@ -128,11 +132,12 @@ public class TourGuideServiceImpl implements TourGuideService {
     }
 
     @Override
-    public TourGuideDetailResponse getTourGuide(String id) {
+    public TourGuideDetailResponse getTourGuide(String id, HttpServletRequest httpReq) {
+
         TourGuide tourGuide = tourGuideRepository.findById(id).orElseThrow(EntityNotFoundException::new);
         List<TourGuideHikingPoint> hikingPoints = tourGuideHikingPointRepository
                 .findByTourGuideAndDeletedDateIsNull(tourGuide);
-        return TourGuideMapper.toTourGuideDetailResponse(tourGuide, hikingPoints);
+        return TourGuideMapper.toTourGuideDetailResponse(tourGuide, hikingPoints, httpReq);
     }
 
     @Override
@@ -175,7 +180,11 @@ public class TourGuideServiceImpl implements TourGuideService {
     }
 
     @Override
-    public TourGuideDetailResponse updateTourGuide(String id, TourGuideRequest request) {
+    public TourGuideDetailResponse updateTourGuide(
+            String id,
+            TourGuideRequest request,
+            HttpServletRequest httpReq) {
+
         TourGuide tourGuide = tourGuideRepository.findById(id).orElseThrow(EntityNotFoundException::new);
         if (request.name() != null) {
             tourGuide.setName(request.name());
@@ -205,21 +214,21 @@ public class TourGuideServiceImpl implements TourGuideService {
         tourGuide = tourGuideRepository.save(tourGuide);
         List<TourGuideHikingPoint> hikingPoints = tourGuideHikingPointRepository
                 .findByTourGuideAndDeletedDateIsNull(tourGuide);
-        return TourGuideMapper.toTourGuideDetailResponse(tourGuide, hikingPoints);
+        return TourGuideMapper.toTourGuideDetailResponse(tourGuide, hikingPoints, httpReq);
     }
 
     @Override
-    public TourGuideDetailResponse toggleTourGuideActiveStatus(String id) {
+    public TourGuideDetailResponse toggleTourGuideActiveStatus(String id, HttpServletRequest httpReq) {
         TourGuide tourGuide = tourGuideRepository.findById(id).orElseThrow(EntityNotFoundException::new);
         tourGuide.setActive(!tourGuide.isActive());
         tourGuide = tourGuideRepository.save(tourGuide);
         List<TourGuideHikingPoint> hikingPoints = tourGuideHikingPointRepository
                 .findByTourGuideAndDeletedDateIsNull(tourGuide);
-        return TourGuideMapper.toTourGuideDetailResponse(tourGuide, hikingPoints);
+        return TourGuideMapper.toTourGuideDetailResponse(tourGuide, hikingPoints, httpReq);
     }
 
     @Override
-    public TourGuideDetailResponse updateTourGuideImage(String id, MultipartFile image) {
+    public TourGuideDetailResponse updateTourGuideImage(String id, MultipartFile image, HttpServletRequest httpReq) {
         TourGuide tourGuide = tourGuideRepository.findById(id).orElseThrow(EntityNotFoundException::new);
         ImageEntity imageEntity = imageService.create(image, PathImage.PROFILE_PICTURE, tourGuide.getName());
         tourGuide.setImage(imageEntity);
@@ -227,7 +236,7 @@ public class TourGuideServiceImpl implements TourGuideService {
         List<TourGuideHikingPoint> hikingPoints = tourGuideHikingPointRepository
                 .findByTourGuideAndDeletedDateIsNull(tourGuide);
 
-        return TourGuideMapper.toTourGuideDetailResponse(tourGuide, hikingPoints);
+        return TourGuideMapper.toTourGuideDetailResponse(tourGuide, hikingPoints, httpReq);
     }
 
     @Override
