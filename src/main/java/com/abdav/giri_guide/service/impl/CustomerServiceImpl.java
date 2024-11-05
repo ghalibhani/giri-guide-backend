@@ -21,6 +21,16 @@ import com.abdav.giri_guide.model.response.CustomerResponse;
 import com.abdav.giri_guide.repository.CustomerRepository;
 import com.abdav.giri_guide.service.CustomerService;
 import com.abdav.giri_guide.service.ImageService;
+import com.abdav.giri_guide.service.UserService;
+import jakarta.servlet.http.HttpServletRequest;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.server.ResponseStatusException;
 
 import lombok.RequiredArgsConstructor;
 
@@ -36,21 +46,21 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
-    public Page<CustomerResponse> customerList(Integer page, Integer size) {
+    public Page<CustomerResponse> customerList(Integer page, Integer size, HttpServletRequest httpReq) {
         if(page <= 0){
             page = 1;
         }
         Pageable pageable = PageRequest.of(page-1, size);
         Page <Customer> customers = customerRepository.findAllByDeletedDateIsNull(pageable);
-        Page<CustomerResponse> customerResponses = customers.map(CustomerMapper::customerToCustomerResponse);
+        Page<CustomerResponse> customerResponses = customers.map(customer -> CustomerMapper.customerToCustomerResponse(customer, httpReq));
 
         return customerResponses;
     }
 
     @Override
-    public CustomerResponse getCustomerById(String id) {
+    public CustomerResponse getCustomerById(String id, HttpServletRequest httpReq) {
         Customer customer = getCustomerByIdOrThrowNotFound(id);
-        return CustomerMapper.customerToCustomerResponse(customer);
+        return CustomerMapper.customerToCustomerResponse(customer, httpReq);
     }
 
     @Override
@@ -61,13 +71,13 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
-    public CustomerResponse getCustomerByUserId(String userId) {
+    public CustomerResponse getCustomerByUserId(String userId, HttpServletRequest httpReq) {
         Customer customer = getCustomerByUserIdOrNotFound(userId);
-        return CustomerMapper.customerToCustomerResponse(customer);
+        return CustomerMapper.customerToCustomerResponse(customer, httpReq);
     }
 
     @Override
-    public CustomerResponse updateCustomer(String id ,CustomerRequest customerRequest) {
+    public CustomerResponse updateCustomer(String id ,CustomerRequest customerRequest, HttpServletRequest httpReq) {
         Customer customer = getCustomerByIdOrThrowNotFound(id);
         customer.setFullName(customerRequest.fullName());
         customer.setAddress(customerRequest.address());
@@ -75,18 +85,18 @@ public class CustomerServiceImpl implements CustomerService {
 
         customerRepository.saveAndFlush(customer);
 
-        return CustomerMapper.customerToCustomerResponse(customer);
+        return CustomerMapper.customerToCustomerResponse(customer, httpReq);
     }
 
     @Override
-    public CustomerResponse uploadProfileImage(String id, MultipartFile file) {
+    public CustomerResponse uploadProfileImage(String id, MultipartFile file, HttpServletRequest httpReq) {
         Customer customer = getCustomerByIdOrThrowNotFound(id);
 
         ImageEntity img = imageService.create(file, PathImage.PROFILE_PICTURE, customer.getFullName());
         customer.setImage(img);
         customerRepository.saveAndFlush(customer);
 
-        return CustomerMapper.customerToCustomerResponse(customer);
+        return CustomerMapper.customerToCustomerResponse(customer, httpReq);
     }
 
     private Customer getCustomerByUserIdOrNotFound(String userId) {

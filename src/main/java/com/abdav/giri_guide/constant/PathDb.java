@@ -6,4 +6,6 @@ public class PathDb {
     public static final String ROLE = "m_role";
     public static final String TRANSACTION = "t_transaction";
     public static final String TRANSACTION_DETAIL = "t_transaction_hiker";
+    public static final String PAYMENT = "m_payment";
+    public static final String TRANSACTION_PAYMENT = "t_payment_customer";
 }

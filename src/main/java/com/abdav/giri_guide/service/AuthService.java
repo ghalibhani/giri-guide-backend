@@ -8,4 +8,6 @@ public interface AuthService {
     void register(RegisterRequest registerRequest);
 
     LoginResponse login(LoginRequest loginRequest);
+
+    void changePassword(String userId, String oldPassword, String newPassword);
 }
