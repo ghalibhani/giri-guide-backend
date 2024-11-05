@@ -7,10 +7,12 @@ import com.abdav.giri_guide.entity.*;
 import com.abdav.giri_guide.mapper.TransactionMapper;
 import com.abdav.giri_guide.model.request.HikerDetailRequest;
 import com.abdav.giri_guide.model.request.TransactionRequest;
+import com.abdav.giri_guide.model.response.CustomerResponse;
 import com.abdav.giri_guide.model.response.TransactionDetailResponse;
 import com.abdav.giri_guide.model.response.TransactionResponse;
 import com.abdav.giri_guide.model.response.TransactionStatusResponse;
 import com.abdav.giri_guide.repository.*;
+import com.abdav.giri_guide.service.CustomerService;
 import com.abdav.giri_guide.service.MidtransService;
 import com.abdav.giri_guide.service.TransactionService;
 import com.midtrans.httpclient.error.MidtransError;
@@ -36,7 +38,7 @@ public class TransactionServiceImpl implements TransactionService {
     private final HikingPointRepository hikingPointRepository;
     private final TransactionHikerRepository transactionHikerRepository;
     private final TourGuideRepository tourGuideRepository;
-    private final MidtransService midtransService;
+    private final CustomerService customerService;
 
     @Value("${app.giri-guide.admin-cost}")
     private Long adminCost;
@@ -133,10 +135,11 @@ public class TransactionServiceImpl implements TransactionService {
 
     @Override
     public Page<TransactionResponse> findAllByStatus(TransactionByStatusRequest request, Integer page, Integer size) {
+        Customer customer = customerService.getById(request.userId());
 
         List<ETransactionStatus> eStatus = request.listStatus().stream().map(s -> ETransactionStatus.valueOf(s.toUpperCase())).toList();
         Pageable pageable = PageRequest.of(page-1, size);
-        Page<Transaction> transactions = transactionRepository.findAllByStatusInAndDeletedDateIsNull(eStatus,pageable);
+        Page<Transaction> transactions = transactionRepository.findAllByCustomerIdAndStatusInAndDeletedDateIsNull(customer.getId(), eStatus,pageable);
 
         return transactions.map(TransactionMapper::transactionToTransactionResponse);
     }

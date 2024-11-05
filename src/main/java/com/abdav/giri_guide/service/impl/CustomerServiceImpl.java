@@ -99,6 +99,11 @@ public class CustomerServiceImpl implements CustomerService {
         return CustomerMapper.customerToCustomerResponse(customer, httpReq);
     }
 
+    @Override
+    public Customer getById(String id) {
+        return getCustomerByUserIdOrNotFound(id);
+    }
+
     private Customer getCustomerByUserIdOrNotFound(String userId) {
         Optional<Customer> customer = customerRepository.findByUserIdAndDeletedDateIsNull(userId);
         return customer.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, Message.DATA_NOT_FOUND));
