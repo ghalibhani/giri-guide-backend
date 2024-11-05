@@ -46,12 +46,12 @@ public class GuideReviewServiceImpl implements GuideReviewService {
         return new GuideReviewResponse(
                 newReview.getId(),
                 newReview.getCustomer(),
-                "fufufafa",
+                "Jane Doe",
                 newReview.getCreatedDate(),
                 newReview.getUsePorter(),
                 newReview.getRating(),
                 newReview.getReview(),
-                "gambar");
+                "https://upload.wikimedia.org/wikipedia/id/e/ed/Nyan_cat_250px_frame.PNG");
     }
 
     @Override
@@ -60,12 +60,12 @@ public class GuideReviewServiceImpl implements GuideReviewService {
         return new GuideReviewResponse(
                 review.getId(),
                 review.getCustomer(),
-                "fufufafa",
+                "Jane Doe",
                 review.getCreatedDate(),
                 review.getUsePorter(),
                 review.getRating(),
                 review.getReview(),
-                "gambar");
+                "https://upload.wikimedia.org/wikipedia/id/e/ed/Nyan_cat_250px_frame.PNG");
     }
 
     @Override
@@ -89,12 +89,12 @@ public class GuideReviewServiceImpl implements GuideReviewService {
             reviewList.add(new GuideReviewResponse(
                     review.getId(),
                     review.getCustomer(),
-                    "fufufafa",
+                    "Jane Doe",
                     review.getCreatedDate(),
                     review.getUsePorter(),
                     review.getRating(),
                     review.getReview(),
-                    "gambar"));
+                    "https://upload.wikimedia.org/wikipedia/id/e/ed/Nyan_cat_250px_frame.PNG"));
         }
 
         return new CommonResponseWithPage<>("Data Fetched", reviewList, paging);

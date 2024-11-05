@@ -43,7 +43,7 @@ public class AuthController {
                 .body(response);
     }
 
-    @PutMapping("/{userId}")
+    @PutMapping(PathApi.CHANGE_PASSWORD_API)
     ResponseEntity<?> changePassword(
             @PathVariable String userId,
             @RequestParam String oldPassword,
