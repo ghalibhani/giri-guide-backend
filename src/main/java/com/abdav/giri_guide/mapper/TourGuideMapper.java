@@ -35,7 +35,16 @@ public class TourGuideMapper {
                 tourGuide.getAdditionalPrice(),
                 tourGuide.getTotalPorter(),
                 tourGuide.getPricePorter(),
-                (tourGuide.getImage() == null) ? null : UrlUtil.resolveImageUrl(tourGuide.getImage(), httpReq));
+                (tourGuide.getImage() == null) ? null : UrlUtil.resolveImageUrl(tourGuide.getImage(), httpReq),
+
+                // #TODO Fix Hard Code
+                450,
+                40,
+                60,
+                4.3,
+                26
+
+        );
     }
 
     public static TourGuideDetailResponse toTourGuideDetailResponse(
