@@ -17,7 +17,9 @@ public class TourGuideMapper {
     }
 
     public static TourGuideProfileResponse toTourGuideProfileResponse(
-            TourGuide tourGuide, HttpServletRequest httpReq) {
+            TourGuide tourGuide,
+            HttpServletRequest httpReq) {
+
         return new TourGuideProfileResponse(
                 tourGuide.getUsers().getId(),
                 tourGuide.getId(),
@@ -38,18 +40,19 @@ public class TourGuideMapper {
 
     public static TourGuideDetailResponse toTourGuideDetailResponse(
             TourGuide tourGuide,
-            List<TourGuideHikingPoint> tourGuideHikingPoint
+            List<TourGuideHikingPoint> tourGuideHikingPoint,
+            HttpServletRequest httpReq
 
     ) {
         return new TourGuideDetailResponse(
                 tourGuide.getId(),
                 tourGuide.getName(),
-                tourGuide.getImage().getPath(),
+                (tourGuide.getImage() == null) ? null : UrlUtil.resolveImageUrl(tourGuide.getImage(), httpReq),
                 tourGuide.getDescription(),
                 tourGuide.isActive(),
                 // TODO fix this hard code
-                0.0,
-                200,
+                3.3,
+                5,
                 10,
                 tourGuide.getPrice(),
                 tourGuide.getAdditionalPrice(),
