@@ -3,22 +3,25 @@ package com.abdav.giri_guide.model.response;
 import java.util.List;
 
 public record TourGuideDetailResponse(
-        String id,
-        String name,
-        String image,
-        String description,
-        boolean isActive,
+                String id,
+                String name,
+                String image,
+                String description,
+                boolean isActive,
 
-        Double rating,
-        Integer totalReview,
-        Integer totalCustomer,
+                Double rating,
+                Integer totalReview,
+                Integer totalCustomer,
 
-        Long price,
-        Long additionalPrice,
-        Integer totalPorter,
-        Long pricePorter,
+                Integer donePercentage,
+                Integer rejectPercentage,
 
-        List<MountainListHikingPointResponse> mountains
+                Long price,
+                Long additionalPrice,
+                Integer totalPorter,
+                Long pricePorter,
+
+                List<MountainListHikingPointResponse> mountains
 
 ) {
 }
