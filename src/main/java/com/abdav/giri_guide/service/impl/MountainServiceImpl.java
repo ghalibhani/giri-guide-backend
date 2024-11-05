@@ -1,7 +1,6 @@
 package com.abdav.giri_guide.service.impl;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -98,16 +97,14 @@ public class MountainServiceImpl implements MountainsService {
     public MountainsDetailResponse updateMountain(
             String id, MountainsRequest updatedMountains, HttpServletRequest httpReq) {
 
-        // TODO check mountain checker for new data
         Mountains mountain = mountainRepository.findById(id).orElseThrow(EntityNotFoundException::new);
 
-        Optional<Mountains> savedMountain = mountainRepository
-                .findByNameIgnoreCaseAndDeletedDateIsNull(updatedMountains.name().trim());
-        if (savedMountain.isPresent() && !mountain.equals(savedMountain.get())) {
-            throw new DataIntegrityViolationException("Active data with same name already exist");
-        }
-
         if (updatedMountains.name() != null) {
+            Optional<Mountains> savedMountain = mountainRepository
+                    .findByNameIgnoreCaseAndDeletedDateIsNull(updatedMountains.name().trim());
+            if (savedMountain.isPresent() && !mountain.equals(savedMountain.get())) {
+                throw new DataIntegrityViolationException("Name already used");
+            }
             mountain.setName(updatedMountains.name().trim());
         }
         if (updatedMountains.city() != null) {
@@ -122,12 +119,33 @@ public class MountainServiceImpl implements MountainsService {
         if (updatedMountains.message() != null) {
             mountain.setMessage(updatedMountains.message().trim());
         }
+        if (updatedMountains.useSimaksi() != null) {
+            mountain.setUseSimaksi(updatedMountains.useSimaksi());
+        }
         if (updatedMountains.priceSimaksi() != null) {
             mountain.setPriceSimaksi(updatedMountains.priceSimaksi());
+        }
+        if (updatedMountains.tips() != null) {
+            mountain.setTips(updatedMountains.tips());
+        }
+        if (updatedMountains.bestTime() != null) {
+            mountain.setBestTime(updatedMountains.bestTime());
         }
         mountainRepository.save(mountain);
 
         return MountainsMapper.toMountainsDetailResponse(mountain, httpReq);
+    }
+
+    @Override
+    public MountainsDetailResponse updateMountainImage(String id, MultipartFile image, HttpServletRequest httpRequest) {
+        Mountains mountain = mountainRepository.findById(id).orElseThrow(EntityNotFoundException::new);
+        ImageEntity imageEntity = imageService.create(image, PathImage.MOUNTAINS_PICTURE, mountain.getName());
+        ImageEntity oldImage = mountain.getImage();
+        mountain.setImage(imageEntity);
+        mountain = mountainRepository.save(mountain);
+        imageService.delete(oldImage);
+
+        return MountainsMapper.toMountainsDetailResponse(mountain, httpRequest);
     }
 
     public HikingPointResponse createHikingPoint(String mountainId, HikingPointRequest request) {
