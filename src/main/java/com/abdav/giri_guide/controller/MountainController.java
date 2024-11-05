@@ -55,7 +55,7 @@ public class MountainController {
             @RequestParam String status,
             @RequestParam String message,
             @RequestParam boolean useSimaksi,
-            @RequestParam Double priceSimaksi,
+            @RequestParam Long priceSimaksi,
             @RequestParam MultipartFile image,
             @RequestParam String tips,
             @RequestParam String bestTime,

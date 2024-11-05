@@ -9,13 +9,15 @@ import com.abdav.giri_guide.model.request.TourGuideRequest;
 import com.abdav.giri_guide.model.request.UserIdRequest;
 import com.abdav.giri_guide.model.response.CommonResponseWithPage;
 import com.abdav.giri_guide.model.response.TourGuideDetailResponse;
+import com.abdav.giri_guide.model.response.TourGuideHikingPointActiveResponse;
 import com.abdav.giri_guide.model.response.TourGuideListResponse;
 import com.abdav.giri_guide.model.response.TourGuideProfileResponse;
 
 import jakarta.servlet.http.HttpServletRequest;
 
 public interface TourGuideService {
-    TourGuideProfileResponse createTourGuide(MultipartFile image, TourGuideRequest request, HttpServletRequest httpReq);
+    TourGuideProfileResponse createTourGuide(MultipartFile image, TourGuideRequest request,
+            HttpServletRequest httpReq);
 
     TourGuideProfileResponse getTourGuideProfile(UserIdRequest request, HttpServletRequest httpReq);
 
@@ -34,4 +36,8 @@ public interface TourGuideService {
 
     TourGuideDetailResponse addHikingPoint(
             String tourGuideId, TourGuideAddHikingPointRequest request, HttpServletRequest httpReq);
+
+    List<TourGuideHikingPointActiveResponse> getTourGuideHikingPointActiveList(UserIdRequest request);
+
+    List<TourGuideHikingPointActiveResponse> toggleTourGuideHikingPointActiveList(UserIdRequest request, String id);
 }

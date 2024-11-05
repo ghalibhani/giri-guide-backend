@@ -16,10 +16,10 @@ public record TourGuideRequest(
         String address,
 
         Integer maxHiker,
-        Double price,
-        Double additionalPrice,
+        Long price,
+        Long additionalPrice,
         Integer totalPorter,
-        Double pricePorter
+        Long pricePorter
 
 ) {
 }

@@ -45,19 +45,19 @@ public class Transaction extends AuditEntity{
 
     private Integer porterQty;
 
-    private Double totalPorterPrice;
+    private Long totalPorterPrice;
 
-    private Double totalTourGuidePrice;
+    private Long totalTourGuidePrice;
 
-    private Double additionalPriceTourGuide;
+    private Long additionalPriceTourGuide;
 
-    private Double totalSimaksiPrice;
+    private Long totalSimaksiPrice;
 
-    private Double totalEntryPrice;
+    private Long totalEntryPrice;
 
-    private Double adminCost;
+    private Long adminCost;
 
-    private Double totalPrice;
+    private Long totalPrice;
 
 
     @OneToMany(mappedBy = "transaction", targetEntity = TransactionHiker.class)

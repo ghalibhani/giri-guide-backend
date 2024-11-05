@@ -16,12 +16,12 @@ public record TransactionDetailResponse(
         Integer hikerQty,
         List<HikerDetailResponse> hikers,
         Integer porter,
-        Double pricePorter,
-        Double totalTourGuidePrice,
-        Double totalAdditionalPrice,
-        Double totalSimaksiPrice,
-        Double totalEntryPrice,
-        Double adminCost,
-        Double totalPrice
+        Long pricePorter,
+        Long totalTourGuidePrice,
+        Long totalAdditionalPrice,
+        Long totalSimaksiPrice,
+        Long totalEntryPrice,
+        Long adminCost,
+        Long totalPrice
 ) {
 }

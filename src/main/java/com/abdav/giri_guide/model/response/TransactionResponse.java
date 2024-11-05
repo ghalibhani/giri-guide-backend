@@ -12,12 +12,12 @@ public record TransactionResponse(
         String guideId,
         Integer porter,
         Integer hikerQty,
-        Double pricePorter,
-        Double totalTourGuidePrice,
-        Double totalAdditionalPrice,
-        Double totalSimaksiPrice,
-        Double totalEntryPrice,
-        Double adminCost,
-        Double totalPrice
+        Long pricePorter,
+        Long totalTourGuidePrice,
+        Long totalAdditionalPrice,
+        Long totalSimaksiPrice,
+        Long totalEntryPrice,
+        Long adminCost,
+        Long totalPrice
 ) {
 }

@@ -54,6 +54,8 @@ public class TourGuideMapper {
                 3.3,
                 5,
                 10,
+                40,
+                60,
                 tourGuide.getPrice(),
                 tourGuide.getAdditionalPrice(),
                 tourGuide.getTotalPorter(),

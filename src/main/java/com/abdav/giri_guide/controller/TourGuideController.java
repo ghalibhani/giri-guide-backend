@@ -54,11 +54,11 @@ public class TourGuideController {
             @RequestParam String address,
 
             @RequestParam Integer maxHiker,
-            @RequestParam Double price,
-            @RequestParam Double additionalPrice,
+            @RequestParam Long price,
+            @RequestParam Long additionalPrice,
 
             @RequestParam Integer totalPorter,
-            @RequestParam Double pricePorter,
+            @RequestParam Long pricePorter,
             HttpServletRequest httpReq
 
     ) {
@@ -84,8 +84,10 @@ public class TourGuideController {
     }
 
     @GetMapping("profile")
-    public ResponseEntity<?> getMethodName(@Validated @RequestBody UserIdRequest request,
+    public ResponseEntity<?> getMethodName(
+            @Validated @RequestBody UserIdRequest request,
             HttpServletRequest httpReq) {
+
         return ResponseEntity.status(HttpStatus.OK)
                 .body(tourGuideService.getTourGuideProfile(request, httpReq));
     }
@@ -164,4 +166,19 @@ public class TourGuideController {
                 .body(tourGuideService.getTourGuideList(hikingPoint, size, page, httpReq));
     }
 
+    @GetMapping("profile/hiking-points")
+    public ResponseEntity<?> getProfileHikingPoints(@RequestBody @Validated UserIdRequest request) {
+        return ResponseEntity.status(HttpStatus.OK).body(new CommonResponse<>(
+                Message.SUCCESS_FETCH, tourGuideService.getTourGuideHikingPointActiveList(request)));
+    }
+
+    @PatchMapping("profile/hiking-points/{id}/toggle")
+    public ResponseEntity<?> toggleProfileHikingPoints(
+            @RequestBody @Validated UserIdRequest request,
+            @PathVariable String id) {
+
+        return ResponseEntity.status(HttpStatus.OK).body(new CommonResponse<>(
+                Message.DATA_UPDATED, tourGuideService.toggleTourGuideHikingPointActiveList(request, id)));
+
+    }
 }
