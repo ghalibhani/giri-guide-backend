@@ -1,19 +1,19 @@
 package com.abdav.giri_guide.service.impl;
 
-import com.abdav.giri_guide.config.MidtransConfig;
 import com.abdav.giri_guide.constant.ETransactionStatus;
 import com.abdav.giri_guide.constant.Message;
+import com.abdav.giri_guide.model.request.TransactionByStatusRequest;
 import com.abdav.giri_guide.entity.*;
 import com.abdav.giri_guide.mapper.TransactionMapper;
 import com.abdav.giri_guide.model.request.HikerDetailRequest;
 import com.abdav.giri_guide.model.request.TransactionRequest;
 import com.abdav.giri_guide.model.response.TransactionDetailResponse;
+import com.abdav.giri_guide.model.response.TransactionDetailResponseUser;
+import com.abdav.giri_guide.model.response.TransactionResponse;
 import com.abdav.giri_guide.model.response.TransactionStatusResponse;
 import com.abdav.giri_guide.repository.*;
 import com.abdav.giri_guide.service.MidtransService;
 import com.abdav.giri_guide.service.TransactionService;
-import com.midtrans.Config;
-import com.midtrans.Midtrans;
 import com.midtrans.httpclient.error.MidtransError;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -103,9 +103,9 @@ public class TransactionServiceImpl implements TransactionService {
 
         transaction.setStatus(transactionStatus);
         transactionRepository.saveAndFlush(transaction);
-        if (transactionStatus == ETransactionStatus.WAITING_PAY){
-            return midtransService.createToken(transaction);
-        }
+//        if (transactionStatus == ETransactionStatus.WAITING_PAY){
+//            return midtransService.createToken(transaction);
+//        }
 
         return new TransactionStatusResponse(transaction.getStatus().toString(), null);
     }
@@ -130,6 +130,23 @@ public class TransactionServiceImpl implements TransactionService {
     public TransactionDetailResponse getTransactionById(String id) {
         Transaction transaction = getTransactionOrThrowNotFound(id);
         return TransactionMapper.transactionToAdminResponse(transaction);
+    }
+
+    @Override
+    public Page<TransactionResponse> findAllByStatus(TransactionByStatusRequest request, Integer page, Integer size) {
+
+        List<ETransactionStatus> eStatus = request.listStatus().stream().map(s -> ETransactionStatus.valueOf(s.toUpperCase())).toList();
+        Pageable pageable = PageRequest.of(page-1, size);
+        Page<Transaction> transactions = transactionRepository.findAllByStatusInAndDeletedDateIsNull(eStatus,pageable);
+
+        return transactions.map(TransactionMapper::transactionToTransactionResponse);
+    }
+
+    @Override
+    public TransactionDetailResponseUser getByIdTransactionDetailResponseUser(String id) {
+        Transaction transaction = getTransactionOrThrowNotFound(id);
+
+        return TransactionMapper.transactionToDetailResponseUser(transaction);
     }
 
     @Override
