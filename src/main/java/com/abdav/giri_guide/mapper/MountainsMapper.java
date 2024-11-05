@@ -44,7 +44,8 @@ public class MountainsMapper {
                     mountain.getName(),
                     mountain.getImage() == null ? null : UrlUtil.resolveImageUrl(mountain.getImage(), httpReq),
                     mountain.getCity(),
-                    mountain.getStatus()));
+                    mountain.getStatus(),
+                    mountain.getHikingPoints().size()));
         }
         return mountainList;
     }
