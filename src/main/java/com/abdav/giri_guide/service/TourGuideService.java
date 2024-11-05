@@ -9,28 +9,35 @@ import com.abdav.giri_guide.model.request.TourGuideRequest;
 import com.abdav.giri_guide.model.request.UserIdRequest;
 import com.abdav.giri_guide.model.response.CommonResponseWithPage;
 import com.abdav.giri_guide.model.response.TourGuideDetailResponse;
+import com.abdav.giri_guide.model.response.TourGuideHikingPointActiveResponse;
 import com.abdav.giri_guide.model.response.TourGuideListResponse;
 import com.abdav.giri_guide.model.response.TourGuideProfileResponse;
 
 import jakarta.servlet.http.HttpServletRequest;
 
 public interface TourGuideService {
-    TourGuideProfileResponse createTourGuide(MultipartFile image, TourGuideRequest request, HttpServletRequest httpReq);
+    TourGuideProfileResponse createTourGuide(MultipartFile image, TourGuideRequest request,
+            HttpServletRequest httpReq);
 
     TourGuideProfileResponse getTourGuideProfile(UserIdRequest request, HttpServletRequest httpReq);
 
-    TourGuideDetailResponse getTourGuide(String id);
+    TourGuideDetailResponse getTourGuide(String id, HttpServletRequest httpReq);
 
-    TourGuideDetailResponse updateTourGuide(String id, TourGuideRequest request);
+    TourGuideDetailResponse updateTourGuide(String id, TourGuideRequest request, HttpServletRequest httpReq);
 
-    TourGuideDetailResponse updateTourGuideImage(String id, MultipartFile image);
+    TourGuideDetailResponse updateTourGuideImage(String id, MultipartFile image, HttpServletRequest httpReq);
 
-    TourGuideDetailResponse toggleTourGuideActiveStatus(String id);
+    TourGuideDetailResponse toggleTourGuideActiveStatus(String id, HttpServletRequest httpReq);
 
     void softDeleteTourGuide(String id);
 
     CommonResponseWithPage<List<TourGuideListResponse>> getTourGuideList(
             String hikingPointId, Integer size, Integer page, HttpServletRequest httpReq);
 
-    TourGuideDetailResponse addHikingPoint(String tourGuideId, TourGuideAddHikingPointRequest request);
+    TourGuideDetailResponse addHikingPoint(
+            String tourGuideId, TourGuideAddHikingPointRequest request, HttpServletRequest httpReq);
+
+    List<TourGuideHikingPointActiveResponse> getTourGuideHikingPointActiveList(UserIdRequest request);
+
+    List<TourGuideHikingPointActiveResponse> toggleTourGuideHikingPointActiveList(UserIdRequest request, String id);
 }

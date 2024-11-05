@@ -11,8 +11,10 @@ public record MountainsRequest(
         String description,
         String status,
         String message,
-        boolean useSimaksi,
-        Double priceSimaksi
+        Boolean useSimaksi,
+        Long priceSimaksi,
+        String tips,
+        String bestTime
 
 ) {
     public EMountainStatus statusToEnum() {
@@ -51,6 +53,8 @@ public record MountainsRequest(
                 .message(message.trim())
                 .useSimaksi(useSimaksi)
                 .priceSimaksi(priceSimaksi)
+                .tips(tips)
+                .bestTime(bestTime)
                 .build();
     }
 }

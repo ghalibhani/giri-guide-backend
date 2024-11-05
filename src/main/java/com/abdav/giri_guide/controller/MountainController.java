@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.abdav.giri_guide.constant.Message;
 import com.abdav.giri_guide.constant.PathApi;
 import com.abdav.giri_guide.model.request.HikingPointRequest;
 import com.abdav.giri_guide.model.request.MountainsRequest;
@@ -53,29 +55,31 @@ public class MountainController {
             @RequestParam String status,
             @RequestParam String message,
             @RequestParam boolean useSimaksi,
-            @RequestParam Double priceSimaksi,
+            @RequestParam Long priceSimaksi,
             @RequestParam MultipartFile image,
+            @RequestParam String tips,
+            @RequestParam String bestTime,
             HttpServletRequest httpReq
 
     ) {
         MountainsRequest request = new MountainsRequest(
-                name, city, description, status, message, useSimaksi, priceSimaksi
+                name, city, description, status, message, useSimaksi, priceSimaksi, tips, bestTime);
 
-        );
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(new CommonResponse<>("Mountain data successfully created",
                         service.createMountain(request, image, httpReq)));
     }
 
     @GetMapping("{id}")
-    public ResponseEntity<CommonResponse<?>> getMountainDetail(@PathVariable String id, HttpServletRequest httpReq) {
+    public ResponseEntity<CommonResponse<?>> getMountainDetail(@PathVariable String id,
+            HttpServletRequest httpReq) {
         return ResponseEntity.status(HttpStatus.OK)
-                .body(new CommonResponse<>("Data fetched successfully",
+                .body(new CommonResponse<>(Message.SUCCESS_FETCH,
                         service.mountainDetail(id, httpReq)));
     }
 
     @PutMapping("{id}")
-    public ResponseEntity<CommonResponse<?>> updateMountain(
+    public ResponseEntity<?> updateMountain(
             @PathVariable String id,
             @RequestBody MountainsRequest request,
             HttpServletRequest httpReq
@@ -83,8 +87,20 @@ public class MountainController {
     ) {
 
         return ResponseEntity.status(HttpStatus.OK)
-                .body(new CommonResponse<>("Data updated successfully",
+                .body(new CommonResponse<>(Message.DATA_UPDATED,
                         service.updateMountain(id, request, httpReq)));
+    }
+
+    @PatchMapping(path = "{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<?> updateMountainImage(
+            @PathVariable String id,
+            @RequestParam MultipartFile image,
+            HttpServletRequest httpReq
+
+    ) {
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(new CommonResponse<>(Message.DATA_UPDATED,
+                        service.updateMountainImage(id, image, httpReq)));
     }
 
     @DeleteMapping("{id}")

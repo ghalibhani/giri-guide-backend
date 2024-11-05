@@ -11,5 +11,5 @@ public interface ImageService {
 
     ImageEntity getByPath();
 
-    void delete();
+    void delete(ImageEntity imageEntity);
 }

@@ -1,15 +1,15 @@
 package com.abdav.giri_guide.service.impl;
 
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.stereotype.Service;
+
 import com.abdav.giri_guide.entity.AppUser;
 import com.abdav.giri_guide.entity.User;
 import com.abdav.giri_guide.repository.UserRepository;
 import com.abdav.giri_guide.service.UserService;
+
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
 @Service
 @RequiredArgsConstructor
@@ -18,7 +18,8 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public AppUser loadUserByUserId(String userId) {
-        User user = userRepository.findById(userId).orElseThrow(() -> new UsernameNotFoundException("Invalid Credential"));
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UsernameNotFoundException("Invalid Credential"));
         return AppUser.builder()
                 .id(user.getId())
                 .email(user.getEmail())
@@ -29,7 +30,8 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        User user = userRepository.findByEmail(email).orElseThrow(() -> new UsernameNotFoundException("Invalid Credential"));
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new UsernameNotFoundException("Invalid Credential"));
         return AppUser.builder()
                 .id(user.getId())
                 .email(user.getEmail())
