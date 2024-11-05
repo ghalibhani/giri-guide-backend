@@ -5,7 +5,7 @@ public record HikingPointResponse(
         String mountainId,
         String name,
         String coordinate,
-        Double price
+        Long price
 
 ) {
 }
