@@ -40,7 +40,7 @@ public class TransactionServiceImpl implements TransactionService {
     private final MidtransService midtransService;
 
     @Value("${app.giri-guide.admin-cost}")
-    private Double adminCost;
+    private Long adminCost;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -76,12 +76,12 @@ public class TransactionServiceImpl implements TransactionService {
         transaction.setTransactionHikers(hikers);
         Long days = ChronoUnit.DAYS.between(transaction.getStartDate(), transaction.getEndDate());
 
-        Double totalTourguidePrice = tourGuide.getPrice() * days;
-        Double totalPorterPrice = calculatePorterPrice(tourGuide.getPricePorter(), transactionRequest.porterQty(), days);
-        Double totalAdditionalPrice = calculateAdditionalPrice(tourGuide, hikers.size(), days);
-        Double totalSimaksiPrice = calculateSimaksiPrice(mountain, hikers.size());
-        Double totalEntryPrice = hikingPointReq.getPrice() * hikers.size() * days;
-        Double totalPrice = totalPorterPrice + totalTourguidePrice + totalAdditionalPrice + totalEntryPrice + totalSimaksiPrice + adminCost;
+        Long totalTourguidePrice = tourGuide.getPrice() * days;
+        Long totalPorterPrice = calculatePorterPrice(tourGuide.getPricePorter(), transactionRequest.porterQty(), days);
+        Long totalAdditionalPrice = calculateAdditionalPrice(tourGuide, hikers.size(), days);
+        Long totalSimaksiPrice = calculateSimaksiPrice(mountain, hikers.size());
+        Long totalEntryPrice = hikingPointReq.getPrice() * hikers.size() * days;
+        Long totalPrice = totalPorterPrice + totalTourguidePrice + totalAdditionalPrice + totalEntryPrice + totalSimaksiPrice + adminCost;
 
 
         transaction.setTotalPorterPrice(totalPorterPrice);
@@ -138,19 +138,19 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
 
-    private Double calculatePorterPrice(Double porterRate, Integer porterQty, Long days){
+    private Long calculatePorterPrice(Long porterRate, Integer porterQty, Long days){
         return porterRate * porterQty * days;
     }
 
-    private Double calculateSimaksiPrice(Mountains mountains, int hikerQty){
-        return mountains.isUseSimaksi() ? mountains.getPriceSimaksi() * hikerQty : 0.0;
+    private Long calculateSimaksiPrice(Mountains mountains, int hikerQty){
+        return mountains.isUseSimaksi() ? mountains.getPriceSimaksi() * hikerQty : 0L;
     }
 
-    private Double calculateAdditionalPrice(TourGuide tourGuide, int hikerQty, Long days){
+    private Long calculateAdditionalPrice(TourGuide tourGuide, int hikerQty, Long days){
         if(hikerQty > tourGuide.getMaxHiker()){
             int additionalHiker = hikerQty - tourGuide.getMaxHiker();
             return tourGuide.getAdditionalPrice() * additionalHiker * days;
         }
-        return 0.0;
+        return 0L;
     }
 }

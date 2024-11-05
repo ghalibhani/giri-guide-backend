@@ -29,6 +29,7 @@ import com.abdav.giri_guide.model.request.UserIdRequest;
 import com.abdav.giri_guide.model.response.CommonResponseWithPage;
 import com.abdav.giri_guide.model.response.PagingResponse;
 import com.abdav.giri_guide.model.response.TourGuideDetailResponse;
+import com.abdav.giri_guide.model.response.TourGuideHikingPointActiveResponse;
 import com.abdav.giri_guide.model.response.TourGuideListResponse;
 import com.abdav.giri_guide.model.response.TourGuideProfileResponse;
 import com.abdav.giri_guide.repository.HikingPointRepository;
@@ -243,6 +244,38 @@ public class TourGuideServiceImpl implements TourGuideService {
         TourGuide tourGuide = tourGuideRepository.findById(id).orElseThrow(EntityNotFoundException::new);
         tourGuide.setDeletedDate(LocalDateTime.now());
         tourGuideRepository.save(tourGuide);
+    }
+
+    @Override
+    public List<TourGuideHikingPointActiveResponse> getTourGuideHikingPointActiveList(UserIdRequest request) {
+        User user = userRepository.findById(request.userId()).orElseThrow(EntityNotFoundException::new);
+        TourGuide tourGuide = tourGuideRepository.findByUsersAndDeletedDateIsNull(user)
+                .orElseThrow(EntityNotFoundException::new);
+        List<TourGuideHikingPoint> hikingPoints = tourGuideHikingPointRepository
+                .findByTourGuideAndDeletedDateIsNull(tourGuide);
+
+        return TourGuideHikingPointMapper.toListOfTourGuideHikingPointActiveResponse(hikingPoints);
+    }
+
+    @Override
+    public List<TourGuideHikingPointActiveResponse> toggleTourGuideHikingPointActiveList(
+            UserIdRequest request, String id) {
+
+        User user = userRepository.findById(request.userId()).orElseThrow(EntityNotFoundException::new);
+        TourGuideHikingPoint tourGuideHikingPoint = tourGuideHikingPointRepository.findById(id)
+                .orElseThrow(EntityNotFoundException::new);
+
+        if (!tourGuideHikingPoint.getTourGuide().getUsers().equals(user)) {
+            throw new EntityNotFoundException();
+        }
+
+        tourGuideHikingPoint.setActive(!tourGuideHikingPoint.isActive());
+        tourGuideHikingPointRepository.save(tourGuideHikingPoint);
+
+        List<TourGuideHikingPoint> hikingPoints = tourGuideHikingPointRepository
+                .findByTourGuideAndDeletedDateIsNull(tourGuideHikingPoint.getTourGuide());
+
+        return TourGuideHikingPointMapper.toListOfTourGuideHikingPointActiveResponse(hikingPoints);
     }
 
 }
