@@ -1,5 +1,6 @@
 package com.abdav.giri_guide.service.impl;
 
+import com.abdav.giri_guide.config.MidtransConfig;
 import com.abdav.giri_guide.constant.ETransactionStatus;
 import com.abdav.giri_guide.constant.Message;
 import com.abdav.giri_guide.entity.*;
@@ -9,7 +10,11 @@ import com.abdav.giri_guide.model.request.TransactionRequest;
 import com.abdav.giri_guide.model.response.TransactionDetailResponse;
 import com.abdav.giri_guide.model.response.TransactionStatusResponse;
 import com.abdav.giri_guide.repository.*;
+import com.abdav.giri_guide.service.MidtransService;
 import com.abdav.giri_guide.service.TransactionService;
+import com.midtrans.Config;
+import com.midtrans.Midtrans;
+import com.midtrans.httpclient.error.MidtransError;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -32,6 +37,8 @@ public class TransactionServiceImpl implements TransactionService {
     private final HikingPointRepository hikingPointRepository;
     private final TransactionHikerRepository transactionHikerRepository;
     private final TourGuideRepository tourGuideRepository;
+    private final MidtransService midtransService;
+
     @Value("${app.giri-guide.admin-cost}")
     private Double adminCost;
 
@@ -86,18 +93,21 @@ public class TransactionServiceImpl implements TransactionService {
 
         transactionRepository.saveAndFlush(transaction);
 
-        return new TransactionStatusResponse(transaction.getStatus().toString());
+        return new TransactionStatusResponse(transaction.getStatus().toString(), null);
     }
 
     @Override
-    public TransactionStatusResponse updateTransactionStatus(String id, String status) {
+    public TransactionStatusResponse updateTransactionStatus(String id, String status) throws MidtransError {
         Transaction transaction = getTransactionOrThrowNotFound(id);
         ETransactionStatus transactionStatus = ETransactionStatus.valueOf(status.toUpperCase());
 
         transaction.setStatus(transactionStatus);
         transactionRepository.saveAndFlush(transaction);
+        if (transactionStatus == ETransactionStatus.WAITING_PAY){
+            return midtransService.createToken(transaction);
+        }
 
-        return new TransactionStatusResponse(transaction.getStatus().toString());
+        return new TransactionStatusResponse(transaction.getStatus().toString(), null);
     }
 
     private Transaction getTransactionOrThrowNotFound(String id) {
@@ -120,6 +130,11 @@ public class TransactionServiceImpl implements TransactionService {
     public TransactionDetailResponse getTransactionById(String id) {
         Transaction transaction = getTransactionOrThrowNotFound(id);
         return TransactionMapper.transactionToAdminResponse(transaction);
+    }
+
+    @Override
+    public Transaction getById(String id) {
+        return getTransactionOrThrowNotFound(id);
     }
 
 

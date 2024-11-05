@@ -5,6 +5,7 @@ import com.abdav.giri_guide.constant.PathApi;
 import com.abdav.giri_guide.model.request.TransactionRequest;
 import com.abdav.giri_guide.model.response.*;
 import com.abdav.giri_guide.service.TransactionService;
+import com.midtrans.httpclient.error.MidtransError;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -32,7 +33,7 @@ public class TransactionController {
     }
 
     @PutMapping("/{id}")
-    ResponseEntity<?> updateTransactionStatus(@PathVariable String id, @RequestParam String status){
+    ResponseEntity<?> updateTransactionStatus(@PathVariable String id, @RequestParam String status) throws MidtransError {
         TransactionStatusResponse transactionStatusResponse = transactionService.updateTransactionStatus(id, status);
         message = Message.DATA_UPDATED;
         CommonResponse<?> response = new CommonResponse<>(message, transactionStatusResponse);
