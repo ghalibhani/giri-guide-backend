@@ -8,6 +8,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -31,5 +32,7 @@ public class HikingPoint extends AuditEntity {
 
     private String name;
     private String coordinate;
-    private Double price;
+
+    @Builder.Default
+    private Long price = 0L;
 }

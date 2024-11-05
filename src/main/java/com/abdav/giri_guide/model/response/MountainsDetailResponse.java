@@ -13,7 +13,9 @@ public record MountainsDetailResponse(
         EMountainStatus status,
         String message,
         boolean useSimaksi,
-        Double priceSimaksi,
+        Long priceSimaksi,
+        String tips,
+        String bestTime,
         Set<HikingPointResponse> hikingPoints
 
 ) {

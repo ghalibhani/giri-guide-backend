@@ -27,6 +27,8 @@ public class MountainsMapper {
                 mountain.getMessage(),
                 mountain.isUseSimaksi(),
                 mountain.getPriceSimaksi(),
+                mountain.getTips(),
+                mountain.getBestTime(),
                 HikingPointMapper.toSetHikingPointResponse(mountain.getHikingPoints())
 
         );

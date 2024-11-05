@@ -13,10 +13,10 @@ public record TourGuideDetailResponse(
         Integer totalReview,
         Integer totalCustomer,
 
-        Double price,
-        Double additionalPrice,
+        Long price,
+        Long additionalPrice,
         Integer totalPorter,
-        Double pricePorter,
+        Long pricePorter,
 
         List<MountainListHikingPointResponse> mountains
 

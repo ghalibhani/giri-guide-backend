@@ -18,14 +18,14 @@ import com.abdav.giri_guide.repository.ImageRepository;
 import com.abdav.giri_guide.service.ImageService;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ImageServiceImpl implements ImageService {
     private final ImageRepository imageRepository;
-
     private final Path rootPath = Paths.get(System.getenv("IMAGE_LOCATION"));
-
     private final List<String> validDataType = new ArrayList<>(List.of("jpeg", "png"));
 
     @Override
@@ -63,8 +63,17 @@ public class ImageServiceImpl implements ImageService {
     }
 
     @Override
-    public void delete() {
-        // TODO Auto-generated method stub
+    public void delete(ImageEntity imageEntity) {
+        Path filePath = Paths.get(rootPath.toString(), imageEntity.getPath());
+        try {
+            Files.delete(filePath);
+            imageRepository.delete(imageEntity);
+            log.info("File Deleted");
+
+        } catch (Exception e) {
+            log.error("Cannot Delete File: ", e);
+
+        }
 
     }
 
