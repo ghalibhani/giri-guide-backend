@@ -123,8 +123,8 @@ public class TourGuideServiceImpl implements TourGuideService {
     }
 
     @Override
-    public TourGuideProfileResponse getTourGuideProfile(UserIdRequest request, HttpServletRequest httpReq) {
-        User users = userRepository.findById(request.userId()).orElseThrow(EntityNotFoundException::new);
+    public TourGuideProfileResponse getTourGuideProfile(String userId, HttpServletRequest httpReq) {
+        User users = userRepository.findById(userId).orElseThrow(EntityNotFoundException::new);
         TourGuide tourGuide = tourGuideRepository.findByUsersAndDeletedDateIsNull(users)
                 .orElseThrow(EntityNotFoundException::new);
 
