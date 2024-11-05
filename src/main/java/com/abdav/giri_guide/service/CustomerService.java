@@ -15,4 +15,6 @@ public interface CustomerService {
     CustomerResponse getCustomerByUserId(String userId, HttpServletRequest httpReq);
     CustomerResponse updateCustomer(String id, CustomerRequest customerRequest, HttpServletRequest httpReq);
     CustomerResponse uploadProfileImage(String id, MultipartFile file, HttpServletRequest httpReq);
+
+    Customer getById(String id);
 }

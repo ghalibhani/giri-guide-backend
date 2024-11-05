@@ -70,7 +70,7 @@ public class TransactionController {
                 .body(response);
     }
 
-    @GetMapping(PathApi.HISTORY_TRANSACTION)
+    @PostMapping(PathApi.HISTORY_TRANSACTION)
     ResponseEntity<?> transactionByStatus(
             @RequestParam(required = false, defaultValue = "1") Integer page,
             @RequestParam(required = false, defaultValue = "5") Integer size,
