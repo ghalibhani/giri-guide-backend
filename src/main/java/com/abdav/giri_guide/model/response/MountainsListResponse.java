@@ -7,7 +7,8 @@ public record MountainsListResponse(
         String name,
         String image,
         String city,
-        EMountainStatus status
+        EMountainStatus status,
+        Integer hikingPointCount
 
 ) {
 }
