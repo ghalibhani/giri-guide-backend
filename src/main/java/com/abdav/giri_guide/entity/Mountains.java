@@ -62,7 +62,7 @@ public class Mountains extends AuditEntity {
     private boolean useSimaksi = false;
 
     @Builder.Default
-    private Double priceSimaksi = 0.0;
+    private Long priceSimaksi = 0L;
 
     @Nullable
     @Column(columnDefinition = "Text")

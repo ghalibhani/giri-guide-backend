@@ -12,7 +12,7 @@ public record MountainsRequest(
         String status,
         String message,
         Boolean useSimaksi,
-        Double priceSimaksi,
+        Long priceSimaksi,
         String tips,
         String bestTime
 
