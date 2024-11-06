@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.abdav.giri_guide.entity.GuideReview;
 import com.abdav.giri_guide.entity.HikingPoint;
 import com.abdav.giri_guide.entity.Mountains;
 import com.abdav.giri_guide.entity.TourGuideHikingPoint;
@@ -58,14 +59,16 @@ public class TourGuideHikingPointMapper {
 
         List<TourGuideListResponse> result = new ArrayList<>();
         for (TourGuideHikingPoint data : listData) {
+
+            AverageRating averageRating = countAverageRating(data.getTourGuide().getReviews());
             result.add(new TourGuideListResponse(
                     data.getTourGuide().getId(),
                     data.getTourGuide().getName(),
                     (data.getTourGuide().getImage() == null) ? null
                             : UrlUtil.resolveImageUrl(data.getTourGuide().getImage(), httpReq),
                     data.getTourGuide().getDescription(),
-                    5.0,
-                    10));
+                    averageRating.rating,
+                    averageRating.totalReview));
         }
         return result;
     }
@@ -83,6 +86,28 @@ public class TourGuideHikingPointMapper {
         }
 
         return result;
+
+    }
+
+    private record AverageRating(
+            Double rating,
+            Integer totalReview) {
+    }
+
+    private static AverageRating countAverageRating(List<GuideReview> reviews) {
+        Double totalRating = 0.0;
+        Integer totalReview = 0;
+
+        for (GuideReview review : reviews) {
+            if (review.getDeletedDate() == null) {
+                totalRating += Double.valueOf(review.getRating());
+                totalReview += 1;
+            }
+        }
+
+        return new AverageRating(
+                (totalReview > 0) ? totalRating / Double.valueOf(totalReview) : 0.0,
+                totalReview);
 
     }
 }
