@@ -4,22 +4,26 @@ import com.abdav.giri_guide.entity.Transaction;
 import com.abdav.giri_guide.model.response.HikerDetailResponse;
 import com.abdav.giri_guide.model.response.TransactionDetailResponse;
 import com.abdav.giri_guide.model.response.TransactionResponse;
+import com.abdav.giri_guide.util.UrlUtil;
+import jakarta.servlet.http.HttpServletRequest;
 import org.jetbrains.annotations.NotNull;
 
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 public class TransactionMapper {
-    public static TransactionResponse transactionToTransactionResponse(Transaction transaction) {
+    public static TransactionResponse transactionToTransactionResponse(Transaction transaction, HttpServletRequest httpReq) {
         return new TransactionResponse(
                 transaction.getId(),
                 transaction.getStatus().toString(),
                 transaction.getHikingPoint().getMountain().getName(),
                 transaction.getHikingPoint().getId(),
+                transaction.getHikingPoint().getName(),
                 transaction.getStartDate(),
                 transaction.getEndDate(),
                 getDay(transaction),
                 transaction.getCustomer().getId(),
+                transaction.getTourGuide().getImage() == null ?null : UrlUtil.resolveImageUrl(transaction.getTourGuide().getImage(), httpReq),
                 transaction.getTourGuide().getName(),
                 transaction.getPorterQty(),
                 transaction.getTransactionHikers().size(),
@@ -27,7 +31,7 @@ public class TransactionMapper {
         );
     }
 
-    public static TransactionDetailResponse transactionToAdminResponse(Transaction transaction){
+    public static TransactionDetailResponse transactionToTransactionDetailResponse(Transaction transaction){
         return new TransactionDetailResponse(
                 transaction.getId(),
                 transaction.getStatus().toString(),

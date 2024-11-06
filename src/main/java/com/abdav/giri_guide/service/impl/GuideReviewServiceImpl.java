@@ -2,81 +2,87 @@ package com.abdav.giri_guide.service.impl;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import com.abdav.giri_guide.entity.Customer;
 import com.abdav.giri_guide.entity.GuideReview;
+import com.abdav.giri_guide.entity.TourGuide;
+import com.abdav.giri_guide.mapper.GuideReviewMapper;
 import com.abdav.giri_guide.model.request.GuideReviewRequest;
 import com.abdav.giri_guide.model.response.CommonResponseWithPage;
 import com.abdav.giri_guide.model.response.GuideReviewResponse;
 import com.abdav.giri_guide.model.response.PagingResponse;
+import com.abdav.giri_guide.repository.CustomerRepository;
 import com.abdav.giri_guide.repository.GuideReviewRepository;
+import com.abdav.giri_guide.repository.TourGuideRepository;
 import com.abdav.giri_guide.service.GuideReviewService;
 
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
 public class GuideReviewServiceImpl implements GuideReviewService {
     private final GuideReviewRepository reviewRepository;
+    private final CustomerRepository customerRepository;
+    private final TourGuideRepository tourGuideRepository;
 
     @Override
-    public GuideReviewResponse createGuideReview(String guideId, GuideReviewRequest request) {
-        Optional<GuideReview> review = reviewRepository.findByGuideAndCustomerAndDeletedDateIsNull(
-                guideId, request.customerId());
+    public GuideReviewResponse createGuideReview(
+            String tourGuideId, GuideReviewRequest request, HttpServletRequest httpReq) {
 
-        if (review.isPresent()) {
-            throw new DataIntegrityViolationException("Customer already reviewed");
-        }
+        Customer customer = customerRepository.findByUserIdAndDeletedDateIsNull(request.userId())
+                .orElseThrow(EntityNotFoundException::new);
+
+        TourGuide tourGuide = tourGuideRepository.findByIdAndDeletedDateIsNull(tourGuideId)
+                .orElseThrow(EntityNotFoundException::new);
+
+        // TODO: Check transaction entity
+        // Optional<GuideReview> review =
+        // reviewRepository.findByGuideAndCustomerAndDeletedDateIsNull(
+        // tourGuideId, user);
+
+        // if (review.isPresent()) {
+        // throw new DataIntegrityViolationException("Customer already reviewed");
+        // }
+
         GuideReview newReview = GuideReview.builder()
-                .customer(request.customerId())
-                .guide(guideId)
+                .customer(customer)
+                .tourGuide(tourGuide)
+                .transaction(null)
                 .rating(request.rating())
                 .usePorter(request.usePorter())
                 .review(request.review())
                 .build();
-
         newReview = reviewRepository.save(newReview);
-        return new GuideReviewResponse(
-                newReview.getId(),
-                newReview.getCustomer(),
-                "Jane Doe",
-                newReview.getCreatedDate(),
-                newReview.getUsePorter(),
-                newReview.getRating(),
-                newReview.getReview(),
-                "https://upload.wikimedia.org/wikipedia/id/e/ed/Nyan_cat_250px_frame.PNG");
+
+        return GuideReviewMapper.toGuideReviewResponse(newReview, httpReq);
     }
 
     @Override
-    public GuideReviewResponse getGuideReviewById(String id) {
+    public GuideReviewResponse getGuideReviewById(String id, HttpServletRequest httpReq) {
+
         GuideReview review = reviewRepository.findById(id).orElseThrow(EntityNotFoundException::new);
-        return new GuideReviewResponse(
-                review.getId(),
-                review.getCustomer(),
-                "Jane Doe",
-                review.getCreatedDate(),
-                review.getUsePorter(),
-                review.getRating(),
-                review.getReview(),
-                "https://upload.wikimedia.org/wikipedia/id/e/ed/Nyan_cat_250px_frame.PNG");
+        return GuideReviewMapper.toGuideReviewResponse(review, httpReq);
     }
 
     @Override
     public CommonResponseWithPage<List<GuideReviewResponse>> getGuideReviewsByGuideId(
-            String id, Integer page, Integer size) {
+            String tourGuideId, Integer page, Integer size, HttpServletRequest httpReq) {
 
         if (page <= 0) {
             page = 1;
         }
         Pageable pageable = PageRequest.of(page - 1, size);
-        Page<GuideReview> reviews = reviewRepository.findByGuideAndDeletedDateIsNull(id, pageable);
+
+        TourGuide tourGuide = tourGuideRepository.findByIdAndDeletedDateIsNull(tourGuideId)
+                .orElseThrow(EntityNotFoundException::new);
+        Page<GuideReview> reviews = reviewRepository.findByTourGuideAndDeletedDateIsNull(tourGuide, pageable);
 
         PagingResponse paging = new PagingResponse(
                 page,
@@ -86,15 +92,7 @@ public class GuideReviewServiceImpl implements GuideReviewService {
 
         List<GuideReviewResponse> reviewList = new ArrayList<>();
         for (GuideReview review : reviews.getContent()) {
-            reviewList.add(new GuideReviewResponse(
-                    review.getId(),
-                    review.getCustomer(),
-                    "Jane Doe",
-                    review.getCreatedDate(),
-                    review.getUsePorter(),
-                    review.getRating(),
-                    review.getReview(),
-                    "https://upload.wikimedia.org/wikipedia/id/e/ed/Nyan_cat_250px_frame.PNG"));
+            reviewList.add(GuideReviewMapper.toGuideReviewResponse(review, httpReq));
         }
 
         return new CommonResponseWithPage<>("Data Fetched", reviewList, paging);
