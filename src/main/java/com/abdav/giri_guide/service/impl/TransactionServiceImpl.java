@@ -7,16 +7,15 @@ import com.abdav.giri_guide.entity.*;
 import com.abdav.giri_guide.mapper.TransactionMapper;
 import com.abdav.giri_guide.model.request.HikerDetailRequest;
 import com.abdav.giri_guide.model.request.TransactionRequest;
-import com.abdav.giri_guide.model.response.CustomerResponse;
 import com.abdav.giri_guide.model.response.TransactionDetailResponse;
 import com.abdav.giri_guide.model.response.TransactionResponse;
 import com.abdav.giri_guide.model.response.TransactionStatusResponse;
 import com.abdav.giri_guide.repository.*;
 import com.abdav.giri_guide.service.CustomerService;
-import com.abdav.giri_guide.service.MidtransService;
 import com.abdav.giri_guide.service.TransactionService;
 import com.midtrans.httpclient.error.MidtransError;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
@@ -124,24 +123,24 @@ public class TransactionServiceImpl implements TransactionService {
         Pageable pageable = PageRequest.of(page-1, size);
         Page<Transaction> transactions = transactionRepository.findAllByDeletedDateIsNull(pageable);
 
-        return transactions.map(TransactionMapper::transactionToAdminResponse);
+        return transactions.map(TransactionMapper::transactionToTransactionDetailResponse);
     }
 
     @Override
     public TransactionDetailResponse getTransactionById(String id) {
         Transaction transaction = getTransactionOrThrowNotFound(id);
-        return TransactionMapper.transactionToAdminResponse(transaction);
+        return TransactionMapper.transactionToTransactionDetailResponse(transaction);
     }
 
     @Override
-    public Page<TransactionResponse> findAllByStatus(TransactionByStatusRequest request, Integer page, Integer size) {
-        Customer customer = customerService.getById(request.userId());
-
-        List<ETransactionStatus> eStatus = request.listStatus().stream().map(s -> ETransactionStatus.valueOf(s.toUpperCase())).toList();
+    public Page<TransactionResponse> findAllByStatus(List<String> statusList, String userId, Integer page, Integer size, HttpServletRequest httpReq) {
+        Customer customer = customerService.getById(userId);
+        System.out.println(customer);
+        List<ETransactionStatus> eStatus = statusList.stream().map(ETransactionStatus::valueOf).toList();
         Pageable pageable = PageRequest.of(page-1, size);
-        Page<Transaction> transactions = transactionRepository.findAllByCustomerIdAndStatusInAndDeletedDateIsNull(customer.getId(), eStatus,pageable);
+        Page<Transaction> transactions = transactionRepository.findAllByCustomerIdAndStatusInAndDeletedDateIsNullOrderByStartDateAsc(customer.getId(), eStatus,pageable);
 
-        return transactions.map(TransactionMapper::transactionToTransactionResponse);
+        return transactions.map(transaction -> TransactionMapper.transactionToTransactionResponse(transaction, httpReq));
     }
 
     @Override
