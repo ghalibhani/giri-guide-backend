@@ -2,11 +2,10 @@ package com.abdav.giri_guide.controller;
 
 import com.abdav.giri_guide.constant.Message;
 import com.abdav.giri_guide.constant.PathApi;
-import com.abdav.giri_guide.model.request.TransactionByStatusRequest;
 import com.abdav.giri_guide.model.request.TransactionRequest;
+import com.abdav.giri_guide.model.request.TransactionStatusUpdateRequest;
 import com.abdav.giri_guide.model.response.*;
 import com.abdav.giri_guide.service.TransactionService;
-import com.midtrans.httpclient.error.MidtransError;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -38,8 +37,8 @@ public class TransactionController {
     }
 
     @PutMapping("/{id}")
-    ResponseEntity<?> updateTransactionStatus(@PathVariable String id, @RequestParam String status) throws MidtransError {
-        TransactionStatusResponse transactionStatusResponse = transactionService.updateTransactionStatus(id, status);
+    ResponseEntity<?> updateTransactionStatus(@PathVariable String id, @RequestBody TransactionStatusUpdateRequest request)  {
+        TransactionStatusResponse transactionStatusResponse = transactionService.updateTransactionStatus(id, request.status(), request.rejectedNote());
         message = Message.DATA_UPDATED;
         CommonResponse<?> response = new CommonResponse<>(message, transactionStatusResponse);
 

@@ -59,6 +59,7 @@ public class TransactionServiceImpl implements TransactionService {
                 .status(ETransactionStatus.WAITING_APPROVE)
                 .porterQty(transactionRequest.porterQty())
                 .adminCost(adminCost)
+                .customerNote(transactionRequest.customerNote())
                 .build();
         transactionRepository.saveAndFlush(transaction);
 
@@ -97,12 +98,15 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     @Override
-    public TransactionStatusResponse updateTransactionStatus(String id, String status) throws MidtransError {
+    public TransactionStatusResponse updateTransactionStatus(String id, String status, String rejectedNote) {
         Transaction transaction = getTransactionOrThrowNotFound(id);
         ETransactionStatus transactionStatus = ETransactionStatus.valueOf(status.toUpperCase());
 
         transaction.setStatus(transactionStatus);
         transactionRepository.saveAndFlush(transaction);
+        if(transactionStatus == ETransactionStatus.REJECTED && rejectedNote!=null){
+            return  new TransactionStatusResponse(transaction.getStatus().toString(), rejectedNote);
+        }
 //        if (transactionStatus == ETransactionStatus.WAITING_PAY){
 //            return midtransService.createToken(transaction);
 //        }

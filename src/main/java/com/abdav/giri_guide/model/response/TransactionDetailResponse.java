@@ -27,6 +27,7 @@ public record TransactionDetailResponse(
         Long entryPerDay,
         Long totalEntry,
         Long adminCost,
-        Long totalPrice
+        Long totalPrice,
+        String customerNote
 ) {
 }

@@ -14,7 +14,7 @@ import java.util.List;
 
 public interface TransactionService {
     TransactionStatusResponse createTransaction(TransactionRequest transactionRequest);
-    TransactionStatusResponse updateTransactionStatus(String id, String status) throws MidtransError;
+    TransactionStatusResponse updateTransactionStatus(String id, String status, String rejectedError);
     Page<TransactionDetailResponse> transactionList(Integer page, Integer size);
     TransactionDetailResponse getTransactionById(String id);
     Page<TransactionResponse> findAllByStatus(List<String> stringList,String userId, Integer page, Integer size, HttpServletRequest httpReq);
