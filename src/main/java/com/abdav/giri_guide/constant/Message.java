@@ -1,6 +1,9 @@
 package com.abdav.giri_guide.constant;
 
 public class Message {
+    private Message() {
+    }
+
     public static final String REQUIRED_EMAIL = "Email harus diisi";
     public static final String REQUIRED_PASSWORD = "Password harus diisi";
     public static final String REQUIRED_DATA = "Data harus diisi";

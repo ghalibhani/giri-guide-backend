@@ -83,15 +83,6 @@ public class TourGuideController {
                         tourGuideService.createTourGuide(image, request, httpReq)));
     }
 
-    @GetMapping("profile/{id}")
-    public ResponseEntity<?> getMethodName(
-            @PathVariable String id,
-            HttpServletRequest httpReq) {
-
-        return ResponseEntity.status(HttpStatus.OK)
-                .body(tourGuideService.getTourGuideProfile(id, httpReq));
-    }
-
     @GetMapping("{id}")
     public ResponseEntity<?> getTourGuideById(@PathVariable String id, HttpServletRequest httpReq) {
         return ResponseEntity.status(HttpStatus.OK)
@@ -100,7 +91,33 @@ public class TourGuideController {
                         tourGuideService.getTourGuide(id, httpReq)));
     }
 
-    @PutMapping("profile/{id}")
+    @PatchMapping("{id}/toggle-active")
+    public ResponseEntity<?> toggleTourGuideIsActive(@PathVariable String id, HttpServletRequest httpReq) {
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(new CommonResponse<>(
+                        Message.DATA_UPDATED,
+                        tourGuideService.toggleTourGuideActiveStatus(id, httpReq)));
+    }
+
+    @GetMapping("profile/{userId}")
+    public ResponseEntity<?> getTourGuideProfileByUserId(
+            @PathVariable String userId,
+            HttpServletRequest httpReq) {
+
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(tourGuideService.getTourGuideProfile(userId, httpReq));
+    }
+
+    @GetMapping("data/{id}")
+    public ResponseEntity<?> getTourGuideData(
+            @PathVariable String id,
+            HttpServletRequest httpReq) {
+
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(tourGuideService.getTourGuideData(id, httpReq));
+    }
+
+    @PatchMapping("data/{id}")
     public ResponseEntity<?> updateTourGuide(
             @PathVariable String id,
             @RequestBody TourGuideRequest request,
@@ -112,15 +129,7 @@ public class TourGuideController {
                         tourGuideService.updateTourGuide(id, request, httpReq)));
     }
 
-    @PatchMapping("{id}/toggle-active")
-    public ResponseEntity<?> toggleTourGuideIsActive(@PathVariable String id, HttpServletRequest httpReq) {
-        return ResponseEntity.status(HttpStatus.OK)
-                .body(new CommonResponse<>(
-                        Message.DATA_UPDATED,
-                        tourGuideService.toggleTourGuideActiveStatus(id, httpReq)));
-    }
-
-    @PatchMapping(path = "profile/{id}/update-image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PatchMapping(path = "data/{id}/update-image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> updateTourGuideImage(
             @PathVariable String id,
             @RequestParam MultipartFile image,
