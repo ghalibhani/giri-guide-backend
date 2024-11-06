@@ -3,10 +3,12 @@ package com.abdav.giri_guide.controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.abdav.giri_guide.constant.Message;
 import com.abdav.giri_guide.model.request.GuideReviewRequest;
 import com.abdav.giri_guide.model.response.CommonResponse;
 import com.abdav.giri_guide.service.GuideReviewService;
 
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.http.HttpStatus;
@@ -24,22 +26,39 @@ import org.springframework.web.bind.annotation.RequestParam;
 public class GuideReviewController {
     private final GuideReviewService reviewService;
 
-    @PostMapping("{id}/reviews")
-    public ResponseEntity<?> createReview(@PathVariable String id, @RequestBody @Validated GuideReviewRequest request) {
+    @PostMapping("{tourGuideId}/reviews")
+    public ResponseEntity<?> createReview(
+            @PathVariable String tourGuideId,
+            @RequestBody @Validated GuideReviewRequest request,
+            HttpServletRequest httpReq) {
+
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(new CommonResponse<>("Data Created", reviewService.createGuideReview(id, request)));
+                .body(new CommonResponse<>(
+                        Message.DATA_CREATED, reviewService.createGuideReview(tourGuideId, request, httpReq)));
     }
 
-    @GetMapping("{id}/reviews")
-    public ResponseEntity<?> getReviewsByGuideId(@PathVariable String id) {
+    @GetMapping("{tourGuideId}/reviews")
+    public ResponseEntity<?> getReviewsByGuideId(
+            @PathVariable String tourGuideId,
+            @RequestParam(required = false, defaultValue = "5") Integer size,
+            @RequestParam(required = false, defaultValue = "1") Integer page,
+            HttpServletRequest httpReq
+
+    ) {
+
         return ResponseEntity.status(HttpStatus.OK)
-                .body(reviewService.getGuideReviewsByGuideId(id, 1, 5));
+                .body(reviewService.getGuideReviewsByGuideId(tourGuideId, page, size, httpReq));
     }
 
-    @GetMapping("{guideId}/reviews/{reviewId}")
-    public ResponseEntity<?> getReviewById(@PathVariable String guideId, @PathVariable String reviewId) {
+    @GetMapping("reviews/{reviewId}")
+    public ResponseEntity<?> getReviewById(
+            @PathVariable String guideId,
+            @PathVariable String reviewId,
+            HttpServletRequest httpReq
+
+    ) {
         return ResponseEntity.status(HttpStatus.OK)
-                .body(new CommonResponse<>("Data Fetched", reviewService.getGuideReviewById(reviewId)));
+                .body(new CommonResponse<>("Data Fetched", reviewService.getGuideReviewById(reviewId, httpReq)));
     }
 
 }

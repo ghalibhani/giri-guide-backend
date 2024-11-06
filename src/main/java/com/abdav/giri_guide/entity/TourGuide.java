@@ -1,6 +1,8 @@
 package com.abdav.giri_guide.entity;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import com.abdav.giri_guide.constant.EGender;
 
@@ -11,6 +13,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
@@ -61,5 +64,9 @@ public class TourGuide extends AuditEntity {
 
     @Builder.Default
     private boolean isActive = true;
+
+    @OneToMany(mappedBy = "tourGuide")
+    @Builder.Default
+    private List<GuideReview> reviews = new ArrayList<>();
 
 }
