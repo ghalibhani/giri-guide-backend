@@ -3,6 +3,7 @@ package com.abdav.giri_guide.mapper;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.abdav.giri_guide.entity.GuideReview;
 import com.abdav.giri_guide.entity.TourGuide;
 import com.abdav.giri_guide.entity.TourGuideHikingPoint;
 import com.abdav.giri_guide.model.response.TourGuideDetailResponse;
@@ -18,8 +19,10 @@ public class TourGuideMapper {
 
     public static TourGuideProfileResponse toTourGuideProfileResponse(
             TourGuide tourGuide,
-            HttpServletRequest httpReq) {
+            HttpServletRequest httpReq
 
+    ) {
+        AverageRating averageRating = countAverageRating(tourGuide.getReviews());
         return new TourGuideProfileResponse(
                 tourGuide.getUsers().getId(),
                 tourGuide.getId(),
@@ -35,7 +38,16 @@ public class TourGuideMapper {
                 tourGuide.getAdditionalPrice(),
                 tourGuide.getTotalPorter(),
                 tourGuide.getPricePorter(),
-                (tourGuide.getImage() == null) ? null : UrlUtil.resolveImageUrl(tourGuide.getImage(), httpReq));
+                (tourGuide.getImage() == null) ? null : UrlUtil.resolveImageUrl(tourGuide.getImage(), httpReq),
+
+                // #TODO Fix Hard Code
+                999,
+                50,
+                50,
+                averageRating.rating,
+                averageRating.totalReview
+
+        );
     }
 
     public static TourGuideDetailResponse toTourGuideDetailResponse(
@@ -44,18 +56,20 @@ public class TourGuideMapper {
             HttpServletRequest httpReq
 
     ) {
+        AverageRating averageRating = countAverageRating(tourGuide.getReviews());
         return new TourGuideDetailResponse(
                 tourGuide.getId(),
                 tourGuide.getName(),
                 (tourGuide.getImage() == null) ? null : UrlUtil.resolveImageUrl(tourGuide.getImage(), httpReq),
                 tourGuide.getDescription(),
                 tourGuide.isActive(),
+                averageRating.rating,
+                averageRating.totalReview,
+
                 // TODO fix this hard code
-                3.3,
-                5,
-                10,
-                40,
-                60,
+                999,
+                50,
+                50,
                 tourGuide.getPrice(),
                 tourGuide.getAdditionalPrice(),
                 tourGuide.getTotalPorter(),
@@ -70,14 +84,37 @@ public class TourGuideMapper {
 
         List<TourGuideListResponse> result = new ArrayList<>();
         for (TourGuide tourGuide : tourGuides) {
+            AverageRating averageRating = countAverageRating(tourGuide.getReviews());
             result.add(new TourGuideListResponse(
                     tourGuide.getId(),
                     tourGuide.getName(),
                     (tourGuide.getImage() == null) ? null : UrlUtil.resolveImageUrl(tourGuide.getImage(), httpReq),
                     tourGuide.getDescription(),
-                    5.0,
-                    10));
+                    averageRating.rating,
+                    averageRating.totalReview));
         }
         return result;
+    }
+
+    private record AverageRating(
+            Double rating,
+            Integer totalReview) {
+    }
+
+    private static AverageRating countAverageRating(List<GuideReview> reviews) {
+        Double totalRating = 0.0;
+        Integer totalReview = 0;
+
+        for (GuideReview review : reviews) {
+            if (review.getDeletedDate() == null) {
+                totalRating += Double.valueOf(review.getRating());
+                totalReview += 1;
+            }
+        }
+
+        return new AverageRating(
+                totalRating / Double.valueOf(totalReview),
+                totalReview);
+
     }
 }

@@ -6,7 +6,8 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
 public record GuideReviewRequest(
-        @NotBlank String customerId,
+        @NotBlank String userId,
+        @NotBlank String transactionId,
         @Min(1) @Max(5) Integer rating,
         @NotNull Boolean usePorter,
         String review

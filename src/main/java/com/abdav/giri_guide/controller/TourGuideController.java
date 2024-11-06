@@ -83,13 +83,13 @@ public class TourGuideController {
                         tourGuideService.createTourGuide(image, request, httpReq)));
     }
 
-    @GetMapping("profile")
+    @GetMapping("profile/{id}")
     public ResponseEntity<?> getMethodName(
-            @Validated @RequestBody UserIdRequest request,
+            @PathVariable String id,
             HttpServletRequest httpReq) {
 
         return ResponseEntity.status(HttpStatus.OK)
-                .body(tourGuideService.getTourGuideProfile(request, httpReq));
+                .body(tourGuideService.getTourGuideProfile(id, httpReq));
     }
 
     @GetMapping("{id}")
@@ -178,7 +178,8 @@ public class TourGuideController {
             @PathVariable String id) {
 
         return ResponseEntity.status(HttpStatus.OK).body(new CommonResponse<>(
-                Message.DATA_UPDATED, tourGuideService.toggleTourGuideHikingPointActiveList(request, id)));
+                Message.DATA_UPDATED,
+                tourGuideService.toggleTourGuideHikingPointActiveList(request, id)));
 
     }
 }
