@@ -113,7 +113,7 @@ public class TourGuideMapper {
         }
 
         return new AverageRating(
-                totalRating / Double.valueOf(totalReview),
+                (totalReview > 0) ? totalRating / Double.valueOf(totalReview) : 0.0,
                 totalReview);
 
     }
