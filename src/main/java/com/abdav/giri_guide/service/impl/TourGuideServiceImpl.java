@@ -229,7 +229,8 @@ public class TourGuideServiceImpl implements TourGuideService {
 
     @Override
     public TourGuideDetailResponse updateTourGuideImage(String id, MultipartFile image, HttpServletRequest httpReq) {
-        TourGuide tourGuide = tourGuideRepository.findById(id).orElseThrow(EntityNotFoundException::new);
+        TourGuide tourGuide = tourGuideRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Tour Guide " + Message.DATA_NOT_FOUND));
         ImageEntity imageEntity = imageService.create(image, PathImage.PROFILE_PICTURE, tourGuide.getName());
         tourGuide.setImage(imageEntity);
         tourGuide = tourGuideRepository.save(tourGuide);
@@ -237,6 +238,13 @@ public class TourGuideServiceImpl implements TourGuideService {
                 .findByTourGuideAndDeletedDateIsNull(tourGuide);
 
         return TourGuideMapper.toTourGuideDetailResponse(tourGuide, hikingPoints, httpReq);
+    }
+
+    @Override
+    public TourGuideProfileResponse getTourGuideData(String id, HttpServletRequest httpReq) {
+        TourGuide tourGuide = tourGuideRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Tour Guide " + Message.DATA_NOT_FOUND));
+        return TourGuideMapper.toTourGuideProfileResponse(tourGuide, httpReq);
     }
 
     @Override

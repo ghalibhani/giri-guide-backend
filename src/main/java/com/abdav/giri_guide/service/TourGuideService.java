@@ -21,6 +21,8 @@ public interface TourGuideService {
 
         TourGuideProfileResponse getTourGuideProfile(String userId, HttpServletRequest httpReq);
 
+        TourGuideProfileResponse getTourGuideData(String id, HttpServletRequest httpReq);
+
         TourGuideDetailResponse getTourGuide(String id, HttpServletRequest httpReq);
 
         TourGuideDetailResponse updateTourGuide(String id, TourGuideRequest request, HttpServletRequest httpReq);
