@@ -38,7 +38,7 @@ import lombok.RequiredArgsConstructor;
 public class TourGuideController {
     private final TourGuideService tourGuideService;
 
-    @PostMapping("")
+    @PostMapping(path = "", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Validated
     public ResponseEntity<?> registerTourGuide(
             @RequestParam MultipartFile image,
