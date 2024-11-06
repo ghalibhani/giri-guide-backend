@@ -15,6 +15,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Arrays;
+import java.util.List;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping(PathApi.TRANSACTIONS_API)
@@ -71,14 +74,16 @@ public class TransactionController {
                 .body(response);
     }
 
-    @PostMapping(PathApi.HISTORY_TRANSACTION)
+    @GetMapping(PathApi.HISTORY_TRANSACTION)
     ResponseEntity<?> transactionByStatus(
             @RequestParam(required = false, defaultValue = "1") Integer page,
             @RequestParam(required = false, defaultValue = "5") Integer size,
-            @RequestBody TransactionByStatusRequest request,
+            @RequestParam String userId,
+            @RequestParam String status,
             HttpServletRequest httpReq
     ){
-        Page<TransactionResponse> transaction = transactionService.findAllByStatus(request, page, size, httpReq);
+        List<String> statusList = Arrays.stream(status.split(",")).map(String::toUpperCase).toList();
+        Page<TransactionResponse> transaction = transactionService.findAllByStatus(statusList, userId, page, size, httpReq);
         PagingResponse paging = new PagingResponse(page, size, transaction.getTotalPages(), transaction.getTotalElements());
         message = Message.SUCCESS_FETCH;
         CommonResponseWithPage<?> response = new CommonResponseWithPage<>(message, transaction.getContent(), paging);

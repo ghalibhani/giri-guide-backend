@@ -133,12 +133,12 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     @Override
-    public Page<TransactionResponse> findAllByStatus(TransactionByStatusRequest request, Integer page, Integer size, HttpServletRequest httpReq) {
-        Customer customer = customerService.getById(request.userId());
-
-        List<ETransactionStatus> eStatus = request.listStatus().stream().map(s -> ETransactionStatus.valueOf(s.toUpperCase())).toList();
+    public Page<TransactionResponse> findAllByStatus(List<String> statusList, String userId, Integer page, Integer size, HttpServletRequest httpReq) {
+        Customer customer = customerService.getById(userId);
+        System.out.println(customer);
+        List<ETransactionStatus> eStatus = statusList.stream().map(ETransactionStatus::valueOf).toList();
         Pageable pageable = PageRequest.of(page-1, size);
-        Page<Transaction> transactions = transactionRepository.findAllByCustomerIdAndStatusInAndDeletedDateIsNull(customer.getId(), eStatus,pageable);
+        Page<Transaction> transactions = transactionRepository.findAllByCustomerIdAndStatusInAndDeletedDateIsNullOrderByStartDateAsc(customer.getId(), eStatus,pageable);
 
         return transactions.map(transaction -> TransactionMapper.transactionToTransactionResponse(transaction, httpReq));
     }
