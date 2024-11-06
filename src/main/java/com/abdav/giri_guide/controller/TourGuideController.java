@@ -100,7 +100,7 @@ public class TourGuideController {
                         tourGuideService.getTourGuide(id, httpReq)));
     }
 
-    @PutMapping("{id}")
+    @PutMapping("profile/{id}")
     public ResponseEntity<?> updateTourGuide(
             @PathVariable String id,
             @RequestBody TourGuideRequest request,
@@ -120,7 +120,7 @@ public class TourGuideController {
                         tourGuideService.toggleTourGuideActiveStatus(id, httpReq)));
     }
 
-    @PatchMapping(path = "{id}/update-image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PatchMapping(path = "profile/{id}/update-image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> updateTourGuideImage(
             @PathVariable String id,
             @RequestParam MultipartFile image,
