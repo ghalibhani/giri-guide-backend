@@ -1,21 +1,21 @@
 package com.abdav.giri_guide.service.impl;
 
-import com.abdav.giri_guide.config.MidtransConfig;
 import com.abdav.giri_guide.constant.ETransactionStatus;
 import com.abdav.giri_guide.constant.Message;
+import com.abdav.giri_guide.model.request.TransactionByStatusRequest;
 import com.abdav.giri_guide.entity.*;
 import com.abdav.giri_guide.mapper.TransactionMapper;
 import com.abdav.giri_guide.model.request.HikerDetailRequest;
 import com.abdav.giri_guide.model.request.TransactionRequest;
 import com.abdav.giri_guide.model.response.TransactionDetailResponse;
+import com.abdav.giri_guide.model.response.TransactionResponse;
 import com.abdav.giri_guide.model.response.TransactionStatusResponse;
 import com.abdav.giri_guide.repository.*;
-import com.abdav.giri_guide.service.MidtransService;
+import com.abdav.giri_guide.service.CustomerService;
 import com.abdav.giri_guide.service.TransactionService;
-import com.midtrans.Config;
-import com.midtrans.Midtrans;
 import com.midtrans.httpclient.error.MidtransError;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
@@ -37,7 +37,7 @@ public class TransactionServiceImpl implements TransactionService {
     private final HikingPointRepository hikingPointRepository;
     private final TransactionHikerRepository transactionHikerRepository;
     private final TourGuideRepository tourGuideRepository;
-    private final MidtransService midtransService;
+    private final CustomerService customerService;
 
     @Value("${app.giri-guide.admin-cost}")
     private Long adminCost;
@@ -103,9 +103,9 @@ public class TransactionServiceImpl implements TransactionService {
 
         transaction.setStatus(transactionStatus);
         transactionRepository.saveAndFlush(transaction);
-        if (transactionStatus == ETransactionStatus.WAITING_PAY){
-            return midtransService.createToken(transaction);
-        }
+//        if (transactionStatus == ETransactionStatus.WAITING_PAY){
+//            return midtransService.createToken(transaction);
+//        }
 
         return new TransactionStatusResponse(transaction.getStatus().toString(), null);
     }
@@ -123,13 +123,24 @@ public class TransactionServiceImpl implements TransactionService {
         Pageable pageable = PageRequest.of(page-1, size);
         Page<Transaction> transactions = transactionRepository.findAllByDeletedDateIsNull(pageable);
 
-        return transactions.map(TransactionMapper::transactionToAdminResponse);
+        return transactions.map(TransactionMapper::transactionToTransactionDetailResponse);
     }
 
     @Override
     public TransactionDetailResponse getTransactionById(String id) {
         Transaction transaction = getTransactionOrThrowNotFound(id);
-        return TransactionMapper.transactionToAdminResponse(transaction);
+        return TransactionMapper.transactionToTransactionDetailResponse(transaction);
+    }
+
+    @Override
+    public Page<TransactionResponse> findAllByStatus(TransactionByStatusRequest request, Integer page, Integer size, HttpServletRequest httpReq) {
+        Customer customer = customerService.getById(request.userId());
+
+        List<ETransactionStatus> eStatus = request.listStatus().stream().map(s -> ETransactionStatus.valueOf(s.toUpperCase())).toList();
+        Pageable pageable = PageRequest.of(page-1, size);
+        Page<Transaction> transactions = transactionRepository.findAllByCustomerIdAndStatusInAndDeletedDateIsNull(customer.getId(), eStatus,pageable);
+
+        return transactions.map(transaction -> TransactionMapper.transactionToTransactionResponse(transaction, httpReq));
     }
 
     @Override

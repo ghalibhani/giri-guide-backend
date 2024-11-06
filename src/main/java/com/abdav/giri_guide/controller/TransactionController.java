@@ -2,11 +2,13 @@ package com.abdav.giri_guide.controller;
 
 import com.abdav.giri_guide.constant.Message;
 import com.abdav.giri_guide.constant.PathApi;
+import com.abdav.giri_guide.model.request.TransactionByStatusRequest;
 import com.abdav.giri_guide.model.request.TransactionRequest;
 import com.abdav.giri_guide.model.response.*;
 import com.abdav.giri_guide.service.TransactionService;
 import com.midtrans.httpclient.error.MidtransError;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
@@ -63,6 +65,23 @@ public class TransactionController {
         TransactionDetailResponse transactionDetailResponse = transactionService.getTransactionById(id);
         message = Message.SUCCESS_FETCH;
         CommonResponse<?> response = new CommonResponse<>(message, transactionDetailResponse);
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(response);
+    }
+
+    @PostMapping(PathApi.HISTORY_TRANSACTION)
+    ResponseEntity<?> transactionByStatus(
+            @RequestParam(required = false, defaultValue = "1") Integer page,
+            @RequestParam(required = false, defaultValue = "5") Integer size,
+            @RequestBody TransactionByStatusRequest request,
+            HttpServletRequest httpReq
+    ){
+        Page<TransactionResponse> transaction = transactionService.findAllByStatus(request, page, size, httpReq);
+        PagingResponse paging = new PagingResponse(page, size, transaction.getTotalPages(), transaction.getTotalElements());
+        message = Message.SUCCESS_FETCH;
+        CommonResponseWithPage<?> response = new CommonResponseWithPage<>(message, transaction.getContent(), paging);
 
         return ResponseEntity
                 .status(HttpStatus.OK)
