@@ -175,20 +175,21 @@ public class TourGuideController {
                 .body(tourGuideService.getTourGuideList(hikingPoint, size, page, httpReq));
     }
 
-    @GetMapping("profile/hiking-points")
-    public ResponseEntity<?> getProfileHikingPoints(@RequestBody @Validated UserIdRequest request) {
+    @GetMapping("profile/{userId}/hiking-points")
+    public ResponseEntity<?> getProfileHikingPoints(@PathVariable String userId) {
         return ResponseEntity.status(HttpStatus.OK).body(new CommonResponse<>(
-                Message.SUCCESS_FETCH, tourGuideService.getTourGuideHikingPointActiveList(request)));
+                Message.SUCCESS_FETCH, tourGuideService.getTourGuideHikingPointActiveList(new UserIdRequest(userId))));
     }
 
-    @PatchMapping("profile/hiking-points/{id}/toggle")
+    @PatchMapping("profile/{userId}/hiking-points/{tourGuideHikingPointId}/toggle")
     public ResponseEntity<?> toggleProfileHikingPoints(
-            @RequestBody @Validated UserIdRequest request,
-            @PathVariable String id) {
+            @PathVariable String userId,
+            @PathVariable String tourGuideHikingPointId) {
 
         return ResponseEntity.status(HttpStatus.OK).body(new CommonResponse<>(
                 Message.DATA_UPDATED,
-                tourGuideService.toggleTourGuideHikingPointActiveList(request, id)));
+                tourGuideService.toggleTourGuideHikingPointActiveList(
+                        new UserIdRequest(userId), tourGuideHikingPointId)));
 
     }
 }
