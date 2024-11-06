@@ -7,6 +7,7 @@ import com.abdav.giri_guide.model.response.TransactionDetailResponse;
 import com.abdav.giri_guide.model.response.TransactionResponse;
 import com.abdav.giri_guide.model.response.TransactionStatusResponse;
 import com.midtrans.httpclient.error.MidtransError;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.data.domain.Page;
 
 public interface TransactionService {
@@ -14,7 +15,7 @@ public interface TransactionService {
     TransactionStatusResponse updateTransactionStatus(String id, String status) throws MidtransError;
     Page<TransactionDetailResponse> transactionList(Integer page, Integer size);
     TransactionDetailResponse getTransactionById(String id);
-    Page<TransactionResponse> findAllByStatus(TransactionByStatusRequest request, Integer page, Integer size);
+    Page<TransactionResponse> findAllByStatus(TransactionByStatusRequest request, Integer page, Integer size, HttpServletRequest httpReq);
 
     Transaction getById(String id);
 }
