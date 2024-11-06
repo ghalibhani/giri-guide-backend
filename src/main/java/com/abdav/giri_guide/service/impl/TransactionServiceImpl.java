@@ -135,7 +135,6 @@ public class TransactionServiceImpl implements TransactionService {
     @Override
     public Page<TransactionResponse> findAllByStatus(List<String> statusList, String userId, Integer page, Integer size, HttpServletRequest httpReq) {
         Customer customer = customerService.getById(userId);
-        System.out.println(customer);
         List<ETransactionStatus> eStatus = statusList.stream().map(ETransactionStatus::valueOf).toList();
         Pageable pageable = PageRequest.of(page-1, size);
         Page<Transaction> transactions = transactionRepository.findAllByCustomerIdAndStatusInAndDeletedDateIsNullOrderByStartDateAsc(customer.getId(), eStatus,pageable);

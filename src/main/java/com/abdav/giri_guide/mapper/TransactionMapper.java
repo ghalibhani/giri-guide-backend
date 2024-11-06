@@ -55,6 +55,7 @@ public class TransactionMapper {
                 transaction.getTotalSimaksiPrice(),
                 transaction.getHikingPoint().getPrice(),
                 transaction.getTotalEntryPrice(),
+                transaction.getAdminCost(),
                 transaction.getTotalPrice()
         );
     }

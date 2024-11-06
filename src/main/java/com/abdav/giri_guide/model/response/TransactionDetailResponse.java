@@ -26,6 +26,7 @@ public record TransactionDetailResponse(
         Long totalPriceSimaksi,
         Long entryPerDay,
         Long totalEntry,
+        Long adminCost,
         Long totalPrice
 ) {
 }

@@ -59,6 +59,10 @@ public class Transaction extends AuditEntity{
 
     private Long totalPrice;
 
+    private String customerNote;
+
+    private String rejectedNote;
+
 
     @OneToMany(mappedBy = "transaction", targetEntity = TransactionHiker.class)
     @JsonManagedReference
