@@ -91,7 +91,7 @@ public class TourGuideController {
                         tourGuideService.getTourGuide(id, httpReq)));
     }
 
-    @PatchMapping("{id}/toggle-active")
+    @PatchMapping("{userId}/toggle-active")
     public ResponseEntity<?> toggleTourGuideIsActive(@PathVariable String userId, HttpServletRequest httpReq) {
         return ResponseEntity.status(HttpStatus.OK)
                 .body(new CommonResponse<>(
