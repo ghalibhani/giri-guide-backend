@@ -10,6 +10,7 @@ public record TransactionRequest(
         String hikingPointId,
         LocalDateTime startDate,
         LocalDateTime endDate,
-        List<HikerDetailRequest> hikerDetails
+        List<HikerDetailRequest> hikerDetails,
+        String customerNote
 ) {
 }
