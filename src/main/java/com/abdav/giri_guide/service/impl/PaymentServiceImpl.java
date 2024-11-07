@@ -2,8 +2,6 @@ package com.abdav.giri_guide.service.impl;
 
 import com.abdav.giri_guide.entity.Payment;
 import com.abdav.giri_guide.entity.TransactionPayment;
-import com.abdav.giri_guide.model.request.PaymentDetailRequest;
-import com.abdav.giri_guide.model.request.PaymentRequest;
 import com.abdav.giri_guide.repository.PaymentRepository;
 import com.abdav.giri_guide.service.PaymentService;
 import com.midtrans.Config;
@@ -25,8 +23,6 @@ public class PaymentServiceImpl implements PaymentService {
     @Override
     public Payment create(TransactionPayment transactionPayment) throws MidtransError {
         MidtransSnapApi snapApi = new ConfigFactory(midtransConfig).getSnapApi();
-        Long amount = (long) Math.round(transactionPayment.getAmount());
-//        PaymentDetailRequest paymentDetailRequest = new PaymentDetailRequest(transactionPayment.getId(), amount);
         Map<String, Object> transactionDetail = Map.of(
                 "order_id", transactionPayment.getId(),
                 "gross_amount", transactionPayment.getAmount()
