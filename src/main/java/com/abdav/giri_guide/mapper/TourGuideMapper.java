@@ -70,6 +70,7 @@ public class TourGuideMapper {
                 999,
                 50,
                 50,
+                tourGuide.getMaxHiker(),
                 tourGuide.getPrice(),
                 tourGuide.getAdditionalPrice(),
                 tourGuide.getTotalPorter(),
