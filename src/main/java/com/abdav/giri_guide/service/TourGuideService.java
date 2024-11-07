@@ -12,32 +12,39 @@ import com.abdav.giri_guide.model.response.TourGuideDetailResponse;
 import com.abdav.giri_guide.model.response.TourGuideHikingPointActiveResponse;
 import com.abdav.giri_guide.model.response.TourGuideListResponse;
 import com.abdav.giri_guide.model.response.TourGuideProfileResponse;
+import com.abdav.giri_guide.model.response.TourGuideStatsResponse;
 
 import jakarta.servlet.http.HttpServletRequest;
 
 public interface TourGuideService {
-        TourGuideProfileResponse createTourGuide(MultipartFile image, TourGuideRequest request,
-                        HttpServletRequest httpReq);
+    TourGuideProfileResponse createTourGuide(MultipartFile image, TourGuideRequest request,
+            HttpServletRequest httpReq);
 
-        TourGuideProfileResponse getTourGuideProfile(String userId, HttpServletRequest httpReq);
+    TourGuideProfileResponse getTourGuideProfile(String userId, HttpServletRequest httpReq);
 
-        TourGuideDetailResponse getTourGuide(String id, HttpServletRequest httpReq);
+    TourGuideProfileResponse getTourGuideData(String id, HttpServletRequest httpReq);
 
-        TourGuideDetailResponse updateTourGuide(String id, TourGuideRequest request, HttpServletRequest httpReq);
+    TourGuideDetailResponse getTourGuide(String id, HttpServletRequest httpReq);
 
-        TourGuideDetailResponse updateTourGuideImage(String id, MultipartFile image, HttpServletRequest httpReq);
+    TourGuideDetailResponse updateTourGuide(String id, TourGuideRequest request, HttpServletRequest httpReq);
 
-        TourGuideDetailResponse toggleTourGuideActiveStatus(String id, HttpServletRequest httpReq);
+    TourGuideDetailResponse updateTourGuideImage(String id, MultipartFile image, HttpServletRequest httpReq);
 
-        void softDeleteTourGuide(String id);
+    TourGuideDetailResponse toggleTourGuideActiveStatus(String id, HttpServletRequest httpReq);
 
-        CommonResponseWithPage<List<TourGuideListResponse>> getTourGuideList(
-                        String hikingPointId, Integer size, Integer page, HttpServletRequest httpReq);
+    void softDeleteTourGuide(String id);
 
-        TourGuideDetailResponse addHikingPoint(
-                        String tourGuideId, TourGuideAddHikingPointRequest request, HttpServletRequest httpReq);
+    CommonResponseWithPage<List<TourGuideListResponse>> getTourGuideList(
+            String hikingPointId, Integer size, Integer page, HttpServletRequest httpReq);
 
-        List<TourGuideHikingPointActiveResponse> getTourGuideHikingPointActiveList(UserIdRequest request);
+    TourGuideDetailResponse addHikingPoint(
+            String tourGuideId, TourGuideAddHikingPointRequest request, HttpServletRequest httpReq);
 
-        List<TourGuideHikingPointActiveResponse> toggleTourGuideHikingPointActiveList(UserIdRequest request, String id);
+    List<TourGuideHikingPointActiveResponse> getTourGuideHikingPointActiveList(String userId);
+
+    List<TourGuideHikingPointActiveResponse> toggleTourGuideHikingPointActiveList(
+            String userId, String hikingPointId);
+
+    TourGuideStatsResponse getTourGuideStats(String userId);
+
 }

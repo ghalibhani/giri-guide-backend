@@ -12,8 +12,11 @@ public record TransactionDetailResponse(
         LocalDateTime endDate,
         Long days,
         String customerId,
+        String customerName,
+        String customerImage,
         String tourGuideId,
         String tourGuideName,
+        String tourGuideImage,
         List<HikerDetailResponse> hikers,
         Integer porter,
         Long porterPerDay,
@@ -26,6 +29,9 @@ public record TransactionDetailResponse(
         Long totalPriceSimaksi,
         Long entryPerDay,
         Long totalEntry,
-        Long totalPrice
+        Long adminCost,
+        Long totalPrice,
+        String customerNote,
+        LocalDateTime endOfPay
 ) {
 }

@@ -38,7 +38,7 @@ import lombok.RequiredArgsConstructor;
 public class TourGuideController {
     private final TourGuideService tourGuideService;
 
-    @PostMapping("")
+    @PostMapping(path = "", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Validated
     public ResponseEntity<?> registerTourGuide(
             @RequestParam MultipartFile image,
@@ -83,15 +83,6 @@ public class TourGuideController {
                         tourGuideService.createTourGuide(image, request, httpReq)));
     }
 
-    @GetMapping("profile/{id}")
-    public ResponseEntity<?> getMethodName(
-            @PathVariable String id,
-            HttpServletRequest httpReq) {
-
-        return ResponseEntity.status(HttpStatus.OK)
-                .body(tourGuideService.getTourGuideProfile(id, httpReq));
-    }
-
     @GetMapping("{id}")
     public ResponseEntity<?> getTourGuideById(@PathVariable String id, HttpServletRequest httpReq) {
         return ResponseEntity.status(HttpStatus.OK)
@@ -100,7 +91,33 @@ public class TourGuideController {
                         tourGuideService.getTourGuide(id, httpReq)));
     }
 
-    @PutMapping("{id}")
+    @PatchMapping("{userId}/toggle-active")
+    public ResponseEntity<?> toggleTourGuideIsActive(@PathVariable String userId, HttpServletRequest httpReq) {
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(new CommonResponse<>(
+                        Message.DATA_UPDATED,
+                        tourGuideService.toggleTourGuideActiveStatus(userId, httpReq)));
+    }
+
+    @GetMapping("profile/{userId}")
+    public ResponseEntity<?> getTourGuideProfileByUserId(
+            @PathVariable String userId,
+            HttpServletRequest httpReq) {
+
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(tourGuideService.getTourGuideProfile(userId, httpReq));
+    }
+
+    @GetMapping("data/{id}")
+    public ResponseEntity<?> getTourGuideData(
+            @PathVariable String id,
+            HttpServletRequest httpReq) {
+
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(tourGuideService.getTourGuideData(id, httpReq));
+    }
+
+    @PatchMapping("data/{id}")
     public ResponseEntity<?> updateTourGuide(
             @PathVariable String id,
             @RequestBody TourGuideRequest request,
@@ -112,15 +129,7 @@ public class TourGuideController {
                         tourGuideService.updateTourGuide(id, request, httpReq)));
     }
 
-    @PatchMapping("{id}/toggle-active")
-    public ResponseEntity<?> toggleTourGuideIsActive(@PathVariable String id, HttpServletRequest httpReq) {
-        return ResponseEntity.status(HttpStatus.OK)
-                .body(new CommonResponse<>(
-                        Message.DATA_UPDATED,
-                        tourGuideService.toggleTourGuideActiveStatus(id, httpReq)));
-    }
-
-    @PatchMapping(path = "{id}/update-image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PatchMapping(path = "data/{id}/update-image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> updateTourGuideImage(
             @PathVariable String id,
             @RequestParam MultipartFile image,
@@ -166,20 +175,29 @@ public class TourGuideController {
                 .body(tourGuideService.getTourGuideList(hikingPoint, size, page, httpReq));
     }
 
-    @GetMapping("profile/hiking-points")
-    public ResponseEntity<?> getProfileHikingPoints(@RequestBody @Validated UserIdRequest request) {
+    @GetMapping("profile/{userId}/hiking-points")
+    public ResponseEntity<?> getProfileHikingPoints(@PathVariable String userId) {
         return ResponseEntity.status(HttpStatus.OK).body(new CommonResponse<>(
-                Message.SUCCESS_FETCH, tourGuideService.getTourGuideHikingPointActiveList(request)));
+                Message.SUCCESS_FETCH,
+                tourGuideService.getTourGuideHikingPointActiveList(userId)));
     }
 
-    @PatchMapping("profile/hiking-points/{id}/toggle")
+    @PatchMapping("profile/{userId}/hiking-points/{tourGuideHikingPointId}/toggle")
     public ResponseEntity<?> toggleProfileHikingPoints(
-            @RequestBody @Validated UserIdRequest request,
-            @PathVariable String id) {
+            @PathVariable String userId,
+            @PathVariable String tourGuideHikingPointId) {
 
         return ResponseEntity.status(HttpStatus.OK).body(new CommonResponse<>(
                 Message.DATA_UPDATED,
-                tourGuideService.toggleTourGuideHikingPointActiveList(request, id)));
+                tourGuideService.toggleTourGuideHikingPointActiveList(userId, tourGuideHikingPointId)));
 
     }
+
+    @GetMapping("stats/{userId}")
+    public ResponseEntity<?> getTourGuideStats(@PathVariable String userId) {
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(new CommonResponse<>(Message.SUCCESS_FETCH,
+                        tourGuideService.getTourGuideStats(userId)));
+    }
+
 }

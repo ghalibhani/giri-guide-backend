@@ -14,10 +14,10 @@ import java.util.List;
 
 public interface TransactionService {
     TransactionStatusResponse createTransaction(TransactionRequest transactionRequest);
-    TransactionStatusResponse updateTransactionStatus(String id, String status) throws MidtransError;
-    Page<TransactionDetailResponse> transactionList(Integer page, Integer size);
-    TransactionDetailResponse getTransactionById(String id);
-    Page<TransactionResponse> findAllByStatus(List<String> stringList,String userId, Integer page, Integer size, HttpServletRequest httpReq);
+    TransactionStatusResponse updateTransactionStatus(String id, String status, String rejectedError);
+    Page<TransactionDetailResponse> transactionList(Integer page, Integer size,String status, HttpServletRequest httpReq);
+    TransactionDetailResponse getTransactionById(String id, HttpServletRequest httpReq);
+    Page<TransactionResponse> findAllByStatus(List<String> stringList,String userId, Integer page, Integer size, String role, HttpServletRequest httpReq);
 
     Transaction getById(String id);
 }
