@@ -57,7 +57,8 @@ public class TransactionMapper {
                 transaction.getTotalEntryPrice(),
                 transaction.getAdminCost(),
                 transaction.getTotalPrice(),
-                transaction.getCustomerNote()
+                transaction.getCustomerNote(),
+                transaction.getEndOfPayTime()
         );
     }
 

@@ -63,6 +63,7 @@ public class Transaction extends AuditEntity{
 
     private String rejectedNote;
 
+    private LocalDateTime endOfPayTime;
 
     @OneToMany(mappedBy = "transaction", targetEntity = TransactionHiker.class)
     @JsonManagedReference

@@ -104,8 +104,15 @@ public class TransactionServiceImpl implements TransactionService {
 
         transaction.setStatus(transactionStatus);
         transactionRepository.saveAndFlush(transaction);
+
         if(transactionStatus == ETransactionStatus.REJECTED && rejectedNote!=null){
-            return  new TransactionStatusResponse(transaction.getStatus().toString(), rejectedNote);
+            transaction.setRejectedNote(rejectedNote);
+            transactionRepository.saveAndFlush(transaction);
+            return  new TransactionStatusResponse(transaction.getStatus().toString(), transaction.getRejectedNote());
+        }
+        if(transactionStatus == ETransactionStatus.WAITING_PAY){
+            transaction.setEndOfPayTime(transaction.getLastModifiedDate().plusDays(1));
+            transactionRepository.saveAndFlush(transaction);
         }
 //        if (transactionStatus == ETransactionStatus.WAITING_PAY){
 //            return midtransService.createToken(transaction);
