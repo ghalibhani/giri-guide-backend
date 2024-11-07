@@ -65,6 +65,9 @@ public class TourGuide extends AuditEntity {
     @Builder.Default
     private boolean isActive = true;
 
+    @OneToOne(mappedBy = "tourGuide")
+    private Deposit deposit;
+
     @OneToMany(mappedBy = "tourGuide")
     @Builder.Default
     private List<GuideReview> reviews = new ArrayList<>();

@@ -213,6 +213,9 @@ public class MountainServiceImpl implements MountainsService {
         if (request.coordinate() != null) {
             hikingPoint.setCoordinate(request.coordinate());
         }
+        if (request.price() != null) {
+            hikingPoint.setPrice(request.price());
+        }
         hikingPointRepository.save(hikingPoint);
 
         return new HikingPointResponse(
