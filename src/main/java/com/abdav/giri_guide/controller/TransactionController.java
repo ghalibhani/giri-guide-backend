@@ -2,11 +2,10 @@ package com.abdav.giri_guide.controller;
 
 import com.abdav.giri_guide.constant.Message;
 import com.abdav.giri_guide.constant.PathApi;
-import com.abdav.giri_guide.model.request.TransactionByStatusRequest;
 import com.abdav.giri_guide.model.request.TransactionRequest;
+import com.abdav.giri_guide.model.request.TransactionStatusUpdateRequest;
 import com.abdav.giri_guide.model.response.*;
 import com.abdav.giri_guide.service.TransactionService;
-import com.midtrans.httpclient.error.MidtransError;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -14,6 +13,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Arrays;
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -35,8 +37,8 @@ public class TransactionController {
     }
 
     @PutMapping("/{id}")
-    ResponseEntity<?> updateTransactionStatus(@PathVariable String id, @RequestParam String status) throws MidtransError {
-        TransactionStatusResponse transactionStatusResponse = transactionService.updateTransactionStatus(id, status);
+    ResponseEntity<?> updateTransactionStatus(@PathVariable String id, @RequestBody TransactionStatusUpdateRequest request)  {
+        TransactionStatusResponse transactionStatusResponse = transactionService.updateTransactionStatus(id, request.status(), request.rejectedNote());
         message = Message.DATA_UPDATED;
         CommonResponse<?> response = new CommonResponse<>(message, transactionStatusResponse);
 
@@ -48,9 +50,10 @@ public class TransactionController {
     @GetMapping
     ResponseEntity<?> transactionResponseCustomer(
             @RequestParam(required = false, defaultValue = "1") Integer page,
-            @RequestParam(required = false, defaultValue = "5") Integer size
+            @RequestParam(required = false, defaultValue = "5") Integer size,
+            HttpServletRequest httpReq
     ){
-        Page<TransactionDetailResponse> transactionList = transactionService.transactionList(page, size);
+        Page<TransactionDetailResponse> transactionList = transactionService.transactionList(page, size, httpReq);
         PagingResponse paging = new PagingResponse(page, size, transactionList.getTotalPages(), transactionList.getTotalElements());
         message = Message.SUCCESS_FETCH;
         CommonResponseWithPage<?> response = new CommonResponseWithPage<>(message, transactionList.getContent(), paging);
@@ -61,8 +64,8 @@ public class TransactionController {
     }
 
     @GetMapping("/{id}")
-    ResponseEntity<?> getTransactionById(@PathVariable String id){
-        TransactionDetailResponse transactionDetailResponse = transactionService.getTransactionById(id);
+    ResponseEntity<?> getTransactionById(@PathVariable String id, HttpServletRequest httpReq){
+        TransactionDetailResponse transactionDetailResponse = transactionService.getTransactionById(id, httpReq);
         message = Message.SUCCESS_FETCH;
         CommonResponse<?> response = new CommonResponse<>(message, transactionDetailResponse);
 
@@ -71,14 +74,17 @@ public class TransactionController {
                 .body(response);
     }
 
-    @PostMapping(PathApi.HISTORY_TRANSACTION)
+    @GetMapping(PathApi.HISTORY_TRANSACTION)
     ResponseEntity<?> transactionByStatus(
             @RequestParam(required = false, defaultValue = "1") Integer page,
             @RequestParam(required = false, defaultValue = "5") Integer size,
-            @RequestBody TransactionByStatusRequest request,
+            @RequestParam String userId,
+            @RequestParam String status,
+            @RequestParam String role,
             HttpServletRequest httpReq
     ){
-        Page<TransactionResponse> transaction = transactionService.findAllByStatus(request, page, size, httpReq);
+        List<String> statusList = Arrays.stream(status.split(",")).map(String::toUpperCase).toList();
+        Page<TransactionResponse> transaction = transactionService.findAllByStatus(statusList, userId, page, size, role, httpReq);
         PagingResponse paging = new PagingResponse(page, size, transaction.getTotalPages(), transaction.getTotalElements());
         message = Message.SUCCESS_FETCH;
         CommonResponseWithPage<?> response = new CommonResponseWithPage<>(message, transaction.getContent(), paging);

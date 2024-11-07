@@ -17,4 +17,6 @@ public interface TourGuideRepository extends JpaRepository<TourGuide, String> {
     Optional<TourGuide> findByUsersAndDeletedDateIsNull(User users);
 
     Page<TourGuide> findAllByDeletedDateIsNull(Pageable pageable);
+
+    Optional<TourGuide> findByUsersIdAndDeletedDateIsNull(String userId);
 }
