@@ -11,7 +11,7 @@ import java.util.List;
 
 @Repository
 public interface TransactionRepository extends JpaRepository<Transaction, String> {
-    Page<Transaction> findAllByDeletedDateIsNull(Pageable pageable);
+    Page<Transaction> findAllByStatus(ETransactionStatus status, Pageable pageable);
     Page<Transaction> findAllByDeletedDateIsNotNull(Pageable pageable);
 
     Page<Transaction> findAllByCustomerIdAndStatusInAndDeletedDateIsNullOrderByStartDateAsc(String customerId,List<ETransactionStatus> status, Pageable pageable);

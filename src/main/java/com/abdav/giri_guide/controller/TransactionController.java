@@ -51,9 +51,10 @@ public class TransactionController {
     ResponseEntity<?> transactionResponseCustomer(
             @RequestParam(required = false, defaultValue = "1") Integer page,
             @RequestParam(required = false, defaultValue = "5") Integer size,
+            @RequestParam(required = false) String status,
             HttpServletRequest httpReq
     ){
-        Page<TransactionDetailResponse> transactionList = transactionService.transactionList(page, size, httpReq);
+        Page<TransactionDetailResponse> transactionList = transactionService.transactionList(page, size, status, httpReq);
         PagingResponse paging = new PagingResponse(page, size, transactionList.getTotalPages(), transactionList.getTotalElements());
         message = Message.SUCCESS_FETCH;
         CommonResponseWithPage<?> response = new CommonResponseWithPage<>(message, transactionList.getContent(), paging);

@@ -132,15 +132,21 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     @Override
-    public Page<TransactionDetailResponse> transactionList(Integer page, Integer size, HttpServletRequest httpReq) {
+    public Page<TransactionDetailResponse> transactionList(Integer page, Integer size, String status, HttpServletRequest httpReq) {
         if (page <= 0) {
             page = 1;
         }
-
         Pageable pageable = PageRequest.of(page - 1, size);
-        Page<Transaction> transactions = transactionRepository.findAllByDeletedDateIsNull(pageable);
+        Page<Transaction> transactionPage;
+        if(status == null){
+            transactionPage = transactionRepository.findAll(pageable);
+            return transactionPage.map(transaction -> TransactionMapper.transactionToTransactionDetailResponse(transaction, httpReq));
+        } else {
 
-        return transactions.map(transaction -> TransactionMapper.transactionToTransactionDetailResponse(transaction, httpReq));
+            ETransactionStatus eStatus = ETransactionStatus.valueOf(status.toUpperCase());
+            transactionPage = transactionRepository.findAllByStatus(eStatus, pageable);
+            return transactionPage.map(transaction -> TransactionMapper.transactionToTransactionDetailResponse(transaction, httpReq));
+        }
     }
 
     @Override
