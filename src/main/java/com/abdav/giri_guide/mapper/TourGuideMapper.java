@@ -1,5 +1,6 @@
 package com.abdav.giri_guide.mapper;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -7,6 +8,7 @@ import com.abdav.giri_guide.entity.GuideReview;
 import com.abdav.giri_guide.entity.TourGuide;
 import com.abdav.giri_guide.entity.TourGuideHikingPoint;
 import com.abdav.giri_guide.model.response.TourGuideDetailResponse;
+import com.abdav.giri_guide.model.response.TourGuideStatsResponse;
 import com.abdav.giri_guide.model.response.TourGuideListResponse;
 import com.abdav.giri_guide.model.response.TourGuideProfileResponse;
 import com.abdav.giri_guide.util.UrlUtil;
@@ -95,6 +97,21 @@ public class TourGuideMapper {
                     averageRating.totalReview));
         }
         return result;
+    }
+
+    // #TODO fix hard code
+    public static TourGuideStatsResponse toTourGuideStatsResponse(TourGuide tourGuide) {
+        return new TourGuideStatsResponse(
+                tourGuide.getDeposit().getMoney(),
+                9990000L,
+                9990000L,
+                999,
+                999,
+                LocalDateTime.now(),
+                999,
+                999
+
+        );
     }
 
     private record AverageRating(

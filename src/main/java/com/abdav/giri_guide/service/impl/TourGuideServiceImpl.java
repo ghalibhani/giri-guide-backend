@@ -32,6 +32,7 @@ import com.abdav.giri_guide.model.response.TourGuideDetailResponse;
 import com.abdav.giri_guide.model.response.TourGuideHikingPointActiveResponse;
 import com.abdav.giri_guide.model.response.TourGuideListResponse;
 import com.abdav.giri_guide.model.response.TourGuideProfileResponse;
+import com.abdav.giri_guide.model.response.TourGuideStatsResponse;
 import com.abdav.giri_guide.repository.HikingPointRepository;
 import com.abdav.giri_guide.repository.TourGuideHikingPointRepository;
 import com.abdav.giri_guide.repository.TourGuideRepository;
@@ -219,7 +220,12 @@ public class TourGuideServiceImpl implements TourGuideService {
 
     @Override
     public TourGuideDetailResponse toggleTourGuideActiveStatus(String id, HttpServletRequest httpReq) {
-        TourGuide tourGuide = tourGuideRepository.findById(id).orElseThrow(EntityNotFoundException::new);
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("User " + Message.DATA_NOT_FOUND));
+
+        TourGuide tourGuide = tourGuideRepository.findByUsersAndDeletedDateIsNull(user)
+                .orElseThrow(() -> new EntityNotFoundException("Tour Guide " + Message.DATA_NOT_FOUND));
+
         tourGuide.setActive(!tourGuide.isActive());
         tourGuide = tourGuideRepository.save(tourGuide);
         List<TourGuideHikingPoint> hikingPoints = tourGuideHikingPointRepository
@@ -255,8 +261,8 @@ public class TourGuideServiceImpl implements TourGuideService {
     }
 
     @Override
-    public List<TourGuideHikingPointActiveResponse> getTourGuideHikingPointActiveList(UserIdRequest request) {
-        User user = userRepository.findById(request.userId()).orElseThrow(EntityNotFoundException::new);
+    public List<TourGuideHikingPointActiveResponse> getTourGuideHikingPointActiveList(String userId) {
+        User user = userRepository.findById(userId).orElseThrow(EntityNotFoundException::new);
         TourGuide tourGuide = tourGuideRepository.findByUsersAndDeletedDateIsNull(user)
                 .orElseThrow(EntityNotFoundException::new);
         List<TourGuideHikingPoint> hikingPoints = tourGuideHikingPointRepository
@@ -267,11 +273,13 @@ public class TourGuideServiceImpl implements TourGuideService {
 
     @Override
     public List<TourGuideHikingPointActiveResponse> toggleTourGuideHikingPointActiveList(
-            UserIdRequest request, String id) {
+            String userId, String id) {
 
-        User user = userRepository.findById(request.userId()).orElseThrow(EntityNotFoundException::new);
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException("User " + Message.DATA_NOT_FOUND));
+
         TourGuideHikingPoint tourGuideHikingPoint = tourGuideHikingPointRepository.findById(id)
-                .orElseThrow(EntityNotFoundException::new);
+                .orElseThrow(() -> new EntityNotFoundException("Hiking Point " + Message.DATA_NOT_FOUND));
 
         if (!tourGuideHikingPoint.getTourGuide().getUsers().equals(user)) {
             throw new EntityNotFoundException();
@@ -284,6 +292,17 @@ public class TourGuideServiceImpl implements TourGuideService {
                 .findByTourGuideAndDeletedDateIsNull(tourGuideHikingPoint.getTourGuide());
 
         return TourGuideHikingPointMapper.toListOfTourGuideHikingPointActiveResponse(hikingPoints);
+    }
+
+    @Override
+    public TourGuideStatsResponse getTourGuideStats(String userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException("User " + Message.DATA_NOT_FOUND));
+
+        TourGuide tourGuide = tourGuideRepository.findByUsersAndDeletedDateIsNull(user)
+                .orElseThrow(() -> new EntityNotFoundException("Tour Guide " + Message.DATA_NOT_FOUND));
+
+        return TourGuideMapper.toTourGuideStatsResponse(tourGuide);
     }
 
 }

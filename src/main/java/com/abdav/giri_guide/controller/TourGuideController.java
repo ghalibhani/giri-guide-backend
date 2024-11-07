@@ -92,11 +92,11 @@ public class TourGuideController {
     }
 
     @PatchMapping("{id}/toggle-active")
-    public ResponseEntity<?> toggleTourGuideIsActive(@PathVariable String id, HttpServletRequest httpReq) {
+    public ResponseEntity<?> toggleTourGuideIsActive(@PathVariable String userId, HttpServletRequest httpReq) {
         return ResponseEntity.status(HttpStatus.OK)
                 .body(new CommonResponse<>(
                         Message.DATA_UPDATED,
-                        tourGuideService.toggleTourGuideActiveStatus(id, httpReq)));
+                        tourGuideService.toggleTourGuideActiveStatus(userId, httpReq)));
     }
 
     @GetMapping("profile/{userId}")
@@ -178,7 +178,8 @@ public class TourGuideController {
     @GetMapping("profile/{userId}/hiking-points")
     public ResponseEntity<?> getProfileHikingPoints(@PathVariable String userId) {
         return ResponseEntity.status(HttpStatus.OK).body(new CommonResponse<>(
-                Message.SUCCESS_FETCH, tourGuideService.getTourGuideHikingPointActiveList(new UserIdRequest(userId))));
+                Message.SUCCESS_FETCH,
+                tourGuideService.getTourGuideHikingPointActiveList(userId)));
     }
 
     @PatchMapping("profile/{userId}/hiking-points/{tourGuideHikingPointId}/toggle")
@@ -188,8 +189,15 @@ public class TourGuideController {
 
         return ResponseEntity.status(HttpStatus.OK).body(new CommonResponse<>(
                 Message.DATA_UPDATED,
-                tourGuideService.toggleTourGuideHikingPointActiveList(
-                        new UserIdRequest(userId), tourGuideHikingPointId)));
+                tourGuideService.toggleTourGuideHikingPointActiveList(userId, tourGuideHikingPointId)));
 
     }
+
+    @GetMapping("stats/{userId}")
+    public ResponseEntity<?> getTourGuideStats(@PathVariable String userId) {
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(new CommonResponse<>(Message.SUCCESS_FETCH,
+                        tourGuideService.getTourGuideStats(userId)));
+    }
+
 }
