@@ -50,9 +50,10 @@ public class TransactionController {
     @GetMapping
     ResponseEntity<?> transactionResponseCustomer(
             @RequestParam(required = false, defaultValue = "1") Integer page,
-            @RequestParam(required = false, defaultValue = "5") Integer size
+            @RequestParam(required = false, defaultValue = "5") Integer size,
+            HttpServletRequest httpReq
     ){
-        Page<TransactionDetailResponse> transactionList = transactionService.transactionList(page, size);
+        Page<TransactionDetailResponse> transactionList = transactionService.transactionList(page, size, httpReq);
         PagingResponse paging = new PagingResponse(page, size, transactionList.getTotalPages(), transactionList.getTotalElements());
         message = Message.SUCCESS_FETCH;
         CommonResponseWithPage<?> response = new CommonResponseWithPage<>(message, transactionList.getContent(), paging);
@@ -63,8 +64,8 @@ public class TransactionController {
     }
 
     @GetMapping("/{id}")
-    ResponseEntity<?> getTransactionById(@PathVariable String id){
-        TransactionDetailResponse transactionDetailResponse = transactionService.getTransactionById(id);
+    ResponseEntity<?> getTransactionById(@PathVariable String id, HttpServletRequest httpReq){
+        TransactionDetailResponse transactionDetailResponse = transactionService.getTransactionById(id, httpReq);
         message = Message.SUCCESS_FETCH;
         CommonResponse<?> response = new CommonResponse<>(message, transactionDetailResponse);
 

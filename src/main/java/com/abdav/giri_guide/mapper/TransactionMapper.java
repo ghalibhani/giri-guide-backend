@@ -34,7 +34,7 @@ public class TransactionMapper {
         );
     }
 
-    public static TransactionDetailResponse transactionToTransactionDetailResponse(Transaction transaction){
+    public static TransactionDetailResponse transactionToTransactionDetailResponse(Transaction transaction, HttpServletRequest httpReq){
         return new TransactionDetailResponse(
                 transaction.getId(),
                 transaction.getStatus().toString(),
@@ -44,8 +44,11 @@ public class TransactionMapper {
                 transaction.getEndDate(),
                 getDay(transaction),
                 transaction.getCustomer().getId(),
+                transaction.getCustomer().getFullName(),
+                transaction.getCustomer().getImage() == null ? null : UrlUtil.resolveImageUrl(transaction.getCustomer().getImage(), httpReq),
                 transaction.getTourGuide().getId(),
                 transaction.getTourGuide().getName(),
+                transaction.getTourGuide().getImage() == null ? null : UrlUtil.resolveImageUrl(transaction.getTourGuide().getImage(), httpReq),
                 getHikerDetailResponsesList(transaction),
                 transaction.getPorterQty(),
                 transaction.getTourGuide().getPricePorter(),

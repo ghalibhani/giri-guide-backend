@@ -132,7 +132,7 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     @Override
-    public Page<TransactionDetailResponse> transactionList(Integer page, Integer size) {
+    public Page<TransactionDetailResponse> transactionList(Integer page, Integer size, HttpServletRequest httpReq) {
         if (page <= 0) {
             page = 1;
         }
@@ -140,13 +140,13 @@ public class TransactionServiceImpl implements TransactionService {
         Pageable pageable = PageRequest.of(page - 1, size);
         Page<Transaction> transactions = transactionRepository.findAllByDeletedDateIsNull(pageable);
 
-        return transactions.map(TransactionMapper::transactionToTransactionDetailResponse);
+        return transactions.map(transaction -> TransactionMapper.transactionToTransactionDetailResponse(transaction, httpReq));
     }
 
     @Override
-    public TransactionDetailResponse getTransactionById(String id) {
+    public TransactionDetailResponse getTransactionById(String id, HttpServletRequest httpReq) {
         Transaction transaction = getTransactionOrThrowNotFound(id);
-        return TransactionMapper.transactionToTransactionDetailResponse(transaction);
+        return TransactionMapper.transactionToTransactionDetailResponse(transaction, httpReq);
     }
 
     @Override
