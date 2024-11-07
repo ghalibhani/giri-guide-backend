@@ -45,6 +45,8 @@ public interface TourGuideService {
     List<TourGuideHikingPointActiveResponse> toggleTourGuideHikingPointActiveList(
             String userId, String hikingPointId);
 
+    void softDeleteTourGuideHikingPoint(String tourGuideId, String hikingPointid);
+
     TourGuideStatsResponse getTourGuideStats(String userId);
 
 }
