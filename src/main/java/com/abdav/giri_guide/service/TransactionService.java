@@ -17,7 +17,7 @@ public interface TransactionService {
     TransactionStatusResponse updateTransactionStatus(String id, String status, String rejectedError);
     Page<TransactionDetailResponse> transactionList(Integer page, Integer size);
     TransactionDetailResponse getTransactionById(String id);
-    Page<TransactionResponse> findAllByStatus(List<String> stringList,String userId, Integer page, Integer size, HttpServletRequest httpReq);
+    Page<TransactionResponse> findAllByStatus(List<String> stringList,String userId, Integer page, Integer size, String role, HttpServletRequest httpReq);
 
     Transaction getById(String id);
 }

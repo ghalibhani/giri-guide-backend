@@ -79,10 +79,11 @@ public class TransactionController {
             @RequestParam(required = false, defaultValue = "5") Integer size,
             @RequestParam String userId,
             @RequestParam String status,
+            @RequestParam String role,
             HttpServletRequest httpReq
     ){
         List<String> statusList = Arrays.stream(status.split(",")).map(String::toUpperCase).toList();
-        Page<TransactionResponse> transaction = transactionService.findAllByStatus(statusList, userId, page, size, httpReq);
+        Page<TransactionResponse> transaction = transactionService.findAllByStatus(statusList, userId, page, size, role, httpReq);
         PagingResponse paging = new PagingResponse(page, size, transaction.getTotalPages(), transaction.getTotalElements());
         message = Message.SUCCESS_FETCH;
         CommonResponseWithPage<?> response = new CommonResponseWithPage<>(message, transaction.getContent(), paging);
