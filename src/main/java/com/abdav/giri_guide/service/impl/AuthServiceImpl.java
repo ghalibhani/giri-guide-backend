@@ -21,6 +21,8 @@ import com.abdav.giri_guide.entity.AppUser;
 import com.abdav.giri_guide.entity.Customer;
 import com.abdav.giri_guide.entity.Role;
 import com.abdav.giri_guide.entity.User;
+import com.abdav.giri_guide.repository.CustomerRepository;
+import com.abdav.giri_guide.repository.TourGuideRepository;
 import com.abdav.giri_guide.repository.UserRepository;
 import com.abdav.giri_guide.security.JwtUtil;
 import com.abdav.giri_guide.service.AuthService;
@@ -40,6 +42,9 @@ public class AuthServiceImpl implements AuthService {
     private final AuthenticationManager authenticationManager;
     private final UserRepository userRepository;
     private final ValidationUtil validationUtil;
+
+    private final CustomerRepository customerRepository;
+    private final TourGuideRepository tourGuideRepository;
 
     @Override
     public void register(RegisterRequest registerRequest) {
@@ -82,11 +87,22 @@ public class AuthServiceImpl implements AuthService {
             AppUser appUser = (AppUser) authentication.getPrincipal();
             String token = jwtUtil.generateToken(appUser);
 
+            String name = null;
+            if (appUser.getRole().equals(ERole.ROLE_CUSTOMER)) {
+                name = customerRepository.findByUserIdAndDeletedDateIsNull(appUser.getId()).get().getFullName();
+
+            } else if (appUser.getRole().equals(ERole.ROLE_GUIDE)) {
+                User user = userRepository.findByEmail(loginRequest.getEmail()).get();
+                name = tourGuideRepository.findByUsersAndDeletedDateIsNull(user).get().getName();
+
+            }
+
             return LoginResponse.builder()
                     .token(token)
                     .UserId(appUser.getId())
                     .email(appUser.getEmail())
                     .role(appUser.getRole())
+                    .name(name)
                     .build();
         } catch (BadCredentialsException e) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid email or password");
@@ -95,8 +111,9 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public void changePassword(String userId, String oldPassword, String newPassword) {
-        User user = userRepository.findById(userId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, Message.DATA_NOT_FOUND));
-        if(!passwordEncoder.matches(oldPassword, user.getPassword())){
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, Message.DATA_NOT_FOUND));
+        if (!passwordEncoder.matches(oldPassword, user.getPassword())) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Password lama salah");
         }
 
