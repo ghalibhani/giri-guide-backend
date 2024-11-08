@@ -242,6 +242,9 @@ public class TourGuideServiceImpl implements TourGuideService {
         if (request.pricePorter() != null) {
             tourGuide.setPricePorter(request.pricePorter());
         }
+        if (request.bankAccount() != null) {
+            tourGuide.setBankAccount(request.bankAccount());
+        }
 
         tourGuide = tourGuideRepository.save(tourGuide);
         List<TourGuideHikingPoint> hikingPoints = tourGuideHikingPointRepository
