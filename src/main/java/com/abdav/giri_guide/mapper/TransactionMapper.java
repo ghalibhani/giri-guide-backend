@@ -64,7 +64,8 @@ public class TransactionMapper {
                 transaction.getAdminCost(),
                 transaction.getTotalPrice(),
                 transaction.getCustomerNote(),
-                transaction.getEndOfPayTime()
+                transaction.getEndOfPayTime(),
+                transaction.getEndOfApprove()
         );
     }
 
@@ -80,7 +81,7 @@ public class TransactionMapper {
     //start date, end date, tour guide per hari, porter per hari,
 
     private static @NotNull Long getDay(Transaction transaction) {
-        Long days = ChronoUnit.DAYS.between(transaction.getStartDate(), transaction.getEndDate());
+        Long days = ChronoUnit.DAYS.between(transaction.getStartDate().toLocalDate(), transaction.getEndDate().toLocalDate());
         return days;
     }
 }

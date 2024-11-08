@@ -65,6 +65,8 @@ public class Transaction extends AuditEntity{
 
     private LocalDateTime endOfPayTime;
 
+    private LocalDateTime endOfApprove;
+
     @OneToMany(mappedBy = "transaction", targetEntity = TransactionHiker.class)
     @JsonManagedReference
     private List<TransactionHiker> transactionHikers;
