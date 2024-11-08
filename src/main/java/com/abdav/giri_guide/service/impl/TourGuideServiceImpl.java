@@ -64,15 +64,24 @@ public class TourGuideServiceImpl implements TourGuideService {
             TourGuideAddHikingPointRequest request,
             HttpServletRequest httpReq) {
 
-        TourGuide tourGuide = tourGuideRepository.findById(tourGuideId).orElseThrow(EntityNotFoundException::new);
+        TourGuide tourGuide = tourGuideRepository.findById(tourGuideId)
+                .orElseThrow(EntityNotFoundException::new);
         HikingPoint hikingPoint = hikingPointRepository.findById(request.hikingPointId())
                 .orElseThrow(EntityNotFoundException::new);
+
+        Optional<TourGuideHikingPoint> data = tourGuideHikingPointRepository
+                .findByTourGuideAndHikingPointAndDeletedDateIsNull(tourGuide, hikingPoint);
+
+        if (data.isPresent()) {
+            throw new DataIntegrityViolationException("User Already Add This Hiking Point");
+        }
 
         TourGuideHikingPoint tourGuideHikingPoint = TourGuideHikingPoint.builder()
                 .tourGuide(tourGuide)
                 .hikingPoint(hikingPoint)
                 .build();
         tourGuideHikingPointRepository.save(tourGuideHikingPoint);
+
         List<TourGuideHikingPoint> hikingPoints = tourGuideHikingPointRepository
                 .findByTourGuideAndDeletedDateIsNull(tourGuide);
 
@@ -159,7 +168,8 @@ public class TourGuideServiceImpl implements TourGuideService {
 
             return new CommonResponseWithPage<>(
                     Message.SUCCESS_FETCH,
-                    TourGuideMapper.toListOfTourGuideListResponse(tourGuidePage.getContent(), httpReq),
+                    TourGuideMapper.toListOfTourGuideListResponse(tourGuidePage.getContent(),
+                            httpReq),
                     paging);
 
         } else {
@@ -174,7 +184,8 @@ public class TourGuideServiceImpl implements TourGuideService {
 
             return new CommonResponseWithPage<>(
                     Message.SUCCESS_FETCH,
-                    TourGuideHikingPointMapper.toListOfTourGuideListResponse(tourGuidePage.getContent(), httpReq),
+                    TourGuideHikingPointMapper.toListOfTourGuideListResponse(
+                            tourGuidePage.getContent(), httpReq),
                     paging);
 
         }
@@ -234,7 +245,9 @@ public class TourGuideServiceImpl implements TourGuideService {
     }
 
     @Override
-    public TourGuideDetailResponse updateTourGuideImage(String id, MultipartFile image, HttpServletRequest httpReq) {
+    public TourGuideDetailResponse updateTourGuideImage(
+            String id, MultipartFile image, HttpServletRequest httpReq) {
+
         TourGuide tourGuide = tourGuideRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Tour Guide " + Message.DATA_NOT_FOUND));
         ImageEntity imageEntity = imageService.create(image, PathImage.PROFILE_PICTURE, tourGuide.getName());
@@ -278,8 +291,8 @@ public class TourGuideServiceImpl implements TourGuideService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException("User " + Message.DATA_NOT_FOUND));
 
-        TourGuideHikingPoint tourGuideHikingPoint = tourGuideHikingPointRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Hiking Point " + Message.DATA_NOT_FOUND));
+        TourGuideHikingPoint tourGuideHikingPoint = tourGuideHikingPointRepository.findById(id).orElseThrow(
+                () -> new EntityNotFoundException("Hiking Point " + Message.DATA_NOT_FOUND));
 
         if (!tourGuideHikingPoint.getTourGuide().getUsers().equals(user)) {
             throw new EntityNotFoundException();
@@ -303,6 +316,24 @@ public class TourGuideServiceImpl implements TourGuideService {
                 .orElseThrow(() -> new EntityNotFoundException("Tour Guide " + Message.DATA_NOT_FOUND));
 
         return TourGuideMapper.toTourGuideStatsResponse(tourGuide);
+    }
+
+    @Override
+    public void softDeleteTourGuideHikingPoint(String tourGuideId, String hikingPointId) {
+
+        TourGuide tourGuide = tourGuideRepository.findById(tourGuideId)
+                .orElseThrow(() -> new EntityNotFoundException("Tour Guide " + Message.DATA_NOT_FOUND));
+
+        HikingPoint hikingPoint = hikingPointRepository.findById(hikingPointId)
+                .orElseThrow(() -> new EntityNotFoundException("Hiking Point " + Message.DATA_NOT_FOUND));
+
+        TourGuideHikingPoint tourGuideHikingPoint = tourGuideHikingPointRepository
+                .findByTourGuideAndHikingPointAndDeletedDateIsNull(tourGuide, hikingPoint)
+                .orElseThrow(() -> new EntityNotFoundException("Tour Guide Hiking Point " + Message.DATA_NOT_FOUND));
+
+        tourGuideHikingPoint.setDeletedDate(LocalDateTime.now());
+        tourGuideHikingPointRepository.save(tourGuideHikingPoint);
+
     }
 
 }

@@ -163,6 +163,16 @@ public class TourGuideController {
                         tourGuideService.addHikingPoint(id, request, httpReq)));
     }
 
+    @DeleteMapping("{tourGuideId}/hiking-points/{hikingPointId}")
+    public ResponseEntity<?> deleteTourGuideHikingPoint(
+            @PathVariable String tourGuideId,
+            @PathVariable String hikingPointId) {
+
+        tourGuideService.softDeleteTourGuideHikingPoint(tourGuideId, hikingPointId);
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(new CommonResponse<>(Message.SUCCESS_DELETE, null));
+    }
+
     @GetMapping("")
     public ResponseEntity<?> getTourGuideList(
             @RequestParam(required = false, defaultValue = "") String hikingPoint,
