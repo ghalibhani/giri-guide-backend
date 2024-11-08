@@ -13,4 +13,7 @@ import com.abdav.giri_guide.entity.DepositHistory;
 public interface DepositHistoryRepository extends JpaRepository<DepositHistory, String> {
     Page<DepositHistory> findByDepositAndStatusInOrderByCreatedDateDesc(
             Deposit deposit, List<EDepositStatus> status, Pageable pageable);
+
+    Page<DepositHistory> findByStatusInOrderByCreatedDateDesc(
+            List<EDepositStatus> status, Pageable pageable);
 }

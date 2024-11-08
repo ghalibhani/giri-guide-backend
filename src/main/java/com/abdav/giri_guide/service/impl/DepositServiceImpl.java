@@ -206,4 +206,54 @@ public class DepositServiceImpl implements DepositService {
         addMoney(tourGuide.getDeposit(), nominal, description);
     }
 
+    @Override
+    public CommonResponseWithPage<List<DepositHistoryListResponse>> getDepositList(
+            String status, Integer size, Integer page) {
+
+        if (page <= 0) {
+            page = 1;
+        }
+        Pageable pageable = PageRequest.of(page - 1, size);
+
+        List<EDepositStatus> statusList;
+        switch (status.toUpperCase().trim()) {
+            case "IN":
+                statusList = new ArrayList<>(List.of(EDepositStatus.IN));
+                break;
+
+            case "OUT":
+                statusList = new ArrayList<>(List.of(EDepositStatus.OUT));
+                break;
+
+            case "PENDING":
+                statusList = new ArrayList<>(List.of(EDepositStatus.PENDING));
+                break;
+
+            case "REJECTED":
+                statusList = new ArrayList<>(List.of(EDepositStatus.REJECTED));
+                break;
+
+            default:
+                statusList = new ArrayList<>(List.of(
+                        EDepositStatus.IN,
+                        EDepositStatus.OUT,
+                        EDepositStatus.PENDING,
+                        EDepositStatus.REJECTED));
+                break;
+        }
+
+        Page<DepositHistory> historyPage = historyRepository.findByStatusInOrderByCreatedDateDesc(statusList, pageable);
+        PagingResponse paging = new PagingResponse(
+                page,
+                size,
+                historyPage.getTotalPages(),
+                historyPage.getTotalElements());
+
+        return new CommonResponseWithPage<>(
+                Message.SUCCESS_FETCH,
+                DepositHistoryMapper.toListOfDepositHistoryListResponse(historyPage.getContent()),
+                paging);
+
+    }
+
 }
