@@ -6,6 +6,7 @@ import com.abdav.giri_guide.entity.Transaction;
 import com.abdav.giri_guide.entity.TransactionPayment;
 import com.abdav.giri_guide.model.response.PaymentResponse;
 import com.abdav.giri_guide.model.response.TransactionPaymentResponse;
+import com.abdav.giri_guide.repository.PaymentRepository;
 import com.abdav.giri_guide.repository.TransactionPaymentRepository;
 import com.abdav.giri_guide.repository.TransactionRepository;
 import com.abdav.giri_guide.service.PaymentService;
@@ -17,6 +18,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Optional;
+
 @Service
 @RequiredArgsConstructor
 public class TransactionPaymentServiceImpl implements TransactionPaymentService {
@@ -24,6 +27,8 @@ public class TransactionPaymentServiceImpl implements TransactionPaymentService 
     private final TransactionPaymentRepository transactionPaymentRepository;
     private final PaymentService paymentService;
     private final TransactionRepository transactionRepository;
+    private final PaymentRepository paymentRepository;
+
     @Override
     @Transactional(rollbackFor = Exception.class)
     public TransactionPaymentResponse create(String transactionId) throws MidtransError {
@@ -50,4 +55,20 @@ public class TransactionPaymentServiceImpl implements TransactionPaymentService 
                 paymentResponse
         );
     }
+
+    @Override
+    public TransactionPayment getById(String orderId) {
+        TransactionPayment findPayment = transactionPaymentRepository.findById(orderId).orElseThrow(() -> new EntityNotFoundException("Transaction Payment " + Message.DATA_NOT_FOUND));
+        return findPayment;
+    }
+
+    @Override
+    public void updateStatusPayment(String orderId, String status) {
+        TransactionPayment transactionPayment =getById(orderId);
+        Payment payment = transactionPayment.getPayment();
+        payment.setTransactionStatus(status);
+        paymentRepository.saveAndFlush(payment);
+    }
+
+
 }
