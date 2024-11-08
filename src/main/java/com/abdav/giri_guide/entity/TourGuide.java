@@ -61,6 +61,7 @@ public class TourGuide extends AuditEntity {
     private Long additionalPrice;
     private Integer totalPorter;
     private Long pricePorter;
+    private String bankAccount;
 
     @Builder.Default
     private boolean isActive = true;

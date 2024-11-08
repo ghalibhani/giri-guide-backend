@@ -59,6 +59,7 @@ public class TourGuideController {
 
             @RequestParam Integer totalPorter,
             @RequestParam Long pricePorter,
+            @RequestParam String bankAccount,
             HttpServletRequest httpReq
 
     ) {
@@ -75,7 +76,8 @@ public class TourGuideController {
                 price,
                 additionalPrice,
                 totalPorter,
-                pricePorter);
+                pricePorter,
+                bankAccount);
 
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(new CommonResponse<>(
