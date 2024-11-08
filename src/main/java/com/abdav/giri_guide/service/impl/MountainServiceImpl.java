@@ -17,6 +17,7 @@ import com.abdav.giri_guide.constant.PathImage;
 import com.abdav.giri_guide.entity.HikingPoint;
 import com.abdav.giri_guide.entity.ImageEntity;
 import com.abdav.giri_guide.entity.Mountains;
+import com.abdav.giri_guide.entity.TourGuideHikingPoint;
 import com.abdav.giri_guide.mapper.MountainsMapper;
 import com.abdav.giri_guide.model.request.HikingPointRequest;
 import com.abdav.giri_guide.model.request.MountainsRequest;
@@ -27,6 +28,7 @@ import com.abdav.giri_guide.model.response.MountainsListResponse;
 import com.abdav.giri_guide.model.response.PagingResponse;
 import com.abdav.giri_guide.repository.HikingPointRepository;
 import com.abdav.giri_guide.repository.MountainsRepository;
+import com.abdav.giri_guide.repository.TourGuideHikingPointRepository;
 import com.abdav.giri_guide.service.ImageService;
 import com.abdav.giri_guide.service.MountainsService;
 
@@ -39,6 +41,7 @@ import lombok.RequiredArgsConstructor;
 public class MountainServiceImpl implements MountainsService {
     private final MountainsRepository mountainRepository;
     private final HikingPointRepository hikingPointRepository;
+    private final TourGuideHikingPointRepository tourGuideHikingPointRepository;
 
     private final ImageService imageService;
 
@@ -63,6 +66,14 @@ public class MountainServiceImpl implements MountainsService {
     public void deleteMountain(String id) {
         Mountains mountain = mountainRepository.findById(id).orElseThrow(EntityNotFoundException::new);
         mountain.setDeletedDate(LocalDateTime.now());
+        for (HikingPoint hikingPoint : mountain.getHikingPoints()) {
+            hikingPoint.setDeletedDate(LocalDateTime.now());
+            for (TourGuideHikingPoint tghp : hikingPoint.getTourGuideHikingPoints()) {
+                tghp.setDeletedDate(LocalDateTime.now());
+            }
+            tourGuideHikingPointRepository.saveAll(hikingPoint.getTourGuideHikingPoints());
+        }
+        hikingPointRepository.saveAll(mountain.getHikingPoints());
         mountainRepository.save(mountain);
     }
 
@@ -189,6 +200,10 @@ public class MountainServiceImpl implements MountainsService {
     public void deleteHikingPoint(String id) {
         HikingPoint hikingPoint = hikingPointRepository.findById(id).orElseThrow(EntityNotFoundException::new);
         hikingPoint.setDeletedDate(LocalDateTime.now());
+        for (TourGuideHikingPoint tghp : hikingPoint.getTourGuideHikingPoints()) {
+            tghp.setDeletedDate(LocalDateTime.now());
+        }
+        tourGuideHikingPointRepository.saveAll(hikingPoint.getTourGuideHikingPoints());
         hikingPointRepository.save(hikingPoint);
     }
 
