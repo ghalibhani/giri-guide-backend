@@ -19,7 +19,9 @@ public record TourGuideRequest(
         Long price,
         Long additionalPrice,
         Integer totalPorter,
-        Long pricePorter
+        Long pricePorter,
+
+        String bankAccount
 
 ) {
 }

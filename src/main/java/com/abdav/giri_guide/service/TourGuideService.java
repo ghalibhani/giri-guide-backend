@@ -6,7 +6,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.abdav.giri_guide.model.request.TourGuideAddHikingPointRequest;
 import com.abdav.giri_guide.model.request.TourGuideRequest;
-import com.abdav.giri_guide.model.request.UserIdRequest;
 import com.abdav.giri_guide.model.response.CommonResponseWithPage;
 import com.abdav.giri_guide.model.response.TourGuideDetailResponse;
 import com.abdav.giri_guide.model.response.TourGuideHikingPointActiveResponse;
