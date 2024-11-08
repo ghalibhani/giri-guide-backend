@@ -15,6 +15,8 @@ public class DepositHistoryMapper {
         for (DepositHistory data : listData) {
             result.add(new DepositHistoryListResponse(
                     data.getId(),
+                    data.getDeposit().getTourGuide().getId(),
+                    data.getDeposit().getTourGuide().getName(),
                     data.getCreatedDate(),
                     data.getNominal(),
                     data.getStatus(),

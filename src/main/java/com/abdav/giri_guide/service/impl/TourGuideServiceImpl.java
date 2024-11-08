@@ -15,6 +15,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.abdav.giri_guide.constant.ERole;
 import com.abdav.giri_guide.constant.Message;
 import com.abdav.giri_guide.constant.PathImage;
+import com.abdav.giri_guide.entity.Deposit;
 import com.abdav.giri_guide.entity.HikingPoint;
 import com.abdav.giri_guide.entity.ImageEntity;
 import com.abdav.giri_guide.entity.Role;
@@ -33,6 +34,7 @@ import com.abdav.giri_guide.model.response.TourGuideHikingPointActiveResponse;
 import com.abdav.giri_guide.model.response.TourGuideListResponse;
 import com.abdav.giri_guide.model.response.TourGuideProfileResponse;
 import com.abdav.giri_guide.model.response.TourGuideStatsResponse;
+import com.abdav.giri_guide.repository.DepositRepository;
 import com.abdav.giri_guide.repository.HikingPointRepository;
 import com.abdav.giri_guide.repository.TourGuideHikingPointRepository;
 import com.abdav.giri_guide.repository.TourGuideRepository;
@@ -52,6 +54,7 @@ public class TourGuideServiceImpl implements TourGuideService {
     private final TourGuideHikingPointRepository tourGuideHikingPointRepository;
     private final HikingPointRepository hikingPointRepository;
     private final UserRepository userRepository;
+    private final DepositRepository depositRepository;
 
     private final RoleService roleService;
     private final ImageService imageService;
@@ -115,7 +118,7 @@ public class TourGuideServiceImpl implements TourGuideService {
                 .users(user)
                 .name(request.name().trim())
                 .gender(request.gender())
-                .nik(request.nik())
+                .nik(request.nik().trim())
                 .birthDate(request.birthDate())
                 .description(request.description().trim())
                 .address(request.address())
@@ -125,8 +128,16 @@ public class TourGuideServiceImpl implements TourGuideService {
                 .additionalPrice(request.additionalPrice())
                 .totalPorter(request.totalPorter())
                 .pricePorter(request.pricePorter())
+                .bankAccount(request.bankAccount())
                 .build();
+        tourGuide = tourGuideRepository.save(tourGuide);
 
+        Deposit deposit = Deposit.builder()
+                .tourGuide(tourGuide)
+                .build();
+        deposit = depositRepository.saveAndFlush(deposit);
+
+        tourGuide.setDeposit(deposit);
         tourGuide = tourGuideRepository.save(tourGuide);
 
         return TourGuideMapper.toTourGuideProfileResponse(tourGuide, httpReq);
@@ -325,11 +336,13 @@ public class TourGuideServiceImpl implements TourGuideService {
                 .orElseThrow(() -> new EntityNotFoundException("Tour Guide " + Message.DATA_NOT_FOUND));
 
         HikingPoint hikingPoint = hikingPointRepository.findById(hikingPointId)
-                .orElseThrow(() -> new EntityNotFoundException("Hiking Point " + Message.DATA_NOT_FOUND));
+                .orElseThrow(() -> new EntityNotFoundException(
+                        "Hiking Point " + Message.DATA_NOT_FOUND));
 
         TourGuideHikingPoint tourGuideHikingPoint = tourGuideHikingPointRepository
                 .findByTourGuideAndHikingPointAndDeletedDateIsNull(tourGuide, hikingPoint)
-                .orElseThrow(() -> new EntityNotFoundException("Tour Guide Hiking Point " + Message.DATA_NOT_FOUND));
+                .orElseThrow(() -> new EntityNotFoundException(
+                        "Tour Guide Hiking Point " + Message.DATA_NOT_FOUND));
 
         tourGuideHikingPoint.setDeletedDate(LocalDateTime.now());
         tourGuideHikingPointRepository.save(tourGuideHikingPoint);

@@ -28,7 +28,7 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 @SuperBuilder
 @Table(name = "m_tour_guide")
-@EqualsAndHashCode(callSuper = true)
+@EqualsAndHashCode(callSuper = true, exclude = "deposit")
 @Entity
 public class TourGuide extends AuditEntity {
 
@@ -61,6 +61,7 @@ public class TourGuide extends AuditEntity {
     private Long additionalPrice;
     private Integer totalPorter;
     private Long pricePorter;
+    private String bankAccount;
 
     @Builder.Default
     private boolean isActive = true;
