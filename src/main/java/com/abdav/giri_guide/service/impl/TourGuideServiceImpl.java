@@ -1,6 +1,8 @@
 package com.abdav.giri_guide.service.impl;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -12,21 +14,24 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.abdav.giri_guide.constant.EDepositStatus;
 import com.abdav.giri_guide.constant.ERole;
+import com.abdav.giri_guide.constant.ETransactionStatus;
 import com.abdav.giri_guide.constant.Message;
 import com.abdav.giri_guide.constant.PathImage;
 import com.abdav.giri_guide.entity.Deposit;
+import com.abdav.giri_guide.entity.DepositHistory;
 import com.abdav.giri_guide.entity.HikingPoint;
 import com.abdav.giri_guide.entity.ImageEntity;
 import com.abdav.giri_guide.entity.Role;
 import com.abdav.giri_guide.entity.TourGuide;
 import com.abdav.giri_guide.entity.TourGuideHikingPoint;
+import com.abdav.giri_guide.entity.Transaction;
 import com.abdav.giri_guide.entity.User;
 import com.abdav.giri_guide.mapper.TourGuideHikingPointMapper;
 import com.abdav.giri_guide.mapper.TourGuideMapper;
 import com.abdav.giri_guide.model.request.TourGuideAddHikingPointRequest;
 import com.abdav.giri_guide.model.request.TourGuideRequest;
-import com.abdav.giri_guide.model.request.UserIdRequest;
 import com.abdav.giri_guide.model.response.CommonResponseWithPage;
 import com.abdav.giri_guide.model.response.PagingResponse;
 import com.abdav.giri_guide.model.response.TourGuideDetailResponse;
@@ -34,10 +39,12 @@ import com.abdav.giri_guide.model.response.TourGuideHikingPointActiveResponse;
 import com.abdav.giri_guide.model.response.TourGuideListResponse;
 import com.abdav.giri_guide.model.response.TourGuideProfileResponse;
 import com.abdav.giri_guide.model.response.TourGuideStatsResponse;
+import com.abdav.giri_guide.repository.DepositHistoryRepository;
 import com.abdav.giri_guide.repository.DepositRepository;
 import com.abdav.giri_guide.repository.HikingPointRepository;
 import com.abdav.giri_guide.repository.TourGuideHikingPointRepository;
 import com.abdav.giri_guide.repository.TourGuideRepository;
+import com.abdav.giri_guide.repository.TransactionRepository;
 import com.abdav.giri_guide.repository.UserRepository;
 import com.abdav.giri_guide.service.ImageService;
 import com.abdav.giri_guide.service.RoleService;
@@ -55,6 +62,8 @@ public class TourGuideServiceImpl implements TourGuideService {
     private final HikingPointRepository hikingPointRepository;
     private final UserRepository userRepository;
     private final DepositRepository depositRepository;
+    private final DepositHistoryRepository depositHistoryRepository;
+    private final TransactionRepository transactionRepository;
 
     private final RoleService roleService;
     private final ImageService imageService;
@@ -233,6 +242,9 @@ public class TourGuideServiceImpl implements TourGuideService {
         if (request.pricePorter() != null) {
             tourGuide.setPricePorter(request.pricePorter());
         }
+        if (request.bankAccount() != null) {
+            tourGuide.setBankAccount(request.bankAccount());
+        }
 
         tourGuide = tourGuideRepository.save(tourGuide);
         List<TourGuideHikingPoint> hikingPoints = tourGuideHikingPointRepository
@@ -326,7 +338,28 @@ public class TourGuideServiceImpl implements TourGuideService {
         TourGuide tourGuide = tourGuideRepository.findByUsersAndDeletedDateIsNull(user)
                 .orElseThrow(() -> new EntityNotFoundException("Tour Guide " + Message.DATA_NOT_FOUND));
 
-        return TourGuideMapper.toTourGuideStatsResponse(tourGuide);
+        List<DepositHistory> histories;
+        if (tourGuide.getDeposit() == null) {
+            histories = new ArrayList<>();
+        } else {
+            LocalDateTime today = LocalDateTime.now();
+            int monthLength = LocalDate.now().lengthOfMonth();
+            histories = depositHistoryRepository.findByDepositAndStatusInAndCreatedDateBetween(
+                    tourGuide.getDeposit(),
+                    new ArrayList<>(List.of(EDepositStatus.IN, EDepositStatus.OUT)),
+                    today.withDayOfMonth(1),
+                    today.withDayOfMonth(monthLength));
+        }
+
+        Optional<Transaction> transaction = transactionRepository
+                .findFirstByTourGuideAndStatusOrderByStartDateAsc(tourGuide, ETransactionStatus.UPCOMING);
+
+        LocalDateTime nearestSchedule = null;
+        if (transaction.isPresent()) {
+            nearestSchedule = transaction.get().getStartDate();
+        }
+
+        return TourGuideMapper.toTourGuideStatsResponse(tourGuide, histories, nearestSchedule);
     }
 
     @Override
