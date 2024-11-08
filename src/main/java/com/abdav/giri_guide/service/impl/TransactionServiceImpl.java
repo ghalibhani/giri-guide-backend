@@ -170,7 +170,7 @@ public class TransactionServiceImpl implements TransactionService {
             TourGuide tourGuide = tourGuideRepository.findByUsersIdAndDeletedDateIsNull(userId).orElseThrow(() -> new EntityNotFoundException("Tour Guide " + Message.DATA_NOT_FOUND));
             transactions = transactionRepository.findAllByTourGuideIdAndStatusInAndDeletedDateIsNullOrderByStartDateAsc(tourGuide.getId(), eStatus);
             getUpdateStatusInHistory(transactions);
-            transactionPage = transactionRepository.findAllByCustomerIdAndStatusInAndDeletedDateIsNullOrderByStartDateAsc(tourGuide.getId(), eStatus, pageable);
+            transactionPage = transactionRepository.findAllByTourGuideIdAndStatusInAndDeletedDateIsNullOrderByStartDateAsc(tourGuide.getId(), eStatus, pageable);
             return transactionPage.map(transaction -> TransactionMapper.transactionToTransactionResponse(transaction, httpReq));
         } else {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
