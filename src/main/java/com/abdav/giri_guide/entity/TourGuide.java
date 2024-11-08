@@ -73,4 +73,8 @@ public class TourGuide extends AuditEntity {
     @Builder.Default
     private List<GuideReview> reviews = new ArrayList<>();
 
+    @Builder.Default
+    @OneToMany(mappedBy = "tourGuide")
+    private List<Transaction> transactions = new ArrayList<>();
+
 }

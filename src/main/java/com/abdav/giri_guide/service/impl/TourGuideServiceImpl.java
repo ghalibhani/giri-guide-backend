@@ -16,6 +16,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.abdav.giri_guide.constant.EDepositStatus;
 import com.abdav.giri_guide.constant.ERole;
+import com.abdav.giri_guide.constant.ETransactionStatus;
 import com.abdav.giri_guide.constant.Message;
 import com.abdav.giri_guide.constant.PathImage;
 import com.abdav.giri_guide.entity.Deposit;
@@ -25,6 +26,7 @@ import com.abdav.giri_guide.entity.ImageEntity;
 import com.abdav.giri_guide.entity.Role;
 import com.abdav.giri_guide.entity.TourGuide;
 import com.abdav.giri_guide.entity.TourGuideHikingPoint;
+import com.abdav.giri_guide.entity.Transaction;
 import com.abdav.giri_guide.entity.User;
 import com.abdav.giri_guide.mapper.TourGuideHikingPointMapper;
 import com.abdav.giri_guide.mapper.TourGuideMapper;
@@ -42,6 +44,7 @@ import com.abdav.giri_guide.repository.DepositRepository;
 import com.abdav.giri_guide.repository.HikingPointRepository;
 import com.abdav.giri_guide.repository.TourGuideHikingPointRepository;
 import com.abdav.giri_guide.repository.TourGuideRepository;
+import com.abdav.giri_guide.repository.TransactionRepository;
 import com.abdav.giri_guide.repository.UserRepository;
 import com.abdav.giri_guide.service.ImageService;
 import com.abdav.giri_guide.service.RoleService;
@@ -60,6 +63,7 @@ public class TourGuideServiceImpl implements TourGuideService {
     private final UserRepository userRepository;
     private final DepositRepository depositRepository;
     private final DepositHistoryRepository depositHistoryRepository;
+    private final TransactionRepository transactionRepository;
 
     private final RoleService roleService;
     private final ImageService imageService;
@@ -344,7 +348,15 @@ public class TourGuideServiceImpl implements TourGuideService {
                     today.withDayOfMonth(monthLength));
         }
 
-        return TourGuideMapper.toTourGuideStatsResponse(tourGuide, histories);
+        Optional<Transaction> transaction = transactionRepository
+                .findFirstByTourGuideAndStatusOrderByStartDateAsc(tourGuide, ETransactionStatus.UPCOMING);
+
+        LocalDateTime nearestSchedule = null;
+        if (transaction.isPresent()) {
+            nearestSchedule = transaction.get().getStartDate();
+        }
+
+        return TourGuideMapper.toTourGuideStatsResponse(tourGuide, histories, nearestSchedule);
     }
 
     @Override
