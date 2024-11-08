@@ -97,6 +97,7 @@ public class TransactionServiceImpl implements TransactionService {
         transaction.setTotalSimaksiPrice(totalSimaksiPrice);
         transaction.setTotalEntryPrice(totalEntryPrice);
         transaction.setTotalPrice(totalPrice);
+        transaction.setEndOfApprove(LocalDateTime.now().plusDays(1));
 
         transactionRepository.saveAndFlush(transaction);
 
@@ -120,9 +121,6 @@ public class TransactionServiceImpl implements TransactionService {
             transaction.setEndOfPayTime(transaction.getLastModifiedDate().plusDays(1));
             transactionRepository.saveAndFlush(transaction);
         }
-//        if (transactionStatus == ETransactionStatus.WAITING_PAY){
-//            return midtransService.createToken(transaction);
-//        }
 
         return new TransactionStatusResponse(transaction.getStatus().toString(), null);
     }
@@ -138,7 +136,7 @@ public class TransactionServiceImpl implements TransactionService {
         }
         Pageable pageable = PageRequest.of(page - 1, size);
         Page<Transaction> transactionPage;
-        if(status == null){
+        if (status == null) {
             transactionPage = transactionRepository.findAll(pageable);
             return transactionPage.map(transaction -> TransactionMapper.transactionToTransactionDetailResponse(transaction, httpReq));
         } else {
@@ -159,39 +157,35 @@ public class TransactionServiceImpl implements TransactionService {
     public Page<TransactionResponse> findAllByStatus(List<String> statusList, String userId, Integer page, Integer size, String role, HttpServletRequest httpReq) {
         ERole eRole = ERole.valueOf(role.toUpperCase());
         List<ETransactionStatus> eStatus = statusList.stream().map(ETransactionStatus::valueOf).toList();
-        Pageable pageable = PageRequest.of(page-1, size);
+        Pageable pageable = PageRequest.of(page - 1, size);
         List<Transaction> transactions;
         Page<Transaction> transactionPage;
         if (eRole.equals(ERole.ROLE_CUSTOMER)) {
             Customer customer = customerService.getById(userId);
             transactions = transactionRepository.findAllByCustomerIdAndStatusInAndDeletedDateIsNullOrderByStartDateAsc(customer.getId(), eStatus);
-            transactions.stream()
-                    .filter(transaction ->
-                            (transaction.getStatus() == ETransactionStatus.WAITING_PAY || transaction.getStatus() == ETransactionStatus.WAITING_APPROVE)
-                                    && transaction.getEndOfPayTime() != null
-                                    && transaction.getEndOfPayTime().isBefore(LocalDateTime.now())
-                    ).forEach(transaction -> {
-                        transaction.setStatus(ETransactionStatus.REJECTED);
-                        transactionRepository.saveAndFlush(transaction);
-                    });
+            getUpdateStatusInHistory(transactions);
             transactionPage = transactionRepository.findAllByCustomerIdAndStatusInAndDeletedDateIsNullOrderByStartDateAsc(customer.getId(), eStatus, pageable);
             return transactionPage.map(transaction -> TransactionMapper.transactionToTransactionResponse(transaction, httpReq));
         } else if (eRole.equals(ERole.ROLE_GUIDE)) {
             TourGuide tourGuide = tourGuideRepository.findByUsersIdAndDeletedDateIsNull(userId).orElseThrow(() -> new EntityNotFoundException("Tour Guide " + Message.DATA_NOT_FOUND));
             transactions = transactionRepository.findAllByTourGuideIdAndStatusInAndDeletedDateIsNullOrderByStartDateAsc(tourGuide.getId(), eStatus);
-            transactions.stream()
-                    .filter(transaction ->
-                            (transaction.getStatus() == ETransactionStatus.WAITING_PAY || transaction.getStatus() == ETransactionStatus.WAITING_APPROVE)
-                                    && transaction.getEndOfPayTime() != null
-                                    && transaction.getEndOfPayTime().isBefore(LocalDateTime.now())
-                    ).forEach(transaction -> {
-                        transaction.setStatus(ETransactionStatus.REJECTED);
-                        transactionRepository.saveAndFlush(transaction);
-                    });
+            getUpdateStatusInHistory(transactions);
             transactionPage = transactionRepository.findAllByCustomerIdAndStatusInAndDeletedDateIsNullOrderByStartDateAsc(tourGuide.getId(), eStatus, pageable);
             return transactionPage.map(transaction -> TransactionMapper.transactionToTransactionResponse(transaction, httpReq));
         } else {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    private void getUpdateStatusInHistory(List<Transaction> transactions) {
+        for(Transaction transaction : transactions){
+            if(transaction.getStatus() == ETransactionStatus.WAITING_PAY && transaction.getEndOfPayTime() != null && transaction.getEndOfPayTime().isBefore(LocalDateTime.now())){
+                transaction.setStatus(ETransactionStatus.REJECTED);
+                transactionRepository.saveAndFlush(transaction);
+            } else if (transaction.getStatus() == ETransactionStatus.WAITING_APPROVE && transaction.getEndOfApprove() != null && transaction.getEndOfApprove().isBefore(LocalDateTime.now())) {
+                transaction.setStatus(ETransactionStatus.REJECTED);
+                transactionRepository.saveAndFlush(transaction);
+            }
         }
     }
 
