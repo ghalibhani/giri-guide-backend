@@ -110,6 +110,7 @@ public class TransactionServiceImpl implements TransactionService {
         transaction.setTotalSimaksiPrice(totalSimaksiPrice);
         transaction.setTotalEntryPrice(totalEntryPrice);
         transaction.setTotalPrice(totalPrice);
+        transaction.setEndOfApprove(LocalDateTime.now().plusDays(1));
 
         transactionRepository.saveAndFlush(transaction);
 
@@ -219,6 +220,18 @@ public class TransactionServiceImpl implements TransactionService {
                     .map(transaction -> TransactionMapper.transactionToTransactionResponse(transaction, httpReq));
         } else {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    private void getUpdateStatusInHistory(List<Transaction> transactions) {
+        for(Transaction transaction : transactions){
+            if(transaction.getStatus() == ETransactionStatus.WAITING_PAY && transaction.getEndOfPayTime() != null && transaction.getEndOfPayTime().isBefore(LocalDateTime.now())){
+                transaction.setStatus(ETransactionStatus.REJECTED);
+                transactionRepository.saveAndFlush(transaction);
+            } else if (transaction.getStatus() == ETransactionStatus.WAITING_APPROVE && transaction.getEndOfApprove() != null && transaction.getEndOfApprove().isBefore(LocalDateTime.now())) {
+                transaction.setStatus(ETransactionStatus.REJECTED);
+                transactionRepository.saveAndFlush(transaction);
+            }
         }
     }
 

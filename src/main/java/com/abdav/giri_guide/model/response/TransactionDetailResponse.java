@@ -32,6 +32,7 @@ public record TransactionDetailResponse(
         Long adminCost,
         Long totalPrice,
         String customerNote,
-        LocalDateTime endOfPay
+        LocalDateTime endOfPay,
+        LocalDateTime endOfApprove
 ) {
 }
