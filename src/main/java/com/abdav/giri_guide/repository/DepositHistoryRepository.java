@@ -1,5 +1,6 @@
 package com.abdav.giri_guide.repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.data.domain.Page;
@@ -16,4 +17,13 @@ public interface DepositHistoryRepository extends JpaRepository<DepositHistory, 
 
     Page<DepositHistory> findByStatusInOrderByCreatedDateDesc(
             List<EDepositStatus> status, Pageable pageable);
+
+    List<DepositHistory> findByDepositAndStatusInAndCreatedDateBetween(
+            Deposit deposit,
+            List<EDepositStatus> status,
+            LocalDateTime createdDateStart,
+            LocalDateTime createdDateEnd
+
+    );
+
 }

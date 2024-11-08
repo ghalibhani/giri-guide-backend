@@ -4,6 +4,8 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.abdav.giri_guide.constant.EDepositStatus;
+import com.abdav.giri_guide.entity.DepositHistory;
 import com.abdav.giri_guide.entity.GuideReview;
 import com.abdav.giri_guide.entity.TourGuide;
 import com.abdav.giri_guide.entity.TourGuideHikingPoint;
@@ -101,11 +103,12 @@ public class TourGuideMapper {
     }
 
     // #TODO fix hard code
-    public static TourGuideStatsResponse toTourGuideStatsResponse(TourGuide tourGuide) {
+    public static TourGuideStatsResponse toTourGuideStatsResponse(TourGuide tourGuide, List<DepositHistory> histories) {
+        TotalIncomeAndWithdraw depositData = countIncomeAndWithdraw(histories);
         return new TourGuideStatsResponse(
                 tourGuide.getDeposit().getMoney(),
-                9990000L,
-                9990000L,
+                depositData.totalIncome(),
+                depositData.totalWithdraw(),
                 999,
                 999,
                 LocalDateTime.now(),
@@ -118,6 +121,11 @@ public class TourGuideMapper {
     private record AverageRating(
             Double rating,
             Integer totalReview) {
+    }
+
+    private record TotalIncomeAndWithdraw(
+            Long totalIncome,
+            Long totalWithdraw) {
     }
 
     private static AverageRating countAverageRating(List<GuideReview> reviews) {
@@ -135,5 +143,20 @@ public class TourGuideMapper {
                 (totalReview > 0) ? totalRating / Double.valueOf(totalReview) : 0.0,
                 totalReview);
 
+    }
+
+    private static TotalIncomeAndWithdraw countIncomeAndWithdraw(List<DepositHistory> histories) {
+        Long totalIncome = 0L;
+        Long totalWithdraw = 0L;
+
+        for (DepositHistory history : histories) {
+            if (history.getStatus().equals(EDepositStatus.IN)) {
+                totalIncome += history.getNominal();
+            } else if (history.getStatus().equals(EDepositStatus.OUT)) {
+                totalWithdraw += history.getNominal();
+            }
+        }
+
+        return new TotalIncomeAndWithdraw(totalIncome, totalWithdraw);
     }
 }
