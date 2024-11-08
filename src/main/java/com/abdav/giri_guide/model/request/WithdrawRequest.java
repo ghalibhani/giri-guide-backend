@@ -5,6 +5,6 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
 public record WithdrawRequest(
-        @NotNull @Min(1000) Long nominal,
+        @NotNull @Min(20000) Long nominal,
         @NotBlank String message) {
 }
