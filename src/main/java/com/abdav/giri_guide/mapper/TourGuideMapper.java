@@ -47,7 +47,8 @@ public class TourGuideMapper {
                 50,
                 50,
                 averageRating.rating,
-                averageRating.totalReview
+                averageRating.totalReview,
+                tourGuide.getBankAccount()
 
         );
     }
