@@ -194,6 +194,16 @@ public class TransactionServiceImpl implements TransactionService {
         return getTransactionOrThrowNotFound(id);
     }
 
+    @Override
+    public void updateStatusFromPayment(Transaction transaction, String status) {
+        if(status.equals("PAID")){
+            transaction.setStatus(ETransactionStatus.UPCOMING);
+        } else if (status.equals("EXPIRED")) {
+            transaction.setStatus(ETransactionStatus.REJECTED);
+        }
+        transactionRepository.saveAndFlush(transaction);
+    }
+
 
     private Long calculatePorterPrice(Long porterRate, Integer porterQty, Long days) {
         return porterRate * porterQty * days;
