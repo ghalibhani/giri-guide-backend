@@ -33,6 +33,7 @@ public record TransactionDetailResponse(
         Long totalPrice,
         String customerNote,
         LocalDateTime endOfPay,
-        LocalDateTime endOfApprove
+        LocalDateTime endOfApprove,
+        String rejectedNote
 ) {
 }
