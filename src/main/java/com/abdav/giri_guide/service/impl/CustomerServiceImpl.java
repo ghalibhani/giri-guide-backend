@@ -88,7 +88,9 @@ public class CustomerServiceImpl implements CustomerService {
         ImageEntity img = imageService.create(file, PathImage.PROFILE_PICTURE, customer.getFullName());
         customer.setImage(img);
         customerRepository.saveAndFlush(customer);
-        imageService.delete(oldImage);
+        if (oldImage != null) {
+            imageService.delete(oldImage);
+        }
 
         return CustomerMapper.customerToCustomerResponse(customer, httpReq);
     }
