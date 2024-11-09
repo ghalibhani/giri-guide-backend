@@ -119,8 +119,10 @@ public class GuideReviewServiceImpl implements GuideReviewService {
         Transaction transaction = transactionRepository.findById(transactionId).orElseThrow(
                 () -> new EntityNotFoundException("Transaction " + Message.DATA_NOT_FOUND));
 
-        GuideReview review = reviewRepository.findByTransactionAndDeletedDateIsNull(transaction)
-                .orElse(createBlankReview(transaction));
+        GuideReview review = transaction.getReview();
+        if (review == null) {
+            review = createBlankReview(transaction);
+        }
 
         if (review.getReview() != null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User already reviewd");
