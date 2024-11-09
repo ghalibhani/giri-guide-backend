@@ -23,4 +23,6 @@ public interface GuideReviewService {
 
     GuideReviewResponse putReviewOnTransaction(
             String transactionId, GuideReviewPutRequest request, HttpServletRequest httpReq);
+
+    GuideReview getGuideReviewByTransactionId(String transactionId);
 }
