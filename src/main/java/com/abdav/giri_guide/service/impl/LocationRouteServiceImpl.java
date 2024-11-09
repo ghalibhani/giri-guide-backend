@@ -35,12 +35,13 @@ public class LocationRouteServiceImpl implements LocationRouteService {
     @Override
     public LocationRouteDetailResponse createRoute(LocationRouteRequest request) {
         LocationRouteNode nextNode = null;
-        for (int i = request.routes().size() - 1; i > 0; i--) {
+        for (int i = request.routes().size() - 1; i >= 0; i--) {
             LocationRouteNode currentNode = LocationRouteNode.builder()
                     .from(request.routes().get(i).from())
                     .to(request.routes().get(i).to())
                     .estimate(request.routes().get(i).estimate())
                     .transportation(request.routes().get(i).transportation())
+                    .distance(request.routes().get(i).distance())
                     .next(nextNode)
                     .build();
             currentNode = routeNodeRepository.saveAndFlush(currentNode);
@@ -112,12 +113,13 @@ public class LocationRouteServiceImpl implements LocationRouteService {
         }
         if (request.routes() != null || !request.routes().isEmpty()) {
             LocationRouteNode nextNode = null;
-            for (int i = request.routes().size() - 1; i > 0; i--) {
+            for (int i = request.routes().size() - 1; i >= 0; i--) {
                 LocationRouteNode currentNode = LocationRouteNode.builder()
                         .from(request.routes().get(i).from())
                         .to(request.routes().get(i).to())
                         .estimate(request.routes().get(i).estimate())
                         .transportation(request.routes().get(i).transportation())
+                        .distance(request.routes().get(i).distance())
                         .next(nextNode)
                         .build();
                 currentNode = routeNodeRepository.saveAndFlush(currentNode);

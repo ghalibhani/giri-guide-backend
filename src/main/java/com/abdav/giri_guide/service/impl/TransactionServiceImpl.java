@@ -168,11 +168,13 @@ public class TransactionServiceImpl implements TransactionService {
     @Override
     public Page<TransactionResponse> findAllByStatus(List<String> statusList, String userId, Integer page, Integer size,
             String role, HttpServletRequest httpReq) {
+
         ERole eRole = ERole.valueOf(role.toUpperCase());
         List<ETransactionStatus> eStatus = statusList.stream().map(ETransactionStatus::valueOf).toList();
         Pageable pageable = PageRequest.of(page - 1, size);
         List<Transaction> transactions;
         Page<Transaction> transactionPage;
+
         if (eRole.equals(ERole.ROLE_CUSTOMER)) {
             Customer customer = customerService.getById(userId);
             transactions = transactionRepository
