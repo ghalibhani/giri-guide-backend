@@ -21,17 +21,8 @@ import com.abdav.giri_guide.model.response.CustomerResponse;
 import com.abdav.giri_guide.repository.CustomerRepository;
 import com.abdav.giri_guide.service.CustomerService;
 import com.abdav.giri_guide.service.ImageService;
-import com.abdav.giri_guide.service.UserService;
-import jakarta.servlet.http.HttpServletRequest;
-import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpStatus;
-import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.server.ResponseStatusException;
 
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -47,12 +38,13 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     public Page<CustomerResponse> customerList(Integer page, Integer size, HttpServletRequest httpReq) {
-        if(page <= 0){
+        if (page <= 0) {
             page = 1;
         }
-        Pageable pageable = PageRequest.of(page-1, size);
-        Page <Customer> customers = customerRepository.findAllByDeletedDateIsNull(pageable);
-        Page<CustomerResponse> customerResponses = customers.map(customer -> CustomerMapper.customerToCustomerResponse(customer, httpReq));
+        Pageable pageable = PageRequest.of(page - 1, size);
+        Page<Customer> customers = customerRepository.findAllByDeletedDateIsNull(pageable);
+        Page<CustomerResponse> customerResponses = customers
+                .map(customer -> CustomerMapper.customerToCustomerResponse(customer, httpReq));
 
         return customerResponses;
     }
@@ -77,8 +69,8 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
-    public CustomerResponse updateCustomer(String id ,CustomerRequest customerRequest, HttpServletRequest httpReq) {
-        Customer customer = getCustomerByIdOrThrowNotFound(id);
+    public CustomerResponse updateCustomer(String id, CustomerRequest customerRequest, HttpServletRequest httpReq) {
+        Customer customer = getCustomerByUserIdOrNotFound(id);
         customer.setFullName(customerRequest.fullName());
         customer.setAddress(customerRequest.address());
         customer.setGender(customerRequest.gender());
@@ -92,9 +84,11 @@ public class CustomerServiceImpl implements CustomerService {
     public CustomerResponse uploadProfileImage(String id, MultipartFile file, HttpServletRequest httpReq) {
         Customer customer = getCustomerByIdOrThrowNotFound(id);
 
+        ImageEntity oldImage = customer.getImage();
         ImageEntity img = imageService.create(file, PathImage.PROFILE_PICTURE, customer.getFullName());
         customer.setImage(img);
         customerRepository.saveAndFlush(customer);
+        imageService.delete(oldImage);
 
         return CustomerMapper.customerToCustomerResponse(customer, httpReq);
     }

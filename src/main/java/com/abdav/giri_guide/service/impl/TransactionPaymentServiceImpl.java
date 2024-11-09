@@ -1,5 +1,6 @@
 package com.abdav.giri_guide.service.impl;
 
+import com.abdav.giri_guide.constant.ETransactionStatus;
 import com.abdav.giri_guide.constant.Message;
 import com.abdav.giri_guide.entity.Payment;
 import com.abdav.giri_guide.entity.Transaction;
@@ -17,8 +18,6 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -44,7 +43,7 @@ public class TransactionPaymentServiceImpl implements TransactionPaymentService 
                 payment.getId(),
                 payment.getToken(),
                 payment.getRedirectUrl(),
-                payment.getTransactionStatus()
+                payment.getPaymentStatus()
         );
         return new TransactionPaymentResponse(
                 savedTransactionPayment.getId(),
@@ -66,9 +65,10 @@ public class TransactionPaymentServiceImpl implements TransactionPaymentService 
     public void updateStatusPayment(String orderId, String status) {
         TransactionPayment transactionPayment =getById(orderId);
         Payment payment = transactionPayment.getPayment();
-        payment.setTransactionStatus(status);
-        paymentRepository.saveAndFlush(payment);
+        paymentService.updateStatus(payment, status);
+
+        Transaction transaction = transactionPayment.getTransaction();
+        transactionService.updateStatusFromPayment(transaction, status);
+        transactionPaymentRepository.saveAndFlush(transactionPayment);
     }
-
-
 }

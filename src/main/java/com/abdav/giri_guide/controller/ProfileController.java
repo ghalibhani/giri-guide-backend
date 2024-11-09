@@ -24,7 +24,7 @@ public class ProfileController {
     private static String message;
 
     @GetMapping("/{id}")
-    ResponseEntity<?> getProfileByUserId(@PathVariable String id, HttpServletRequest httpReq){
+    ResponseEntity<?> getProfileByUserId(@PathVariable String id, HttpServletRequest httpReq) {
         CustomerResponse customer = customerService.getCustomerByUserId(id, httpReq);
         message = Message.SUCCESS_FETCH;
         CommonResponse<?> response = new CommonResponse<>(message, customer);
@@ -35,7 +35,8 @@ public class ProfileController {
     }
 
     @PutMapping("/{id}")
-    ResponseEntity<?> updateProfile(@PathVariable String id, @RequestBody CustomerRequest customerRequest, HttpServletRequest httpReq){
+    ResponseEntity<?> updateProfile(@PathVariable String id, @RequestBody CustomerRequest customerRequest,
+            HttpServletRequest httpReq) {
         CustomerResponse customer = customerService.updateCustomer(id, customerRequest, httpReq);
         message = Message.DATA_UPDATED;
         CommonResponse<?> response = new CommonResponse<>(message, customer);
@@ -47,11 +48,10 @@ public class ProfileController {
 
     @PutMapping(value = PathApi.PROFILE_IMAGE_API, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     ResponseEntity<?> updateProfileImage(
-            @PathVariable String id,
+            @PathVariable String userId,
             @RequestBody MultipartFile image,
-            HttpServletRequest httpReq
-    ){
-        CustomerResponse customer = customerService.uploadProfileImage(id, image, httpReq);
+            HttpServletRequest httpReq) {
+        CustomerResponse customer = customerService.uploadProfileImage(userId, image, httpReq);
         message = Message.DATA_UPDATED;
         CommonResponse<?> response = new CommonResponse<>(message, customer);
 
