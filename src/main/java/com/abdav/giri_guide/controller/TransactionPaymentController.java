@@ -41,7 +41,6 @@ public class TransactionPaymentController {
 
     @PostMapping(value = "/notification", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> handleNotification(@RequestBody Map<String, Object> response) throws MidtransError{
-        System.out.println("===================FLAG=====================");
         MidtransCoreApi coreApi = new ConfigFactory(midtransConfig).getCoreApi();
         String notifResponse = null;
         if(!(response.isEmpty())){
