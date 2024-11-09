@@ -2,22 +2,31 @@ package com.abdav.giri_guide.controller;
 
 import com.abdav.giri_guide.constant.PathApi;
 import com.abdav.giri_guide.model.response.CommonResponse;
+import com.abdav.giri_guide.model.response.CustomerResponse;
 import com.abdav.giri_guide.model.response.TransactionPaymentResponse;
 import com.abdav.giri_guide.service.TransactionPaymentService;
+import com.midtrans.Config;
+import com.midtrans.ConfigFactory;
 import com.midtrans.httpclient.error.MidtransError;
+import com.midtrans.service.MidtransCoreApi;
 import lombok.RequiredArgsConstructor;
+import org.json.JSONObject;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
+
 @RestController
 @RequiredArgsConstructor
-@RequestMapping(PathApi.TRANSACTIONS_API)
+@RequestMapping(PathApi.TRANSACTION_PAYMENT_API)
 public class TransactionPaymentController {
     private final TransactionPaymentService transactionPaymentService;
+    private final Config midtransConfig;
     private static String message;
 
-    @PostMapping(PathApi.PAYMENTS_API)
+    @PostMapping
     public ResponseEntity<?> createPayment(
             @RequestParam String transactionId
     ) throws MidtransError {
@@ -28,5 +37,30 @@ public class TransactionPaymentController {
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(response);
+    }
+
+    @PostMapping(value = "/notification", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> handleNotification(@RequestBody Map<String, Object> response) throws MidtransError{
+        System.out.println("===================FLAG=====================");
+        MidtransCoreApi coreApi = new ConfigFactory(midtransConfig).getCoreApi();
+        String notifResponse = null;
+        if(!(response.isEmpty())){
+            String orderId = (String) response.get("order_id");
+            JSONObject transactionResult = coreApi.checkTransaction(orderId);
+
+            String transactionStatus = (String) transactionResult.get("transaction_status");
+
+            notifResponse = "Transaction notification received. Order ID: " + orderId + ". Transaction status: " + transactionStatus;
+            System.out.println(notifResponse);
+
+            if (transactionStatus.equals("settlement")){
+                transactionPaymentService.updateStatusPayment(orderId, "PAID");
+            } else if (transactionStatus.equals("expire")) {
+                transactionPaymentService.updateStatusPayment(orderId, "EXPIRED");
+            } else if (transactionStatus.equals("pending")) {
+                transactionPaymentService.updateStatusPayment(orderId, "PENDING");
+            }
+        }
+        return ResponseEntity.ok().body(new CommonResponse<>("success", null));
     }
 }

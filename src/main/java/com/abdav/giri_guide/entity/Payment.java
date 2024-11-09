@@ -21,7 +21,7 @@ public class Payment extends AuditEntity{
 
     private String redirectUrl;
 
-    private String transactionStatus;
+    private String paymentStatus;
 
     @OneToOne(mappedBy = "payment")
     private TransactionPayment transactionPayment;

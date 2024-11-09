@@ -65,7 +65,8 @@ public class TransactionMapper {
                 transaction.getTotalPrice(),
                 transaction.getCustomerNote(),
                 transaction.getEndOfPayTime(),
-                transaction.getEndOfApprove()
+                transaction.getEndOfApprove(),
+                transaction.getRejectedNote()
         );
     }
 

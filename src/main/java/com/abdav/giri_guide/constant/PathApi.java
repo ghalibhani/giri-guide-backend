@@ -26,5 +26,7 @@ public class PathApi {
 
     public static final String CHANGE_PASSWORD_API = "/change-password/{userId}";
 
+    public static final String TRANSACTION_PAYMENT_API = GIRI_GUIDE_APP + "/transaction-payment";
+
     public static final String LOCATION_ROUTE_API = GIRI_GUIDE_APP + "/location-routes";
 }
