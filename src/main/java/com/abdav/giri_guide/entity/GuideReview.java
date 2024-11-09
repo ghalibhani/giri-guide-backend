@@ -45,5 +45,7 @@ public class GuideReview extends AuditEntity {
 
     @Builder.Default
     private Integer rating = 5;
+
+    @Nullable
     private String review;
 }
