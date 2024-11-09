@@ -82,7 +82,7 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     public CustomerResponse uploadProfileImage(String id, MultipartFile file, HttpServletRequest httpReq) {
-        Customer customer = getCustomerByIdOrThrowNotFound(id);
+        Customer customer = getCustomerByUserIdOrNotFound(id);
 
         ImageEntity oldImage = customer.getImage();
         ImageEntity img = imageService.create(file, PathImage.PROFILE_PICTURE, customer.getFullName());
