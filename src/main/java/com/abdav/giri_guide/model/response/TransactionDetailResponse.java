@@ -34,6 +34,7 @@ public record TransactionDetailResponse(
         String customerNote,
         LocalDateTime endOfPay,
         LocalDateTime endOfApprove,
-        String rejectedNote
+        String rejectedNote,
+        GuideReviewResponse review
 ) {
 }

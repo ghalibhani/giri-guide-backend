@@ -133,4 +133,14 @@ public class GuideReviewServiceImpl implements GuideReviewService {
         return GuideReviewMapper.toGuideReviewResponse(review, httpReq);
     }
 
+    @Override
+    public GuideReview getGuideReviewByTransactionId(String transactionId) {
+        Transaction transaction = transactionRepository.findById(transactionId).orElseThrow(
+                () -> new EntityNotFoundException("Transaction " + Message.DATA_NOT_FOUND));
+
+        GuideReview review = reviewRepository.findByTransactionAndDeletedDateIsNull(transaction)
+                .orElse(null);
+
+        return review;
+    }
 }

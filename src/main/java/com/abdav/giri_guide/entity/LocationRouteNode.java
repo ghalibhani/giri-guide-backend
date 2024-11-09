@@ -34,6 +34,7 @@ public class LocationRouteNode extends AuditEntity {
     private String to;
     private String transportation;
     private String estimate;
+    private String distance;
 
     @Nullable
     @OneToOne
