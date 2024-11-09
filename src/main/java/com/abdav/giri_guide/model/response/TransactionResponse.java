@@ -19,6 +19,6 @@ public record TransactionResponse(
         String tourGuideName,
         Integer porter,
         Integer hikerQty,
-        Long totalPrice
-) {
+        Long totalPrice,
+        GuideReviewResponse review) {
 }
