@@ -89,7 +89,7 @@ public class TransactionServiceImpl implements TransactionService {
         }
         transactionHikerRepository.saveAllAndFlush(hikers);
         transaction.setTransactionHikers(hikers);
-        Long days = ChronoUnit.DAYS.between(transaction.getStartDate(), transaction.getEndDate());
+        Long days = ChronoUnit.DAYS.between(transaction.getStartDate().toLocalDate(), transaction.getEndDate().toLocalDate());
 
         Long totalTourguidePrice = tourGuide.getPrice() * days;
         Long totalPorterPrice = calculatePorterPrice(tourGuide.getPricePorter(), transactionRequest.porterQty(), days);
