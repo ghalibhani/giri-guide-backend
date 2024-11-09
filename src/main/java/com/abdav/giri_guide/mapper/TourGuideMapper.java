@@ -188,15 +188,17 @@ public class TourGuideMapper {
         Integer upcoming = 0;
 
         for (Transaction transaction : transactions) {
-            total += 1;
             if (transaction.getStatus().equals(ETransactionStatus.DONE)) {
                 done += 1;
+                total += 1;
             } else if (transaction.getStatus().equals(ETransactionStatus.REJECTED)) {
                 reject += 1;
+                total += 1;
             } else if (transaction.getStatus().equals(ETransactionStatus.WAITING_APPROVE)) {
                 waitingApprove += 1;
             } else if (transaction.getStatus().equals(ETransactionStatus.UPCOMING)) {
                 upcoming += 1;
+                total += 1;
             }
         }
 
