@@ -14,6 +14,8 @@ import com.abdav.giri_guide.entity.Transaction;
 public interface GuideReviewRepository extends JpaRepository<GuideReview, String> {
     Page<GuideReview> findByTourGuideAndDeletedDateIsNull(TourGuide tourGuide, Pageable page);
 
+    Page<GuideReview> findByTourGuideAndReviewIsNotNullAndDeletedDateIsNull(TourGuide tourGuide, Pageable page);
+
     Optional<GuideReview> findByTourGuideAndCustomerAndDeletedDateIsNull(TourGuide tourGuide, Customer customer);
 
     Optional<GuideReview> findByTransactionAndDeletedDateIsNull(Transaction transaction);

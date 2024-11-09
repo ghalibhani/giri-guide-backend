@@ -2,6 +2,9 @@ package com.abdav.giri_guide.service;
 
 import java.util.List;
 
+import com.abdav.giri_guide.entity.GuideReview;
+import com.abdav.giri_guide.entity.Transaction;
+import com.abdav.giri_guide.model.request.GuideReviewPutRequest;
 import com.abdav.giri_guide.model.request.GuideReviewRequest;
 import com.abdav.giri_guide.model.response.CommonResponseWithPage;
 import com.abdav.giri_guide.model.response.GuideReviewResponse;
@@ -15,4 +18,9 @@ public interface GuideReviewService {
 
     CommonResponseWithPage<List<GuideReviewResponse>> getGuideReviewsByGuideId(
             String tourGuideId, Integer page, Integer size, HttpServletRequest httpReq);
+
+    GuideReview createBlankReview(Transaction transaction);
+
+    GuideReviewResponse putReviewOnTransaction(
+            String transactionId, GuideReviewPutRequest request, HttpServletRequest httpReq);
 }

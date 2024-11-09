@@ -6,12 +6,17 @@ import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
+import com.abdav.giri_guide.constant.Message;
 import com.abdav.giri_guide.entity.Customer;
 import com.abdav.giri_guide.entity.GuideReview;
 import com.abdav.giri_guide.entity.TourGuide;
+import com.abdav.giri_guide.entity.Transaction;
 import com.abdav.giri_guide.mapper.GuideReviewMapper;
+import com.abdav.giri_guide.model.request.GuideReviewPutRequest;
 import com.abdav.giri_guide.model.request.GuideReviewRequest;
 import com.abdav.giri_guide.model.response.CommonResponseWithPage;
 import com.abdav.giri_guide.model.response.GuideReviewResponse;
@@ -19,6 +24,7 @@ import com.abdav.giri_guide.model.response.PagingResponse;
 import com.abdav.giri_guide.repository.CustomerRepository;
 import com.abdav.giri_guide.repository.GuideReviewRepository;
 import com.abdav.giri_guide.repository.TourGuideRepository;
+import com.abdav.giri_guide.repository.TransactionRepository;
 import com.abdav.giri_guide.service.GuideReviewService;
 
 import jakarta.persistence.EntityNotFoundException;
@@ -31,6 +37,7 @@ public class GuideReviewServiceImpl implements GuideReviewService {
     private final GuideReviewRepository reviewRepository;
     private final CustomerRepository customerRepository;
     private final TourGuideRepository tourGuideRepository;
+    private final TransactionRepository transactionRepository;
 
     @Override
     public GuideReviewResponse createGuideReview(
@@ -41,15 +48,6 @@ public class GuideReviewServiceImpl implements GuideReviewService {
 
         TourGuide tourGuide = tourGuideRepository.findByIdAndDeletedDateIsNull(tourGuideId)
                 .orElseThrow(EntityNotFoundException::new);
-
-        // TODO: Check transaction entity
-        // Optional<GuideReview> review =
-        // reviewRepository.findByGuideAndCustomerAndDeletedDateIsNull(
-        // tourGuideId, user);
-
-        // if (review.isPresent()) {
-        // throw new DataIntegrityViolationException("Customer already reviewed");
-        // }
 
         GuideReview newReview = GuideReview.builder()
                 .customer(customer)
@@ -82,7 +80,8 @@ public class GuideReviewServiceImpl implements GuideReviewService {
 
         TourGuide tourGuide = tourGuideRepository.findByIdAndDeletedDateIsNull(tourGuideId)
                 .orElseThrow(EntityNotFoundException::new);
-        Page<GuideReview> reviews = reviewRepository.findByTourGuideAndDeletedDateIsNull(tourGuide, pageable);
+        Page<GuideReview> reviews = reviewRepository
+                .findByTourGuideAndReviewIsNotNullAndDeletedDateIsNull(tourGuide, pageable);
 
         PagingResponse paging = new PagingResponse(
                 page,
@@ -96,6 +95,42 @@ public class GuideReviewServiceImpl implements GuideReviewService {
         }
 
         return new CommonResponseWithPage<>("Data Fetched", reviewList, paging);
+    }
+
+    @Override
+    public GuideReview createBlankReview(Transaction transaction) {
+        GuideReview review = GuideReview.builder()
+                .customer(transaction.getCustomer())
+                .tourGuide(transaction.getTourGuide())
+                .transaction(transaction)
+                .usePorter(transaction.getPorterQty() > 0)
+                .rating(5)
+                .review(null)
+                .build();
+
+        return reviewRepository.save(review);
+
+    }
+
+    @Override
+    public GuideReviewResponse putReviewOnTransaction(
+            String transactionId, GuideReviewPutRequest request, HttpServletRequest httpReq) {
+
+        Transaction transaction = transactionRepository.findById(transactionId).orElseThrow(
+                () -> new EntityNotFoundException("Transaction " + Message.DATA_NOT_FOUND));
+
+        GuideReview review = reviewRepository.findByTransactionAndDeletedDateIsNull(transaction)
+                .orElse(createBlankReview(transaction));
+
+        if (review.getReview() != null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User already reviewd");
+        }
+
+        review.setRating(request.rating());
+        review.setReview(request.review());
+        reviewRepository.save(review);
+
+        return GuideReviewMapper.toGuideReviewResponse(review, httpReq);
     }
 
 }
