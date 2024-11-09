@@ -32,9 +32,10 @@ public class TransactionPaymentServiceImpl implements TransactionPaymentService 
     @Transactional(rollbackFor = Exception.class)
     public TransactionPaymentResponse create(String transactionId) throws MidtransError {
         Transaction findTransaction = transactionRepository.findById(transactionId).orElseThrow(() -> new EntityNotFoundException(Message.DATA_NOT_FOUND));
+        Long grossAmount = transactionService.getTotalPrice(findTransaction);
         TransactionPayment transactionPayment = TransactionPayment.builder()
                 .transaction(findTransaction)
-                .amount(findTransaction.getTotalPrice())
+                .amount(grossAmount)
                 .build();
         TransactionPayment savedTransactionPayment = transactionPaymentRepository.saveAndFlush(transactionPayment);
         Payment payment = paymentService.create(savedTransactionPayment);

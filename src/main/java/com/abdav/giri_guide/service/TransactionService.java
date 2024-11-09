@@ -21,5 +21,6 @@ public interface TransactionService {
 
     Transaction getById(String id);
     void updateStatusFromPayment(Transaction transaction, String status);
+    Long getTotalPrice(Transaction transaction);
 }
 
