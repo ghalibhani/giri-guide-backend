@@ -1,6 +1,7 @@
 package com.abdav.giri_guide.entity;
 
 import jakarta.annotation.Nullable;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -19,13 +20,17 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 @SuperBuilder
 @Table(name = "m_location_route_node")
-@EqualsAndHashCode(callSuper = true, exclude = "previous")
+@EqualsAndHashCode(callSuper = true)
 @Entity
 public class LocationRouteNode extends AuditEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
+
+    @Column(name = "previous_location")
     private String from;
+
+    @Column(name = "next_location")
     private String to;
     private String transportation;
     private String estimate;
