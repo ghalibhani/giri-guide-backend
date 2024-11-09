@@ -1,6 +1,8 @@
 package com.abdav.giri_guide.mapper;
 
+import com.abdav.giri_guide.entity.GuideReview;
 import com.abdav.giri_guide.entity.Transaction;
+import com.abdav.giri_guide.model.response.GuideReviewResponse;
 import com.abdav.giri_guide.model.response.HikerDetailResponse;
 import com.abdav.giri_guide.model.response.TransactionDetailResponse;
 import com.abdav.giri_guide.model.response.TransactionResponse;
@@ -35,6 +37,10 @@ public class TransactionMapper {
     }
 
     public static TransactionDetailResponse transactionToTransactionDetailResponse(Transaction transaction, HttpServletRequest httpReq){
+
+        GuideReviewResponse review = (transaction.getReview() == null) ?
+                null : GuideReviewMapper.toGuideReviewResponse(transaction.getReview(), httpReq);
+
         return new TransactionDetailResponse(
                 transaction.getId(),
                 transaction.getStatus().toString(),
@@ -66,7 +72,8 @@ public class TransactionMapper {
                 transaction.getCustomerNote(),
                 transaction.getEndOfPayTime(),
                 transaction.getEndOfApprove(),
-                transaction.getRejectedNote()
+                transaction.getRejectedNote(),
+                review
         );
     }
 

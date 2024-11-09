@@ -16,7 +16,7 @@ import java.util.List;
 @Entity
 @Table(name = PathDb.TRANSACTION)
 @Data
-@EqualsAndHashCode(callSuper = true)
+@EqualsAndHashCode(callSuper = true, exclude = "review")
 @AllArgsConstructor
 @NoArgsConstructor
 @SuperBuilder
@@ -70,5 +70,8 @@ public class Transaction extends AuditEntity{
     @OneToMany(mappedBy = "transaction", targetEntity = TransactionHiker.class)
     @JsonManagedReference
     private List<TransactionHiker> transactionHikers;
+
+    @OneToOne(mappedBy = "transaction")
+    private GuideReview review;
 }
 
