@@ -20,5 +20,6 @@ public interface TransactionService {
     Page<TransactionResponse> findAllByStatus(List<String> stringList,String userId, Integer page, Integer size, String role, HttpServletRequest httpReq);
 
     Transaction getById(String id);
+    void updateStatusFromPayment(Transaction transaction, String status);
 }
 

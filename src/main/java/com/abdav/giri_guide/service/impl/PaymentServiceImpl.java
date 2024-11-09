@@ -39,9 +39,15 @@ public class PaymentServiceImpl implements PaymentService {
         Payment payment = Payment.builder()
                 .token(token)
                 .redirectUrl(urlRedirect)
-                .transactionStatus("ordered")
+                .paymentStatus("PENDING")
                 .build();
         return paymentRepository.saveAndFlush(payment);
+    }
+
+    @Override
+    public void updateStatus(Payment payment, String status) {
+        payment.setPaymentStatus(status);
+        paymentRepository.saveAndFlush(payment);
     }
 
 
