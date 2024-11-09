@@ -2,7 +2,6 @@ package com.abdav.giri_guide.service;
 
 import java.util.List;
 
-import com.abdav.giri_guide.constant.EDepositStatus;
 import com.abdav.giri_guide.entity.Deposit;
 import com.abdav.giri_guide.entity.DepositHistory;
 import com.abdav.giri_guide.entity.TourGuide;
@@ -12,7 +11,7 @@ import com.abdav.giri_guide.model.response.DepositHistoryListResponse;
 public interface DepositService {
 
     CommonResponseWithPage<List<DepositHistoryListResponse>> getDepositList(
-            String status, Integer size, Integer page);
+            String status, String name, Integer size, Integer page);
 
     Deposit getUserDeposit(String userId);
 

@@ -208,7 +208,7 @@ public class DepositServiceImpl implements DepositService {
 
     @Override
     public CommonResponseWithPage<List<DepositHistoryListResponse>> getDepositList(
-            String status, Integer size, Integer page) {
+            String status, String name, Integer size, Integer page) {
 
         if (page <= 0) {
             page = 1;
@@ -242,7 +242,10 @@ public class DepositServiceImpl implements DepositService {
                 break;
         }
 
-        Page<DepositHistory> historyPage = historyRepository.findByStatusInOrderByCreatedDateDesc(statusList, pageable);
+        Page<DepositHistory> historyPage = historyRepository
+                .findByStatusInAndDepositTourGuideNameContainsIgnoreCaseOrderByCreatedDateDesc(
+                        statusList, name, pageable);
+
         PagingResponse paging = new PagingResponse(
                 page,
                 size,
