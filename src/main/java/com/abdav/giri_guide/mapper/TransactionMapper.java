@@ -14,7 +14,11 @@ import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 public class TransactionMapper {
-    public static TransactionResponse transactionToTransactionResponse(Transaction transaction, HttpServletRequest httpReq) {
+    public static TransactionResponse transactionToTransactionResponse(Transaction transaction,
+            HttpServletRequest httpReq) {
+        GuideReviewResponse review = (transaction.getReview() == null) ? null
+                : GuideReviewMapper.toGuideReviewResponse(transaction.getReview(), httpReq);
+
         return new TransactionResponse(
                 transaction.getId(),
                 transaction.getStatus().toString(),
@@ -25,21 +29,24 @@ public class TransactionMapper {
                 transaction.getEndDate(),
                 getDay(transaction),
                 transaction.getCustomer().getId(),
-                transaction.getCustomer().getImage() == null ? null : UrlUtil.resolveImageUrl(transaction.getCustomer().getImage(), httpReq),
+                transaction.getCustomer().getImage() == null ? null
+                        : UrlUtil.resolveImageUrl(transaction.getCustomer().getImage(), httpReq),
                 transaction.getCustomer().getFullName(),
                 transaction.getTourGuide().getId(),
-                transaction.getTourGuide().getImage() == null ?null : UrlUtil.resolveImageUrl(transaction.getTourGuide().getImage(), httpReq),
+                transaction.getTourGuide().getImage() == null ? null
+                        : UrlUtil.resolveImageUrl(transaction.getTourGuide().getImage(), httpReq),
                 transaction.getTourGuide().getName(),
                 transaction.getPorterQty(),
                 transaction.getTransactionHikers().size(),
-                transaction.getTotalPrice()
-        );
+                transaction.getTotalPrice(),
+                review);
     }
 
-    public static TransactionDetailResponse transactionToTransactionDetailResponse(Transaction transaction, HttpServletRequest httpReq){
+    public static TransactionDetailResponse transactionToTransactionDetailResponse(Transaction transaction,
+            HttpServletRequest httpReq) {
 
-        GuideReviewResponse review = (transaction.getReview() == null) ?
-                null : GuideReviewMapper.toGuideReviewResponse(transaction.getReview(), httpReq);
+        GuideReviewResponse review = (transaction.getReview() == null) ? null
+                : GuideReviewMapper.toGuideReviewResponse(transaction.getReview(), httpReq);
 
         return new TransactionDetailResponse(
                 transaction.getId(),
@@ -51,10 +58,12 @@ public class TransactionMapper {
                 getDay(transaction),
                 transaction.getCustomer().getId(),
                 transaction.getCustomer().getFullName(),
-                transaction.getCustomer().getImage() == null ? null : UrlUtil.resolveImageUrl(transaction.getCustomer().getImage(), httpReq),
+                transaction.getCustomer().getImage() == null ? null
+                        : UrlUtil.resolveImageUrl(transaction.getCustomer().getImage(), httpReq),
                 transaction.getTourGuide().getId(),
                 transaction.getTourGuide().getName(),
-                transaction.getTourGuide().getImage() == null ? null : UrlUtil.resolveImageUrl(transaction.getTourGuide().getImage(), httpReq),
+                transaction.getTourGuide().getImage() == null ? null
+                        : UrlUtil.resolveImageUrl(transaction.getTourGuide().getImage(), httpReq),
                 getHikerDetailResponsesList(transaction),
                 transaction.getPorterQty(),
                 transaction.getTourGuide().getPricePorter(),
@@ -73,23 +82,24 @@ public class TransactionMapper {
                 transaction.getEndOfPayTime(),
                 transaction.getEndOfApprove(),
                 transaction.getRejectedNote(),
-                review
-        );
+                review);
     }
 
     private static @NotNull List<HikerDetailResponse> getHikerDetailResponsesList(Transaction transaction) {
-        List<HikerDetailResponse> hikerDetailResponses = transaction.getTransactionHikers().stream().map(hiker -> new HikerDetailResponse(
-                hiker.getFullName(),
-                hiker.getNik(),
-                hiker.getBirthDate()
-        )).toList();
+        List<HikerDetailResponse> hikerDetailResponses = transaction.getTransactionHikers().stream()
+                .map(hiker -> new HikerDetailResponse(
+                        hiker.getFullName(),
+                        hiker.getNik(),
+                        hiker.getBirthDate()))
+                .toList();
         return hikerDetailResponses;
     }
 
-    //start date, end date, tour guide per hari, porter per hari,
+    // start date, end date, tour guide per hari, porter per hari,
 
     private static @NotNull Long getDay(Transaction transaction) {
-        Long days = ChronoUnit.DAYS.between(transaction.getStartDate().toLocalDate(), transaction.getEndDate().toLocalDate());
+        Long days = ChronoUnit.DAYS.between(transaction.getStartDate().toLocalDate(),
+                transaction.getEndDate().toLocalDate());
         return days;
     }
 }
