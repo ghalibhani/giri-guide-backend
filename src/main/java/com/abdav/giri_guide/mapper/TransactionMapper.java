@@ -14,11 +14,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 public class TransactionMapper {
-    public static TransactionResponse transactionToTransactionResponse(Transaction transaction,
-            HttpServletRequest httpReq) {
-        GuideReviewResponse review = (transaction.getReview() == null) ? null
-                : GuideReviewMapper.toGuideReviewResponse(transaction.getReview(), httpReq);
-
+    public static TransactionResponse transactionToTransactionResponse(Transaction transaction, Long totalPrice, HttpServletRequest httpReq) {
         return new TransactionResponse(
                 transaction.getId(),
                 transaction.getStatus().toString(),
@@ -38,12 +34,11 @@ public class TransactionMapper {
                 transaction.getTourGuide().getName(),
                 transaction.getPorterQty(),
                 transaction.getTransactionHikers().size(),
-                transaction.getTotalPrice(),
-                review);
+                totalPrice
+                );
     }
 
-    public static TransactionDetailResponse transactionToTransactionDetailResponse(Transaction transaction,
-            HttpServletRequest httpReq) {
+    public static TransactionDetailResponse transactionToTransactionDetailResponse(Transaction transaction, Long totalPrice, HttpServletRequest httpReq){
 
         GuideReviewResponse review = (transaction.getReview() == null) ? null
                 : GuideReviewMapper.toGuideReviewResponse(transaction.getReview(), httpReq);
@@ -77,7 +72,7 @@ public class TransactionMapper {
                 transaction.getHikingPoint().getPrice(),
                 transaction.getTotalEntryPrice(),
                 transaction.getAdminCost(),
-                transaction.getTotalPrice(),
+                totalPrice,
                 transaction.getCustomerNote(),
                 transaction.getEndOfPayTime(),
                 transaction.getEndOfApprove(),
@@ -95,7 +90,6 @@ public class TransactionMapper {
         return hikerDetailResponses;
     }
 
-    // start date, end date, tour guide per hari, porter per hari,
 
     private static @NotNull Long getDay(Transaction transaction) {
         Long days = ChronoUnit.DAYS.between(transaction.getStartDate().toLocalDate(),

@@ -89,22 +89,19 @@ public class TransactionServiceImpl implements TransactionService {
         }
         transactionHikerRepository.saveAllAndFlush(hikers);
         transaction.setTransactionHikers(hikers);
-        Long days = ChronoUnit.DAYS.between(transaction.getStartDate(), transaction.getEndDate());
+        Long days = ChronoUnit.DAYS.between(transaction.getStartDate().toLocalDate(), transaction.getEndDate().toLocalDate());
 
         Long totalTourguidePrice = tourGuide.getPrice() * days;
         Long totalPorterPrice = calculatePorterPrice(tourGuide.getPricePorter(), transactionRequest.porterQty(), days);
         Long totalAdditionalPrice = calculateAdditionalPrice(tourGuide, hikers.size(), days);
         Long totalSimaksiPrice = calculateSimaksiPrice(mountain, hikers.size());
         Long totalEntryPrice = hikingPointReq.getPrice() * hikers.size() * days;
-        Long totalPrice = totalPorterPrice + totalTourguidePrice + totalAdditionalPrice + totalEntryPrice
-                + totalSimaksiPrice + adminCost;
 
         transaction.setTotalPorterPrice(totalPorterPrice);
         transaction.setTotalTourGuidePrice(totalTourguidePrice);
         transaction.setAdditionalPriceTourGuide(totalAdditionalPrice);
         transaction.setTotalSimaksiPrice(totalSimaksiPrice);
         transaction.setTotalEntryPrice(totalEntryPrice);
-        transaction.setTotalPrice(totalPrice);
         transaction.setEndOfApprove(LocalDateTime.now().plusDays(1));
 
         transactionRepository.saveAndFlush(transaction);
@@ -152,20 +149,20 @@ public class TransactionServiceImpl implements TransactionService {
         if (status == null) {
             transactionPage = transactionRepository.findAll(pageable);
             return transactionPage
-                    .map(transaction -> TransactionMapper.transactionToTransactionDetailResponse(transaction, httpReq));
+                    .map(transaction -> TransactionMapper.transactionToTransactionDetailResponse(transaction, getTotalPrice(transaction), httpReq));
         } else {
 
             ETransactionStatus eStatus = ETransactionStatus.valueOf(status.toUpperCase());
             transactionPage = transactionRepository.findAllByStatus(eStatus, pageable);
             return transactionPage
-                    .map(transaction -> TransactionMapper.transactionToTransactionDetailResponse(transaction, httpReq));
+                    .map(transaction -> TransactionMapper.transactionToTransactionDetailResponse(transaction, getTotalPrice(transaction), httpReq));
         }
     }
 
     @Override
     public TransactionDetailResponse getTransactionById(String id, HttpServletRequest httpReq) {
         Transaction transaction = getTransactionOrThrowNotFound(id);
-        return TransactionMapper.transactionToTransactionDetailResponse(transaction, httpReq);
+        return TransactionMapper.transactionToTransactionDetailResponse(transaction, getTotalPrice(transaction), httpReq);
     }
 
     @Override
@@ -187,8 +184,7 @@ public class TransactionServiceImpl implements TransactionService {
                     .findAllByCustomerIdAndStatusInAndDeletedDateIsNullOrderByStartDateAsc(customer.getId(), eStatus,
                             pageable);
             return transactionPage
-                    .map(transaction -> TransactionMapper.transactionToTransactionResponse(transaction, httpReq));
-
+                    .map(transaction -> TransactionMapper.transactionToTransactionResponse(transaction, getTotalPrice(transaction), httpReq));
         } else if (eRole.equals(ERole.ROLE_GUIDE)) {
             TourGuide tourGuide = tourGuideRepository.findByUsersIdAndDeletedDateIsNull(userId)
                     .orElseThrow(() -> new EntityNotFoundException("Tour Guide " + Message.DATA_NOT_FOUND));
@@ -199,7 +195,7 @@ public class TransactionServiceImpl implements TransactionService {
                     .findAllByTourGuideIdAndStatusInAndDeletedDateIsNullOrderByStartDateAsc(tourGuide.getId(), eStatus,
                             pageable);
             return transactionPage
-                    .map(transaction -> TransactionMapper.transactionToTransactionResponse(transaction, httpReq));
+                    .map(transaction -> TransactionMapper.transactionToTransactionResponse(transaction, getTotalPrice(transaction), httpReq));
         } else {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
         }
@@ -249,5 +245,10 @@ public class TransactionServiceImpl implements TransactionService {
             return tourGuide.getAdditionalPrice() * additionalHiker * days;
         }
         return 0L;
+    }
+    @Override
+    public Long getTotalPrice(Transaction transaction){
+        return transaction.getTotalPorterPrice() + transaction.getTotalTourGuidePrice() + transaction.getAdditionalPriceTourGuide() +
+                transaction.getTotalEntryPrice() + transaction.getTotalSimaksiPrice() +transaction.getAdminCost();
     }
 }

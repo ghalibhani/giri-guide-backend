@@ -18,6 +18,9 @@ public interface DepositHistoryRepository extends JpaRepository<DepositHistory, 
     Page<DepositHistory> findByStatusInOrderByCreatedDateDesc(
             List<EDepositStatus> status, Pageable pageable);
 
+    Page<DepositHistory> findByStatusInAndDepositTourGuideNameContainsIgnoreCaseOrderByCreatedDateDesc(
+            List<EDepositStatus> status, String name, Pageable pageable);
+
     List<DepositHistory> findByDepositAndStatusInAndCreatedDateBetween(
             Deposit deposit,
             List<EDepositStatus> status,
