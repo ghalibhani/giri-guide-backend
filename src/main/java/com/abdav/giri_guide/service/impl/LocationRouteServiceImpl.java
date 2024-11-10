@@ -1,6 +1,7 @@
 package com.abdav.giri_guide.service.impl;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.data.domain.Page;
@@ -14,6 +15,7 @@ import com.abdav.giri_guide.entity.LocationRoute;
 import com.abdav.giri_guide.entity.LocationRouteNode;
 import com.abdav.giri_guide.mapper.LocationRouteMapper;
 import com.abdav.giri_guide.model.request.LocationRouteRequest;
+import com.abdav.giri_guide.model.request.LocationRouteUpdateRequest;
 import com.abdav.giri_guide.model.response.CommonResponseWithPage;
 import com.abdav.giri_guide.model.response.LocationRouteDetailResponse;
 import com.abdav.giri_guide.model.response.LocationRouteListResponse;
@@ -63,7 +65,7 @@ public class LocationRouteServiceImpl implements LocationRouteService {
         LocationRoute route = routeRepository.findById(locationRouteId).orElseThrow(
                 () -> new EntityNotFoundException("Route " + Message.DATA_NOT_FOUND));
 
-        deleteNodeRecusive(route.getStartPoint());
+        deleteNodeRecusive(route);
         route.setDeletedDate(LocalDateTime.now());
         routeRepository.save(route);
 
@@ -101,7 +103,7 @@ public class LocationRouteServiceImpl implements LocationRouteService {
     }
 
     @Override
-    public LocationRouteDetailResponse updateRoute(String locationRouteId, LocationRouteRequest request) {
+    public LocationRouteDetailResponse updateRoute(String locationRouteId, LocationRouteUpdateRequest request) {
         LocationRoute route = routeRepository.findById(locationRouteId).orElseThrow(
                 () -> new EntityNotFoundException("Route " + Message.DATA_NOT_FOUND));
 
@@ -125,21 +127,31 @@ public class LocationRouteServiceImpl implements LocationRouteService {
                 currentNode = routeNodeRepository.saveAndFlush(currentNode);
                 nextNode = currentNode;
             }
-            deleteNodeRecusive(route.getStartPoint());
+
+            deleteNodeRecusive(route);
             route.setStartPoint(nextNode);
         }
         route = routeRepository.save(route);
         return LocationRouteMapper.toLocationRouteDetailResponse(route);
     }
 
-    private void deleteNodeRecusive(LocationRouteNode startNode) {
-        LocationRouteNode currentNode = startNode;
-        LocationRouteNode nextNode = startNode.getNext();
+    private void deleteNodeRecusive(LocationRoute route) {
+        LocationRouteNode currentNode = route.getStartPoint();
+        LocationRouteNode nextNode = currentNode.getNext();
+
+        route.setStartPoint(null);
+        routeRepository.saveAndFlush(route);
+
+        List<LocationRouteNode> deletedNode = new ArrayList<>();
         while (nextNode != null) {
-            routeNodeRepository.delete(currentNode);
+            currentNode.setNext(null);
+            deletedNode.add(currentNode);
+
             currentNode = nextNode;
             nextNode = currentNode.getNext();
         }
+        routeNodeRepository.saveAllAndFlush(deletedNode);
+        routeNodeRepository.deleteAll(deletedNode);
     }
 
 }

@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.abdav.giri_guide.constant.Message;
 import com.abdav.giri_guide.constant.PathApi;
 import com.abdav.giri_guide.model.request.LocationRouteRequest;
+import com.abdav.giri_guide.model.request.LocationRouteUpdateRequest;
 import com.abdav.giri_guide.model.response.CommonResponse;
 import com.abdav.giri_guide.service.LocationRouteService;
 
@@ -56,7 +57,7 @@ public class LocationRouteController {
     @PatchMapping("{locationRouteId}")
     public ResponseEntity<?> updateLocationRoute(
             @PathVariable String locationRouteId,
-            @RequestBody @Validated LocationRouteRequest request
+            @RequestBody @Validated LocationRouteUpdateRequest request
 
     ) {
         return ResponseEntity.status(HttpStatus.OK)
