@@ -195,7 +195,8 @@ public class TourGuideServiceImpl implements TourGuideService {
         } else {
             HikingPoint hikingPoint = hikingPointRepository.findById(hikingPointId).orElse(null);
             Page<TourGuideHikingPoint> tourGuidePage = tourGuideHikingPointRepository
-                    .findByHikingPointAndDeletedDateIsNull(hikingPoint, pageable);
+                    .findByHikingPointAndIsActiveIsTrueAndTourGuideIsActiveIsTrueAndDeletedDateIsNull(
+                            hikingPoint, pageable);
             PagingResponse paging = new PagingResponse(
                     page,
                     size,
@@ -352,7 +353,8 @@ public class TourGuideServiceImpl implements TourGuideService {
         }
 
         Optional<Transaction> transaction = transactionRepository
-                .findFirstByTourGuideAndStatusOrderByStartDateAsc(tourGuide, ETransactionStatus.UPCOMING);
+                .findFirstByTourGuideAndStatusOrderByStartDateAsc(tourGuide,
+                        ETransactionStatus.UPCOMING);
 
         LocalDateTime nearestSchedule = null;
         if (transaction.isPresent()) {
