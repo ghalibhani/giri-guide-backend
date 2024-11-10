@@ -3,21 +3,18 @@ package com.abdav.giri_guide.service.impl;
 import com.abdav.giri_guide.constant.ERole;
 import com.abdav.giri_guide.constant.ETransactionStatus;
 import com.abdav.giri_guide.constant.Message;
-import com.abdav.giri_guide.model.request.TransactionByStatusRequest;
 import com.abdav.giri_guide.entity.*;
-import com.abdav.giri_guide.mapper.GuideReviewMapper;
 import com.abdav.giri_guide.mapper.TransactionMapper;
 import com.abdav.giri_guide.model.request.HikerDetailRequest;
 import com.abdav.giri_guide.model.request.TransactionRequest;
+import com.abdav.giri_guide.model.response.CountTransactionResponse;
 import com.abdav.giri_guide.model.response.TransactionDetailResponse;
 import com.abdav.giri_guide.model.response.TransactionResponse;
 import com.abdav.giri_guide.model.response.TransactionStatusResponse;
 import com.abdav.giri_guide.repository.*;
 import com.abdav.giri_guide.service.CustomerService;
 import com.abdav.giri_guide.service.GuideReviewService;
-import com.abdav.giri_guide.service.TourGuideService;
 import com.abdav.giri_guide.service.TransactionService;
-import com.midtrans.httpclient.error.MidtransError;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -30,10 +27,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -45,8 +45,8 @@ public class TransactionServiceImpl implements TransactionService {
     private final TransactionHikerRepository transactionHikerRepository;
     private final TourGuideRepository tourGuideRepository;
     private final CustomerService customerService;
-
     private final GuideReviewService reviewService;
+    private final DepositServiceImpl depositService;
 
     @Value("${app.giri-guide.admin-cost}")
     private Long adminCost;
@@ -126,6 +126,9 @@ public class TransactionServiceImpl implements TransactionService {
             transaction.setEndOfPayTime(transaction.getLastModifiedDate().plusDays(1));
             transactionRepository.saveAndFlush(transaction);
         }
+        if(transactionStatus == ETransactionStatus.UPCOMING){
+            depositService.createDeposit(transaction.getTourGuide());
+        }
         if (transactionStatus.equals(ETransactionStatus.DONE)) {
             reviewService.createBlankReview(transaction);
         }
@@ -199,6 +202,35 @@ public class TransactionServiceImpl implements TransactionService {
         } else {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
         }
+    }
+
+    @Override
+    public CountTransactionResponse getDashboard() {
+        List<Transaction> allTransaction = transactionRepository.findAllByDeletedDateIsNull();
+        int prevYear = LocalDate.now().getYear() - 1;
+        int currentYear = LocalDate.now().getYear();
+        int prevMonth = LocalDate.now().minusMonths(1).getMonthValue();
+
+        Map<ETransactionStatus, Long> countYearBeforeGroupByStatus = allTransaction.stream()
+                .filter(transaction -> transaction.getCreatedDate().getYear() == prevYear)
+                .collect(Collectors.groupingBy(Transaction::getStatus, Collectors.counting()));
+
+        Map<ETransactionStatus, Long> countMonthBeforeGroupByStatus = allTransaction.stream()
+                .filter(transaction -> transaction.getCreatedDate().getYear() == currentYear &&
+                        transaction.getCreatedDate().getMonthValue() == prevMonth)
+                .collect(Collectors.groupingBy(Transaction::getStatus, Collectors.counting()));
+
+        for(ETransactionStatus status : ETransactionStatus.values()){
+            countYearBeforeGroupByStatus.putIfAbsent(status, 0L);
+            countMonthBeforeGroupByStatus.putIfAbsent(status, 0L);
+        }
+
+        return new CountTransactionResponse(
+                countYearBeforeGroupByStatus,
+                countMonthBeforeGroupByStatus,
+                prevYear,
+                prevMonth
+        );
     }
 
     private void getUpdateStatusInHistory(List<Transaction> transactions) {
