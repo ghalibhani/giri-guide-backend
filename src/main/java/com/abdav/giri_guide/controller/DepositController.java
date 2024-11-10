@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.abdav.giri_guide.constant.EDepositStatus;
 import com.abdav.giri_guide.constant.Message;
 import com.abdav.giri_guide.constant.PathApi;
 import com.abdav.giri_guide.entity.Deposit;
@@ -81,8 +80,8 @@ public class DepositController {
             @RequestParam(required = false, defaultValue = "Rejected") String message) {
 
         depositService.approveWithdraw(depositHistoryId, approved, message);
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body(new CommonResponse<>(Message.DATA_CREATED, null));
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(new CommonResponse<>(Message.DATA_UPDATED, null));
     }
 
     @GetMapping("/deposits")
