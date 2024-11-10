@@ -20,7 +20,8 @@ public class DepositHistoryMapper {
                     data.getCreatedDate(),
                     data.getNominal(),
                     data.getStatus(),
-                    data.getDescription()));
+                    data.getDescription(),
+                    data.getDeposit().getMoney()));
         }
 
         return result;

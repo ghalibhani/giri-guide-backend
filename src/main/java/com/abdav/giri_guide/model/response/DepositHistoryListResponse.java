@@ -11,7 +11,8 @@ public record DepositHistoryListResponse(
         LocalDateTime createdAt,
         Long nominal,
         EDepositStatus status,
-        String description
+        String description,
+        Long currentDeposit
 
 ) {
 }

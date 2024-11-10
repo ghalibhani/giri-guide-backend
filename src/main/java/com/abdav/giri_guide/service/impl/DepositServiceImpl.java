@@ -113,6 +113,12 @@ public class DepositServiceImpl implements DepositService {
         }
 
         if (isApproved) {
+            Long totalDeposit = request.getDeposit().getMoney() - request.getNominal();
+
+            if (totalDeposit < 0) {
+                throw new ResponseStatusException(HttpStatus.CONFLICT, "User Deposit Balance Will Negative!");
+            }
+
             request.getDeposit().setMoney(request.getDeposit().getMoney() - request.getNominal());
             depositRepository.save(request.getDeposit());
 
