@@ -12,4 +12,6 @@ public interface HikingPointRepository extends JpaRepository<HikingPoint, String
     List<HikingPoint> findByMountainAndDeletedDateIsNull(Mountains mountain);
 
     Optional<HikingPoint> findByIdAndDeletedDateIsNull(String id);
+
+    List<HikingPoint> findByMountainIdAndDeletedDateIsNull(String mountainId);
 }

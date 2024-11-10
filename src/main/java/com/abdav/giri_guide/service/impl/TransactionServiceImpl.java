@@ -127,10 +127,19 @@ public class TransactionServiceImpl implements TransactionService {
             transactionRepository.saveAndFlush(transaction);
         }
         if(transactionStatus == ETransactionStatus.UPCOMING){
-            depositService.createDeposit(transaction.getTourGuide());
+            Long nominal = transaction.getTotalSimaksiPrice() + transaction.getTotalEntryPrice();
+            depositService.addMoney(
+                    transaction.getTourGuide().getDeposit(),
+                    nominal,
+                    "Uang admin pendakian " + transaction.getHikingPoint().getMountain().getName());
         }
         if (transactionStatus.equals(ETransactionStatus.DONE)) {
             reviewService.createBlankReview(transaction);
+            Long nominal = transaction.getTotalPorterPrice() + transaction.getTotalTourGuidePrice() + transaction.getAdditionalPriceTourGuide();
+            depositService.addMoney(
+                    transaction.getTourGuide().getDeposit(),
+                    nominal,
+                    "Uang pelunasan pendakian " + transaction.getHikingPoint().getMountain().getName());
         }
 
         return new TransactionStatusResponse(transaction.getStatus().toString(), null);
