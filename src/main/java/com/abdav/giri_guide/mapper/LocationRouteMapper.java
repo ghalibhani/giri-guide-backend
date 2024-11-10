@@ -21,7 +21,8 @@ public class LocationRouteMapper {
                     node.getFrom(),
                     node.getTo(),
                     node.getTransportation(),
-                    node.getEstimate()));
+                    node.getEstimate(),
+                    node.getDistance()));
             node = node.getNext();
         }
         return new LocationRouteDetailResponse(

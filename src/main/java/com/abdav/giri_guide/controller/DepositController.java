@@ -87,6 +87,7 @@ public class DepositController {
 
     @GetMapping("/deposits")
     public ResponseEntity<?> getDepositList(
+            @RequestParam(required = false, defaultValue = "") String name,
             @RequestParam(required = false, defaultValue = "") String status,
             @RequestParam(required = false, defaultValue = "1") Integer page,
             @RequestParam(required = false, defaultValue = "20") Integer size
@@ -94,7 +95,7 @@ public class DepositController {
     ) {
 
         return ResponseEntity.status(HttpStatus.OK)
-                .body(depositService.getDepositList(status, size, page));
+                .body(depositService.getDepositList(status, name, size, page));
     }
 
 }
