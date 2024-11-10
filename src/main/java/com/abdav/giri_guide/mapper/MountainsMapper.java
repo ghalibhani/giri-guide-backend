@@ -3,6 +3,7 @@ package com.abdav.giri_guide.mapper;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.abdav.giri_guide.entity.HikingPoint;
 import org.springframework.data.domain.Page;
 
 import com.abdav.giri_guide.entity.Mountains;
@@ -16,7 +17,7 @@ public class MountainsMapper {
     private MountainsMapper() {
     }
 
-    public static MountainsDetailResponse toMountainsDetailResponse(Mountains mountain, HttpServletRequest httpReq) {
+    public static MountainsDetailResponse toMountainsDetailResponse(Mountains mountain, List<HikingPoint> hikingPoints, HttpServletRequest httpReq) {
         return new MountainsDetailResponse(
                 mountain.getId(),
                 mountain.getName(),
@@ -29,7 +30,7 @@ public class MountainsMapper {
                 mountain.getPriceSimaksi(),
                 mountain.getTips(),
                 mountain.getBestTime(),
-                HikingPointMapper.toSetHikingPointResponse(mountain.getHikingPoints())
+                HikingPointMapper.toSetHikingPointResponse(hikingPoints)
 
         );
     }
