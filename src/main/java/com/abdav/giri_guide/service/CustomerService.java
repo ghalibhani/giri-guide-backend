@@ -2,6 +2,7 @@ package com.abdav.giri_guide.service;
 
 import com.abdav.giri_guide.entity.Customer;
 import com.abdav.giri_guide.model.request.CustomerRequest;
+import com.abdav.giri_guide.model.response.RegisterCountResponse;
 import com.abdav.giri_guide.model.response.CustomerResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.data.domain.Page;
@@ -15,6 +16,7 @@ public interface CustomerService {
     CustomerResponse getCustomerByUserId(String userId, HttpServletRequest httpReq);
     CustomerResponse updateCustomer(String id, CustomerRequest customerRequest, HttpServletRequest httpReq);
     CustomerResponse uploadProfileImage(String id, MultipartFile file, HttpServletRequest httpReq);
+    RegisterCountResponse countRegister(Integer month, Integer year);
 
     Customer getById(String id);
 }

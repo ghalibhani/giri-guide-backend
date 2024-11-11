@@ -1,16 +1,14 @@
 package com.abdav.giri_guide.service.impl;
 
-import com.abdav.giri_guide.constant.ETransactionStatus;
 import com.abdav.giri_guide.constant.Message;
 import com.abdav.giri_guide.entity.Payment;
 import com.abdav.giri_guide.entity.Transaction;
 import com.abdav.giri_guide.entity.TransactionPayment;
-import com.abdav.giri_guide.model.response.PaymentResponse;
-import com.abdav.giri_guide.model.response.RevenueResponse;
-import com.abdav.giri_guide.model.response.TransactionPaymentResponse;
+import com.abdav.giri_guide.model.response.*;
 import com.abdav.giri_guide.repository.PaymentRepository;
 import com.abdav.giri_guide.repository.TransactionPaymentRepository;
 import com.abdav.giri_guide.repository.TransactionRepository;
+import com.abdav.giri_guide.service.CustomerService;
 import com.abdav.giri_guide.service.PaymentService;
 import com.abdav.giri_guide.service.TransactionPaymentService;
 import com.abdav.giri_guide.service.TransactionService;
@@ -20,7 +18,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.Year;
+import java.time.LocalDate;
 import java.time.YearMonth;
 import java.time.ZoneId;
 import java.util.List;
@@ -36,6 +34,7 @@ public class TransactionPaymentServiceImpl implements TransactionPaymentService 
     private final TransactionPaymentRepository transactionPaymentRepository;
     private final PaymentService paymentService;
     private final TransactionRepository transactionRepository;
+    private final CustomerService customerService;
     private final PaymentRepository paymentRepository;
 
     @Override
@@ -94,10 +93,10 @@ public class TransactionPaymentServiceImpl implements TransactionPaymentService 
     }
 
     @Override
-    public void updateStatusPayment(String orderId, String status) {
+    public void updateStatusPayment(String orderId, String status, String paymentType) {
         TransactionPayment transactionPayment =getById(orderId);
         Payment payment = transactionPayment.getPayment();
-        paymentService.updateStatus(payment, status);
+        paymentService.updateStatus(payment, status, paymentType);
 
         Transaction transaction = transactionPayment.getTransaction();
         transactionService.updateStatusFromPayment(transaction, status);
@@ -134,5 +133,49 @@ public class TransactionPaymentServiceImpl implements TransactionPaymentService 
         actualRevenue.forEach(revenueOneYearBefore::put);
 
         return new RevenueResponse(revenueOneYearBefore);
+    }
+
+    @Override
+    public DashboardResponse getInfoDashboard(Integer month, Integer year) {
+        if(month == null){
+            month = LocalDate.now().minusMonths(1).getMonthValue();
+        }
+        if(year == null){
+            year = LocalDate.now().getYear();
+        }
+
+        Long totalIncome = getTotalIncome();
+        IncomeYearMonthResponse yearMonthIncome = getIncomeYearMonth(month, year);
+        RegisterCountResponse yearMonthRegisterCount = customerService.countRegister(month, year);
+
+        return new DashboardResponse(totalIncome, yearMonthIncome, yearMonthRegisterCount);
+    }
+
+    @Override
+    public Long getTotalIncome() {
+        List<TransactionPayment> allTransactionPayment = transactionPaymentRepository.findAllByDeletedDateIsNull();
+        Long totalIncome = allTransactionPayment.stream()
+                .filter(transactionPayment -> transactionPayment.getPayment() != null && transactionPayment.getPayment().getPaymentStatus().equals("PAID"))
+                .mapToLong(TransactionPayment::getAmount)
+                .sum();
+        return totalIncome;
+    }
+
+    @Override
+    public IncomeYearMonthResponse getIncomeYearMonth(Integer month, Integer year) {
+        List<TransactionPayment> allTransactionPayment = transactionPaymentRepository.findAllByDeletedDateIsNull();
+
+        YearMonth findYearMonth = YearMonth.of(year, month);
+
+        Long income = allTransactionPayment.stream()
+                .filter(transactionPayment -> transactionPayment.getPayment() != null && transactionPayment.getPayment().getPaymentStatus().equals("PAID"))
+                .filter(transactionPayment -> {
+                    YearMonth yearMonthIncome = YearMonth.from(transactionPayment.getCreatedDate().toLocalDate());
+                    return yearMonthIncome.equals(findYearMonth);
+                })
+                .mapToLong(TransactionPayment::getAmount)
+                .sum();
+
+        return new IncomeYearMonthResponse(findYearMonth, income);
     }
 }

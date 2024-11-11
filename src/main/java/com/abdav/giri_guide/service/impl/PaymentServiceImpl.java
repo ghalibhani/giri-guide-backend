@@ -27,7 +27,7 @@ public class PaymentServiceImpl implements PaymentService {
                 "order_id", transactionPayment.getId(),
                 "gross_amount", transactionPayment.getAmount()
         );
-        List<String> paymentMethod = List.of("shopeePay", "gopay", "indomaret");
+        List<String> paymentMethod = List.of("shopeePay", "gopay", "indomaret", "other_qris");
 
         List<Map<String, Object>> itemDetails = List.of(
                 Map.of(
@@ -85,8 +85,9 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     @Override
-    public void updateStatus(Payment payment, String status) {
+    public void updateStatus(Payment payment, String status, String paymentType) {
         payment.setPaymentStatus(status);
+        payment.setPaymentType(paymentType.toUpperCase());
         paymentRepository.saveAndFlush(payment);
     }
 

@@ -6,5 +6,5 @@ import com.midtrans.httpclient.error.MidtransError;
 
 public interface PaymentService {
     Payment create(TransactionPayment transactionPayment) throws MidtransError;
-    void updateStatus(Payment payment, String status);
+    void updateStatus(Payment payment, String status, String paymentType);
 }

@@ -208,7 +208,7 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     @Override
-    public CountTransactionResponse getDashboard(Integer month, Integer year) {
+    public CountTransactionResponse countAllStatusTransaction(Integer month, Integer year) {
         List<Transaction> allTransaction = transactionRepository.findAllByDeletedDateIsNull();
         if(month == null || year == null){
             month = LocalDate.now().minusMonths(1).getMonthValue();
