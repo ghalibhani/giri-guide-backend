@@ -1,8 +1,16 @@
 package com.abdav.giri_guide.service.impl;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.Year;
+import java.time.YearMonth;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
+import com.abdav.giri_guide.model.request.RegisterCountResponse;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -93,6 +101,31 @@ public class CustomerServiceImpl implements CustomerService {
         }
 
         return CustomerMapper.customerToCustomerResponse(customer, httpReq);
+    }
+
+    @Override
+    public RegisterCountResponse countRegister() {
+        List<Customer> allCustomers = customerRepository.findAllByDeletedDateIsNull();
+        YearMonth currentYear =YearMonth.now();
+
+        Map<YearMonth, Long> countRegister = IntStream.rangeClosed(0,11)
+                .mapToObj(currentYear::minusMonths)
+                .collect(Collectors.toMap(month -> month, month -> 0L));
+
+        Map<YearMonth, Long> actualCountRegister = allCustomers.stream()
+                .filter(customer -> {
+                    YearMonth regisOneYearBefore = YearMonth.from(
+                            customer.getCreatedDate().toLocalDate()
+                    );
+                    return !regisOneYearBefore.isBefore(currentYear.minusMonths(12));
+                })
+                .collect(Collectors.groupingBy(
+                        customer -> YearMonth.from(customer.getCreatedDate().toLocalDate()),
+                        Collectors.counting()
+                ));
+
+        countRegister.putAll(actualCountRegister);
+        return new RegisterCountResponse(countRegister);
     }
 
     @Override

@@ -2,6 +2,7 @@ package com.abdav.giri_guide.controller;
 
 import com.abdav.giri_guide.constant.Message;
 import com.abdav.giri_guide.constant.PathApi;
+import com.abdav.giri_guide.model.request.RegisterCountResponse;
 import com.abdav.giri_guide.model.response.CommonResponse;
 import com.abdav.giri_guide.model.response.CommonResponseWithPage;
 import com.abdav.giri_guide.model.response.CustomerResponse;
@@ -50,5 +51,14 @@ public class CustomerController {
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(response);
+    }
+
+    @GetMapping("/info")
+    public ResponseEntity<?> countRegisterInYear(){
+        RegisterCountResponse registerCountResponse = customerService.countRegister();
+        message = Message.SUCCESS_FETCH;
+        CommonResponse<?> response = new CommonResponse<>(message, registerCountResponse);
+
+        return ResponseEntity.ok(response);
     }
 }
