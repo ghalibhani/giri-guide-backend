@@ -5,9 +5,8 @@ import com.abdav.giri_guide.constant.ETransactionStatus;
 import java.util.Map;
 
 public record CountTransactionResponse(
-        Map<ETransactionStatus, Long> countTransactionPrevYear,
-        Map<ETransactionStatus, Long> countTransactionPrevMonth,
-        int prevYear,
-        int prevMonth
+        Map<ETransactionStatus, Long> countTransaction,
+        Integer year,
+        Integer month
 ) {
 }
