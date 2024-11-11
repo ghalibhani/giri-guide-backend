@@ -2,7 +2,6 @@ package com.abdav.giri_guide.controller;
 
 import com.abdav.giri_guide.constant.Message;
 import com.abdav.giri_guide.constant.PathApi;
-import com.abdav.giri_guide.model.request.RegisterCountResponse;
 import com.abdav.giri_guide.model.response.CommonResponse;
 import com.abdav.giri_guide.model.response.CommonResponseWithPage;
 import com.abdav.giri_guide.model.response.CustomerResponse;
@@ -11,7 +10,6 @@ import com.abdav.giri_guide.service.CustomerService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
-import org.springframework.boot.actuate.autoconfigure.observation.ObservationProperties;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -51,14 +49,5 @@ public class CustomerController {
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(response);
-    }
-
-    @GetMapping("/info")
-    public ResponseEntity<?> countRegisterInYear(){
-        RegisterCountResponse registerCountResponse = customerService.countRegister();
-        message = Message.SUCCESS_FETCH;
-        CommonResponse<?> response = new CommonResponse<>(message, registerCountResponse);
-
-        return ResponseEntity.ok(response);
     }
 }
