@@ -17,7 +17,7 @@ public interface TransactionService {
     Page<TransactionDetailResponse> transactionList(Integer page, Integer size,String status, HttpServletRequest httpReq);
     TransactionDetailResponse getTransactionById(String id, HttpServletRequest httpReq);
     Page<TransactionResponse> findAllByStatus(List<String> stringList,String userId, Integer page, Integer size, String role, HttpServletRequest httpReq);
-    CountTransactionResponse getDashboard(Integer month, Integer year);
+    CountTransactionResponse countAllStatusTransaction(Integer month, Integer year);
 
     Transaction getById(String id);
     void updateStatusFromPayment(Transaction transaction, String status);
