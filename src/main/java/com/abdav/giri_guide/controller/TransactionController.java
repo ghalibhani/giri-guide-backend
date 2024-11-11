@@ -98,8 +98,11 @@ public class TransactionController {
     }
 
     @GetMapping("/dashboard")
-    ResponseEntity<?> dashboardAdmin(){
-        CountTransactionResponse dashboard = transactionService.getDashboard();
+    ResponseEntity<?> dashboardAdmin(
+            @RequestParam(required = false) Integer month,
+            @RequestParam(required = false) Integer year
+    ){
+        CountTransactionResponse dashboard = transactionService.getDashboard(month, year);
         message = Message.SUCCESS_FETCH;
         CommonResponse<?> response = new CommonResponse<>(message, dashboard);
 

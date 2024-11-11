@@ -19,6 +19,7 @@ import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cglib.core.Local;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -214,31 +215,28 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     @Override
-    public CountTransactionResponse getDashboard() {
+    public CountTransactionResponse getDashboard(Integer month, Integer year) {
         List<Transaction> allTransaction = transactionRepository.findAllByDeletedDateIsNull();
-        int prevYear = LocalDate.now().getYear() - 1;
-        int currentYear = LocalDate.now().getYear();
-        int prevMonth = LocalDate.now().minusMonths(1).getMonthValue();
+        if(month == null || year == null){
+            month = LocalDate.now().minusMonths(1).getMonthValue();
+            year = LocalDate.now().getYear();
+        }
 
-        Map<ETransactionStatus, Long> countYearBeforeGroupByStatus = allTransaction.stream()
-                .filter(transaction -> transaction.getCreatedDate().getYear() == prevYear)
-                .collect(Collectors.groupingBy(Transaction::getStatus, Collectors.counting()));
+        Integer finalYear = year;
+        Integer finalMonth = month;
 
-        Map<ETransactionStatus, Long> countMonthBeforeGroupByStatus = allTransaction.stream()
-                .filter(transaction -> transaction.getCreatedDate().getYear() == currentYear &&
-                        transaction.getCreatedDate().getMonthValue() == prevMonth)
+        Map<ETransactionStatus, Long> countTransactionGroupByStatus = allTransaction.stream()
+                .filter(transaction -> transaction.getCreatedDate().getYear() == finalYear && transaction.getCreatedDate().getMonthValue() == finalMonth)
                 .collect(Collectors.groupingBy(Transaction::getStatus, Collectors.counting()));
 
         for(ETransactionStatus status : ETransactionStatus.values()){
-            countYearBeforeGroupByStatus.putIfAbsent(status, 0L);
-            countMonthBeforeGroupByStatus.putIfAbsent(status, 0L);
+            countTransactionGroupByStatus.putIfAbsent(status, 0L);
         }
 
         return new CountTransactionResponse(
-                countYearBeforeGroupByStatus,
-                countMonthBeforeGroupByStatus,
-                prevYear,
-                prevMonth
+                countTransactionGroupByStatus,
+                finalYear,
+                finalMonth
         );
     }
 
