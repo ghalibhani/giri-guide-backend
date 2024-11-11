@@ -94,10 +94,10 @@ public class TransactionPaymentServiceImpl implements TransactionPaymentService 
     }
 
     @Override
-    public void updateStatusPayment(String orderId, String status) {
+    public void updateStatusPayment(String orderId, String status, String paymentType) {
         TransactionPayment transactionPayment =getById(orderId);
         Payment payment = transactionPayment.getPayment();
-        paymentService.updateStatus(payment, status);
+        paymentService.updateStatus(payment, status, paymentType);
 
         Transaction transaction = transactionPayment.getTransaction();
         transactionService.updateStatusFromPayment(transaction, status);

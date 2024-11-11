@@ -47,17 +47,18 @@ public class TransactionPaymentController {
             String orderId = (String) response.get("order_id");
             JSONObject transactionResult = coreApi.checkTransaction(orderId);
 
+            String paymentType = (String) transactionResult.get("payment_type");
             String transactionStatus = (String) transactionResult.get("transaction_status");
 
             notifResponse = "Transaction notification received. Order ID: " + orderId + ". Transaction status: " + transactionStatus;
             System.out.println(notifResponse);
 
             if (transactionStatus.equals("settlement")){
-                transactionPaymentService.updateStatusPayment(orderId, "PAID");
+                transactionPaymentService.updateStatusPayment(orderId, "PAID", paymentType);
             } else if (transactionStatus.equals("expire")) {
-                transactionPaymentService.updateStatusPayment(orderId, "EXPIRED");
+                transactionPaymentService.updateStatusPayment(orderId, "EXPIRED", paymentType);
             } else if (transactionStatus.equals("pending")) {
-                transactionPaymentService.updateStatusPayment(orderId, "PENDING");
+                transactionPaymentService.updateStatusPayment(orderId, "PENDING", paymentType);
             }
         }
         return ResponseEntity.ok().body(new CommonResponse<>("success", null));
