@@ -59,7 +59,8 @@ public class MountainServiceImpl implements MountainsService {
         Mountains mountains = newMountains.toMountains();
         mountains.setImage(image);
         mountainRepository.save(mountains);
-        return MountainsMapper.toMountainsDetailResponse(mountains, httpReq);
+        List<HikingPoint> hikingPoints = getHikingPointListByMountainId(mountains.getId());
+        return MountainsMapper.toMountainsDetailResponse(mountains, hikingPoints, httpReq);
     }
 
     @Override
@@ -80,7 +81,8 @@ public class MountainServiceImpl implements MountainsService {
     @Override
     public MountainsDetailResponse mountainDetail(String id, HttpServletRequest httpReq) {
         Mountains mountain = mountainRepository.findById(id).orElseThrow(EntityNotFoundException::new);
-        return MountainsMapper.toMountainsDetailResponse(mountain, httpReq);
+        List<HikingPoint> hikingPoints = getHikingPointListByMountainId(mountain.getId());
+        return MountainsMapper.toMountainsDetailResponse(mountain, hikingPoints, httpReq);
     }
 
     @Override
@@ -144,7 +146,8 @@ public class MountainServiceImpl implements MountainsService {
         }
         mountainRepository.save(mountain);
 
-        return MountainsMapper.toMountainsDetailResponse(mountain, httpReq);
+        List<HikingPoint> hikingPoints = getHikingPointListByMountainId(mountain.getId());
+        return MountainsMapper.toMountainsDetailResponse(mountain, hikingPoints, httpReq);
     }
 
     @Override
@@ -155,8 +158,8 @@ public class MountainServiceImpl implements MountainsService {
         mountain.setImage(imageEntity);
         mountain = mountainRepository.save(mountain);
         imageService.delete(oldImage);
-
-        return MountainsMapper.toMountainsDetailResponse(mountain, httpRequest);
+        List<HikingPoint> hikingPoints = getHikingPointListByMountainId(mountain.getId());
+        return MountainsMapper.toMountainsDetailResponse(mountain, hikingPoints, httpRequest);
     }
 
     public HikingPointResponse createHikingPoint(String mountainId, HikingPointRequest request) {
@@ -205,6 +208,11 @@ public class MountainServiceImpl implements MountainsService {
         }
         tourGuideHikingPointRepository.saveAll(hikingPoint.getTourGuideHikingPoints());
         hikingPointRepository.save(hikingPoint);
+    }
+
+    @Override
+    public List<HikingPoint> getHikingPointListByMountainId(String mountainId) {
+        return hikingPointRepository.findByMountainIdAndDeletedDateIsNull(mountainId);
     }
 
     @Override

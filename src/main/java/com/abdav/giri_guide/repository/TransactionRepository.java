@@ -6,6 +6,7 @@ import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import com.abdav.giri_guide.constant.EDepositStatus;
@@ -17,7 +18,7 @@ import com.abdav.giri_guide.entity.Transaction;
 public interface TransactionRepository extends JpaRepository<Transaction, String> {
     Page<Transaction> findAllByStatus(ETransactionStatus status, Pageable pageable);
 
-    Page<Transaction> findAllByDeletedDateIsNotNull(Pageable pageable);
+    List<Transaction> findAllByDeletedDateIsNull();
 
     Page<Transaction> findAllByCustomerIdAndStatusInAndDeletedDateIsNullOrderByStartDateAsc(
             String customerId, List<ETransactionStatus> status, Pageable pageable);

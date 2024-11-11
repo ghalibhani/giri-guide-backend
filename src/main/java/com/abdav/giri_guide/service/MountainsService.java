@@ -3,6 +3,7 @@ package com.abdav.giri_guide.service;
 import java.util.List;
 import java.util.Set;
 
+import com.abdav.giri_guide.entity.HikingPoint;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.abdav.giri_guide.model.request.HikingPointRequest;
@@ -37,4 +38,6 @@ public interface MountainsService {
     HikingPointResponse updateHikingPoint(String id, HikingPointRequest request);
 
     void deleteHikingPoint(String id);
+
+    List<HikingPoint> getHikingPointListByMountainId(String mountainId);
 }

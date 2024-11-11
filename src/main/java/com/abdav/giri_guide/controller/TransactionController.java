@@ -5,6 +5,7 @@ import com.abdav.giri_guide.constant.PathApi;
 import com.abdav.giri_guide.model.request.TransactionRequest;
 import com.abdav.giri_guide.model.request.TransactionStatusUpdateRequest;
 import com.abdav.giri_guide.model.response.*;
+import com.abdav.giri_guide.service.TransactionPaymentService;
 import com.abdav.giri_guide.service.TransactionService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.servlet.http.HttpServletRequest;
@@ -23,6 +24,7 @@ import java.util.List;
 @SecurityRequirement(name = "bearerAuth")
 public class TransactionController {
     private final TransactionService transactionService;
+    private final TransactionPaymentService transactionPaymentService;
     private static String message;
 
     @PostMapping()
@@ -89,6 +91,31 @@ public class TransactionController {
         PagingResponse paging = new PagingResponse(page, size, transaction.getTotalPages(), transaction.getTotalElements());
         message = Message.SUCCESS_FETCH;
         CommonResponseWithPage<?> response = new CommonResponseWithPage<>(message, transaction.getContent(), paging);
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(response);
+    }
+
+    @GetMapping("/dashboard")
+    ResponseEntity<?> dashboardAdmin(
+            @RequestParam(required = false) Integer month,
+            @RequestParam(required = false) Integer year
+    ){
+        CountTransactionResponse dashboard = transactionService.getDashboard(month, year);
+        message = Message.SUCCESS_FETCH;
+        CommonResponse<?> response = new CommonResponse<>(message, dashboard);
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(response);
+    }
+
+    @GetMapping("/revenue")
+    ResponseEntity<?> getRevenueOneYearBefore(){
+        RevenueResponse revenueResponse = transactionPaymentService.getRevenue();
+        message = "Revenue" + Message.SUCCESS_FETCH;
+        CommonResponse<?> response = new CommonResponse<>(message, revenueResponse);
 
         return ResponseEntity
                 .status(HttpStatus.OK)

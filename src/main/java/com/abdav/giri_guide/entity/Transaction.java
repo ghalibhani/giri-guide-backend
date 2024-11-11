@@ -57,8 +57,6 @@ public class Transaction extends AuditEntity{
 
     private Long adminCost;
 
-    private Long totalPrice;
-
     private String customerNote;
 
     private String rejectedNote;
