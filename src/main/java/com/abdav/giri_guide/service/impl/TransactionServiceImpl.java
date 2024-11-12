@@ -245,6 +245,9 @@ public class TransactionServiceImpl implements TransactionService {
                     && transaction.getEndOfApprove().isBefore(LocalDateTime.now())) {
                 transaction.setStatus(ETransactionStatus.REJECTED);
                 transactionRepository.saveAndFlush(transaction);
+            } else if (transaction.getStatus() == ETransactionStatus.UPCOMING && transaction.getEndDate() != null && transaction.getEndDate().toLocalDate().plusDays(2).isBefore(LocalDate.now())) {
+                transaction.setStatus(ETransactionStatus.DONE);
+                transactionRepository.saveAndFlush(transaction);
             }
         }
     }
