@@ -326,7 +326,8 @@ public class TourGuideServiceImpl implements TourGuideService {
         tourGuideHikingPointRepository.save(tourGuideHikingPoint);
 
         List<TourGuideHikingPoint> hikingPoints = tourGuideHikingPointRepository
-                .findByTourGuideAndDeletedDateIsNull(tourGuideHikingPoint.getTourGuide());
+                .findByTourGuideAndDeletedDateIsNullOrderByHikingPointMountainNameAsc(
+                        tourGuideHikingPoint.getTourGuide());
 
         return TourGuideHikingPointMapper.toListOfTourGuideHikingPointActiveResponse(hikingPoints);
     }
