@@ -137,6 +137,10 @@ public class LocationRouteServiceImpl implements LocationRouteService {
 
     private void deleteNodeRecusive(LocationRoute route) {
         LocationRouteNode currentNode = route.getStartPoint();
+        if (currentNode == null) {
+            return;
+        }
+
         LocationRouteNode nextNode = currentNode.getNext();
 
         route.setStartPoint(null);
