@@ -20,4 +20,6 @@ public interface CustomerRepository extends JpaRepository<Customer, String> {
 
     Optional<Customer> findByUserIdAndDeletedDateIsNull(String userId);
     Customer findByUserIdAndDeletedDateIsNotNull(String userId);
+
+    Optional<Customer> findByNikAndDeletedDateIsNull(String nik);
 }

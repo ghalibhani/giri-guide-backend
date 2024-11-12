@@ -2,6 +2,7 @@ package com.abdav.giri_guide.service.impl;
 
 import java.util.Optional;
 
+import com.abdav.giri_guide.model.request.RegisterRequest;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
@@ -18,7 +19,6 @@ import com.abdav.giri_guide.constant.EGender;
 import com.abdav.giri_guide.constant.ERole;
 import com.abdav.giri_guide.constant.Message;
 import com.abdav.giri_guide.dto.request.LoginRequest;
-import com.abdav.giri_guide.dto.request.RegisterRequest;
 import com.abdav.giri_guide.dto.response.LoginResponse;
 import com.abdav.giri_guide.entity.AppUser;
 import com.abdav.giri_guide.entity.Customer;
@@ -76,30 +76,29 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public void register(RegisterRequest registerRequest) {
-        try {
-            validationUtil.validate(registerRequest);
-            Role role = roleService.getOrSaveRole(Role.builder().role(ERole.ROLE_CUSTOMER).build());
-
-            User user = User.builder()
-                    .email(registerRequest.getEmail())
-                    .password(passwordEncoder.encode(registerRequest.getPassword()))
-                    .role(role)
-                    .build();
-            userRepository.saveAndFlush(user);
-
-            Customer customer = Customer.builder()
-                    .fullName(registerRequest.getFullName())
-                    .birthDate(registerRequest.getBirthDate())
-                    .nik(registerRequest.getNik())
-                    .address(registerRequest.getAddress())
-                    .gender(EGender.valueOf(registerRequest.getGender().toUpperCase()))
-                    .user(user)
-                    .build();
-            customerService.createCustomer(customer);
-
-        } catch (DataIntegrityViolationException e) {
+        if (userRepository.findByEmailAndDeletedDateIsNull(registerRequest.email()).isPresent() ||
+                customerRepository.findByNikAndDeletedDateIsNull(registerRequest.nik()).isPresent()) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Email atau nik sudah terdaftar");
         }
+        validationUtil.validate(registerRequest);
+        Role role = roleService.getOrSaveRole(Role.builder().role(ERole.ROLE_CUSTOMER).build());
+
+        User user = User.builder()
+                .email(registerRequest.email())
+                .password(passwordEncoder.encode(registerRequest.password()))
+                .role(role)
+                .build();
+        userRepository.saveAndFlush(user);
+
+        Customer customer = Customer.builder()
+                .fullName(registerRequest.fullName())
+                .birthDate(registerRequest.birthDate())
+                .nik(registerRequest.nik())
+                .address(registerRequest.address())
+                .gender(EGender.valueOf(registerRequest.gender().toUpperCase()))
+                .user(user)
+                .build();
+        customerService.createCustomer(customer);
     }
 
     @Override
