@@ -51,7 +51,7 @@ public class TourGuideMapper {
                 tourGuide.getPricePorter(),
                 (tourGuide.getImage() == null) ? null : UrlUtil.resolveImageUrl(tourGuide.getImage(), httpReq),
 
-                stats.total(),
+                stats.done(),
                 (stats.total().equals(0)) ? 0 : doneRate.intValue(),
                 (stats.total().equals(0)) ? 0 : rejectRate.intValue(),
                 averageRating.rating,
