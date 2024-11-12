@@ -97,12 +97,12 @@ public class TransactionController {
                 .body(response);
     }
 
-    @GetMapping("/dashboard")
+    @GetMapping("/dashboard/info-status")
     ResponseEntity<?> dashboardAdmin(
             @RequestParam(required = false) Integer month,
             @RequestParam(required = false) Integer year
     ){
-        CountTransactionResponse dashboard = transactionService.getDashboard(month, year);
+        CountTransactionResponse dashboard = transactionService.countAllStatusTransaction(month, year);
         message = Message.SUCCESS_FETCH;
         CommonResponse<?> response = new CommonResponse<>(message, dashboard);
 
@@ -120,5 +120,17 @@ public class TransactionController {
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(response);
+    }
+
+    @GetMapping("/dashboard")
+    ResponseEntity<?> getInfoDashboard(
+            @RequestParam(required = false) Integer month,
+            @RequestParam(required = false) Integer year
+    ){
+        DashboardResponse dashboardResponse = transactionPaymentService.getInfoDashboard(month, year);
+        message = Message.SUCCESS_FETCH;
+        CommonResponse<?> response = new CommonResponse<>(message, dashboardResponse);
+
+        return ResponseEntity.ok(response);
     }
 }

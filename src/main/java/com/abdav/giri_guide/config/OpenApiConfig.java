@@ -11,7 +11,7 @@ import io.swagger.v3.oas.annotations.servers.Server;
 
 @Configuration
 @OpenAPIDefinition(info = @Info(title = "Giri Guide", version = "1.0"), servers = {
-                @Server(url = "https://active-gator-enabling.ngrok-free.app/") })
+                @Server(url = "https://urgently-precious-spider.ngrok-free.app/") })
 
 @SecurityScheme(name = "bearerAuth", type = SecuritySchemeType.HTTP, scheme = "bearer", bearerFormat = "JWT")
 public class OpenApiConfig {

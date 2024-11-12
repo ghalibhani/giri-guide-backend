@@ -127,13 +127,6 @@ public class TransactionServiceImpl implements TransactionService {
             transaction.setEndOfPayTime(transaction.getLastModifiedDate().plusDays(1));
             transactionRepository.saveAndFlush(transaction);
         }
-        if(transactionStatus == ETransactionStatus.UPCOMING){
-            Long nominal = transaction.getTotalSimaksiPrice() + transaction.getTotalEntryPrice();
-            depositService.addMoney(
-                    transaction.getTourGuide().getDeposit(),
-                    nominal,
-                    "Uang admin pendakian " + transaction.getHikingPoint().getMountain().getName());
-        }
         if (transactionStatus.equals(ETransactionStatus.DONE)) {
             reviewService.createBlankReview(transaction);
             Long nominal = transaction.getTotalPorterPrice() + transaction.getTotalTourGuidePrice() + transaction.getAdditionalPriceTourGuide();
@@ -215,7 +208,7 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     @Override
-    public CountTransactionResponse getDashboard(Integer month, Integer year) {
+    public CountTransactionResponse countAllStatusTransaction(Integer month, Integer year) {
         List<Transaction> allTransaction = transactionRepository.findAllByDeletedDateIsNull();
         if(month == null || year == null){
             month = LocalDate.now().minusMonths(1).getMonthValue();
@@ -264,6 +257,12 @@ public class TransactionServiceImpl implements TransactionService {
     public void updateStatusFromPayment(Transaction transaction, String status) {
         if (status.equals("PAID")) {
             transaction.setStatus(ETransactionStatus.UPCOMING);
+            Long nominal = transaction.getTotalSimaksiPrice() + transaction.getTotalEntryPrice();
+            depositService.addMoney(
+                    transaction.getTourGuide().getDeposit(),
+                    nominal,
+                    "Uang admin pendakian " + transaction.getHikingPoint().getMountain().getName());
+
         } else if (status.equals("EXPIRED")) {
             transaction.setStatus(ETransactionStatus.REJECTED);
         }

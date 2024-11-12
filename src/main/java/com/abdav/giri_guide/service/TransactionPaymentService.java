@@ -1,6 +1,8 @@
 package com.abdav.giri_guide.service;
 
 import com.abdav.giri_guide.entity.TransactionPayment;
+import com.abdav.giri_guide.model.response.DashboardResponse;
+import com.abdav.giri_guide.model.response.IncomeYearMonthResponse;
 import com.abdav.giri_guide.model.response.RevenueResponse;
 import com.abdav.giri_guide.model.response.TransactionPaymentResponse;
 import com.midtrans.httpclient.error.MidtransError;
@@ -10,7 +12,10 @@ import java.util.List;
 public interface TransactionPaymentService {
     TransactionPaymentResponse create(String transactionId) throws MidtransError;
     TransactionPayment getById (String orderId);
-    void updateStatusPayment(String orderId, String status);
+    void updateStatusPayment(String orderId, String status, String paymentType);
     List<TransactionPayment> transactionPaymentList();
     RevenueResponse getRevenue();
+    DashboardResponse getInfoDashboard(Integer month, Integer year);
+    Long getTotalIncome();
+    IncomeYearMonthResponse getIncomeYearMonth(Integer month, Integer year);
 }

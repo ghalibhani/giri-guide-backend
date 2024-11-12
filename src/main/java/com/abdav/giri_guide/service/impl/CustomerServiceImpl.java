@@ -1,8 +1,12 @@
 package com.abdav.giri_guide.service.impl;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.YearMonth;
+import java.util.List;
 import java.util.Optional;
 
+import com.abdav.giri_guide.model.response.RegisterCountResponse;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -93,6 +97,21 @@ public class CustomerServiceImpl implements CustomerService {
         }
 
         return CustomerMapper.customerToCustomerResponse(customer, httpReq);
+    }
+
+    @Override
+    public RegisterCountResponse countRegister(Integer month, Integer year) {
+        List<Customer> allCustomers = customerRepository.findAllByDeletedDateIsNull();
+
+        YearMonth findYearMonth =YearMonth.of(year, month);
+
+        Long registerCount = allCustomers.stream()
+                .filter(customer -> {
+                    YearMonth registerYearMonth = YearMonth.from(customer.getCreatedDate().toLocalDate());
+                    return registerYearMonth.equals(findYearMonth);
+                })
+                .count();
+        return new RegisterCountResponse(findYearMonth, registerCount);
     }
 
     @Override
