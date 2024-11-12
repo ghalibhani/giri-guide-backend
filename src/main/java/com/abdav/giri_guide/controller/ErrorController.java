@@ -1,6 +1,6 @@
 package com.abdav.giri_guide.controller;
 
-import com.abdav.giri_guide.dto.response.CommonResponse;
+import com.abdav.giri_guide.model.response.CommonResponse;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.ConstraintViolationException;
 
@@ -60,5 +60,15 @@ public class ErrorController {
     public ResponseEntity<?> dataConflict(DataIntegrityViolationException e) {
         return ResponseEntity.status(HttpStatus.CONFLICT)
                 .body(new CommonResponse<>(e.getMessage(), null));
+    }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<?> illegalArgument(IllegalArgumentException e){
+        message = e.getMessage();
+        CommonResponse<?> response = new CommonResponse<>(message, null);
+
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(response);
     }
 }
