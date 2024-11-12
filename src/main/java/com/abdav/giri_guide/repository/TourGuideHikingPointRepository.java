@@ -14,6 +14,9 @@ import com.abdav.giri_guide.entity.TourGuideHikingPoint;
 public interface TourGuideHikingPointRepository extends JpaRepository<TourGuideHikingPoint, String> {
     List<TourGuideHikingPoint> findByTourGuideAndDeletedDateIsNull(TourGuide tourGuide);
 
+    List<TourGuideHikingPoint> findByTourGuideAndDeletedDateIsNullOrderByHikingPointMountainNameAsc(
+            TourGuide tourGuide);
+
     Page<TourGuideHikingPoint> findByHikingPointAndIsActiveIsTrueAndTourGuideIsActiveIsTrueAndDeletedDateIsNull(
             HikingPoint hikingPoint,
             Pageable pageable);
