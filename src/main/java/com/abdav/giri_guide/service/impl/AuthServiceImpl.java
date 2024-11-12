@@ -1,6 +1,8 @@
 package com.abdav.giri_guide.service.impl;
 
-import com.abdav.giri_guide.constant.Message;
+import java.util.Optional;
+
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -14,6 +16,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import com.abdav.giri_guide.constant.EGender;
 import com.abdav.giri_guide.constant.ERole;
+import com.abdav.giri_guide.constant.Message;
 import com.abdav.giri_guide.dto.request.LoginRequest;
 import com.abdav.giri_guide.dto.request.RegisterRequest;
 import com.abdav.giri_guide.dto.response.LoginResponse;
@@ -30,6 +33,7 @@ import com.abdav.giri_guide.service.CustomerService;
 import com.abdav.giri_guide.service.RoleService;
 import com.abdav.giri_guide.util.ValidationUtil;
 
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -45,6 +49,30 @@ public class AuthServiceImpl implements AuthService {
 
     private final CustomerRepository customerRepository;
     private final TourGuideRepository tourGuideRepository;
+
+    @Value("${app.giri-guide.email-admin}")
+    private String emailAdmin;
+
+    @Value("${app.giri-guide.password-admin}")
+    private String passwordAdmin;
+
+    @PostConstruct
+    private void initAdmin() {
+        Optional<User> admin = userRepository.findByEmail(emailAdmin);
+        if (admin.isPresent()) {
+            return;
+        }
+
+        Role role = roleService.getOrSaveRole(Role.builder().role(ERole.ROLE_ADMIN).build());
+
+        User user = User.builder()
+                .email(emailAdmin)
+                .password(passwordEncoder.encode(passwordAdmin))
+                .role(role)
+                .build();
+        userRepository.saveAndFlush(user);
+
+    }
 
     @Override
     public void register(RegisterRequest registerRequest) {
