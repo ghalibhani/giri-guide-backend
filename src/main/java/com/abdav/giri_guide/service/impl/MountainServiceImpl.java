@@ -124,7 +124,7 @@ public class MountainServiceImpl implements MountainsService {
             mountain.setCity(updatedMountains.city().trim());
         }
         if (updatedMountains.description() != null) {
-            mountain.setCity(updatedMountains.description().trim());
+            mountain.setDescription(updatedMountains.description().trim());
         }
         if (updatedMountains.status() != null) {
             mountain.setStatus(updatedMountains.statusToEnum());

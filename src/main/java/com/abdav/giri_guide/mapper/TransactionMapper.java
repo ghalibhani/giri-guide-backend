@@ -15,11 +15,11 @@ import java.util.List;
 
 public class TransactionMapper {
     public static TransactionResponse transactionToTransactionResponse(Transaction transaction, Long totalPrice, HttpServletRequest httpReq) {
-
+        
         GuideReviewResponse review = (transaction.getReview() == null) ? null
                 : GuideReviewMapper.toGuideReviewResponse(transaction.getReview(), httpReq);
-
-        return new TransactionResponse(
+        
+                return new TransactionResponse(
                 transaction.getId(),
                 transaction.getStatus().toString(),
                 transaction.getHikingPoint().getMountain().getName(),
