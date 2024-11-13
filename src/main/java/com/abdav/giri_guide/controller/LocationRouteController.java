@@ -2,6 +2,7 @@ package com.abdav.giri_guide.controller;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -28,6 +29,7 @@ import lombok.RequiredArgsConstructor;
 public class LocationRouteController {
     private final LocationRouteService locationRouteService;
 
+    @PreAuthorize("hasAnyRole('CUSTOMER', 'GUIDE', 'ADMIN')")
     @GetMapping("")
     public ResponseEntity<?> getAllLocationRoute(
             @RequestParam(required = false, defaultValue = "") String title,
@@ -39,6 +41,7 @@ public class LocationRouteController {
         return ResponseEntity.status(HttpStatus.OK).body(locationRouteService.getAllRoute(title, page, size));
     }
 
+    @PreAuthorize("hasAnyRole('CUSTOMER', 'GUIDE', 'ADMIN')")
     @GetMapping("{locationRouteId}")
     public ResponseEntity<?> getLocationRouteDetail(@PathVariable String locationRouteId) {
         return ResponseEntity.status(HttpStatus.OK)
@@ -46,6 +49,7 @@ public class LocationRouteController {
                         Message.SUCCESS_FETCH, locationRouteService.getRouteDetail(locationRouteId)));
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN')")
     @PostMapping("")
     public ResponseEntity<?> createLocationRoute(
             @RequestBody @Validated LocationRouteRequest request) {
@@ -54,6 +58,7 @@ public class LocationRouteController {
                 .body(new CommonResponse<>(Message.DATA_CREATED, locationRouteService.createRoute(request)));
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN')")
     @PatchMapping("{locationRouteId}")
     public ResponseEntity<?> updateLocationRoute(
             @PathVariable String locationRouteId,
@@ -66,6 +71,7 @@ public class LocationRouteController {
                         locationRouteService.updateRoute(locationRouteId, request)));
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN')")
     @DeleteMapping("{locationRouteId}")
     public ResponseEntity<?> deleteRoute(@PathVariable String locationRouteId) {
         locationRouteService.deleteRoute(locationRouteId);

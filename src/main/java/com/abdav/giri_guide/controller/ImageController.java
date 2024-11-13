@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 import com.abdav.giri_guide.entity.ImageEntity;
 import com.abdav.giri_guide.model.response.CommonResponse;
@@ -23,6 +24,7 @@ import lombok.RequiredArgsConstructor;
 public class ImageController {
     private final ImageService imageService;
 
+    @PreAuthorize("hasAnyRole('ADMIN')")
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<CommonResponse<ImageUploadResponse>> create(
             @RequestParam MultipartFile image, HttpServletRequest request

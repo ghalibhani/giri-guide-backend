@@ -14,6 +14,7 @@ import org.json.JSONObject;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
@@ -26,6 +27,7 @@ public class TransactionPaymentController {
     private final Config midtransConfig;
     private static String message;
 
+    @PreAuthorize("hasAnyRole('CUSTOMER')")
     @PostMapping
     public ResponseEntity<?> createPayment(
             @RequestParam String transactionId

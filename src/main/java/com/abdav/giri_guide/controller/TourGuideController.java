@@ -7,6 +7,7 @@ import java.util.Date;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -38,6 +39,7 @@ import lombok.RequiredArgsConstructor;
 public class TourGuideController {
     private final TourGuideService tourGuideService;
 
+    @PreAuthorize("hasAnyRole('ADMIN')")
     @PostMapping(path = "", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Validated
     public ResponseEntity<?> registerTourGuide(
@@ -85,6 +87,7 @@ public class TourGuideController {
                         tourGuideService.createTourGuide(image, request, httpReq)));
     }
 
+    @PreAuthorize("hasAnyRole('CUSTOMER', 'GUIDE', 'ADMIN')")
     @GetMapping("{id}")
     public ResponseEntity<?> getTourGuideById(@PathVariable String id, HttpServletRequest httpReq) {
         return ResponseEntity.status(HttpStatus.OK)
@@ -93,6 +96,7 @@ public class TourGuideController {
                         tourGuideService.getTourGuide(id, httpReq)));
     }
 
+    @PreAuthorize("hasAnyRole('GUIDE')")
     @PatchMapping("{userId}/toggle-active")
     public ResponseEntity<?> toggleTourGuideIsActive(@PathVariable String userId, HttpServletRequest httpReq) {
         return ResponseEntity.status(HttpStatus.OK)
@@ -101,6 +105,7 @@ public class TourGuideController {
                         tourGuideService.toggleTourGuideActiveStatus(userId, httpReq)));
     }
 
+    @PreAuthorize("hasAnyRole('GUIDE')")
     @GetMapping("profile/{userId}")
     public ResponseEntity<?> getTourGuideProfileByUserId(
             @PathVariable String userId,
@@ -110,6 +115,7 @@ public class TourGuideController {
                 .body(tourGuideService.getTourGuideProfile(userId, httpReq));
     }
 
+    @PreAuthorize("hasAnyRole('CUSTOMER', 'GUIDE', 'ADMIN')")
     @GetMapping("data/{id}")
     public ResponseEntity<?> getTourGuideData(
             @PathVariable String id,
@@ -119,6 +125,7 @@ public class TourGuideController {
                 .body(tourGuideService.getTourGuideData(id, httpReq));
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN')")
     @PatchMapping("data/{id}")
     public ResponseEntity<?> updateTourGuide(
             @PathVariable String id,
@@ -131,6 +138,7 @@ public class TourGuideController {
                         tourGuideService.updateTourGuide(id, request, httpReq)));
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN')")
     @PatchMapping(path = "data/{id}/update-image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> updateTourGuideImage(
             @PathVariable String id,
@@ -143,6 +151,7 @@ public class TourGuideController {
                         tourGuideService.updateTourGuideImage(id, image, httpReq)));
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN')")
     @DeleteMapping("{id}")
     public ResponseEntity<?> deleteTourGuide(@PathVariable String id) {
         tourGuideService.softDeleteTourGuide(id);
@@ -152,6 +161,7 @@ public class TourGuideController {
                         null));
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN')")
     @PostMapping("{id}/hiking-points")
     public ResponseEntity<?> addTourGuideHikingPoint(
             @PathVariable String id,
@@ -165,6 +175,7 @@ public class TourGuideController {
                         tourGuideService.addHikingPoint(id, request, httpReq)));
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN')")
     @DeleteMapping("{tourGuideId}/hiking-points/{hikingPointId}")
     public ResponseEntity<?> deleteTourGuideHikingPoint(
             @PathVariable String tourGuideId,
@@ -175,6 +186,7 @@ public class TourGuideController {
                 .body(new CommonResponse<>(Message.SUCCESS_DELETE, null));
     }
 
+    @PreAuthorize("hasAnyRole('CUSTOMER', 'GUIDE', 'ADMIN')")
     @GetMapping("")
     public ResponseEntity<?> getTourGuideList(
             @RequestParam(required = false, defaultValue = "") String hikingPoint,
@@ -188,6 +200,7 @@ public class TourGuideController {
                 .body(tourGuideService.getTourGuideList(hikingPoint, name, size, page, httpReq));
     }
 
+    @PreAuthorize("hasAnyRole('GUIDE')")
     @GetMapping("profile/{userId}/hiking-points")
     public ResponseEntity<?> getProfileHikingPoints(@PathVariable String userId) {
         return ResponseEntity.status(HttpStatus.OK).body(new CommonResponse<>(
@@ -195,6 +208,7 @@ public class TourGuideController {
                 tourGuideService.getTourGuideHikingPointActiveList(userId)));
     }
 
+    @PreAuthorize("hasAnyRole('GUIDE')")
     @PatchMapping("profile/{userId}/hiking-points/{tourGuideHikingPointId}/toggle")
     public ResponseEntity<?> toggleProfileHikingPoints(
             @PathVariable String userId,
@@ -206,6 +220,7 @@ public class TourGuideController {
 
     }
 
+    @PreAuthorize("hasAnyRole('GUIDE')")
     @GetMapping("stats/{userId}")
     public ResponseEntity<?> getTourGuideStats(@PathVariable String userId) {
         return ResponseEntity.status(HttpStatus.OK)

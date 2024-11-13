@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -23,6 +24,7 @@ public class ProfileController {
     private final CustomerService customerService;
     private static String message;
 
+    @PreAuthorize("hasAnyRole('CUSTOMER')")
     @GetMapping("/{id}")
     ResponseEntity<?> getProfileByUserId(@PathVariable String id, HttpServletRequest httpReq) {
         CustomerResponse customer = customerService.getCustomerByUserId(id, httpReq);
@@ -34,6 +36,7 @@ public class ProfileController {
                 .body(response);
     }
 
+    @PreAuthorize("hasAnyRole('CUSTOMER')")
     @PutMapping("/{id}")
     ResponseEntity<?> updateProfile(@PathVariable String id, @RequestBody CustomerRequest customerRequest,
             HttpServletRequest httpReq) {
@@ -46,6 +49,7 @@ public class ProfileController {
                 .body(response);
     }
 
+    @PreAuthorize("hasAnyRole('CUSTOMER')")
     @PutMapping(value = PathApi.PROFILE_IMAGE_API, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     ResponseEntity<?> updateProfileImage(
             @PathVariable String userId,
