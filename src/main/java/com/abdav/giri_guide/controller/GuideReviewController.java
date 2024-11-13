@@ -14,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -28,6 +29,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 public class GuideReviewController {
     private final GuideReviewService reviewService;
 
+    @PreAuthorize("hasAnyRole('CUSTOMER')")
     @PostMapping("{tourGuideId}/reviews")
     public ResponseEntity<?> createReview(
             @PathVariable String tourGuideId,
@@ -40,6 +42,7 @@ public class GuideReviewController {
                         reviewService.createGuideReview(tourGuideId, request, httpReq)));
     }
 
+    @PreAuthorize("hasAnyRole('CUSTOMER', 'GUIDE', 'ADMIN')")
     @GetMapping("{tourGuideId}/reviews")
     public ResponseEntity<?> getReviewsByGuideId(
             @PathVariable String tourGuideId,
@@ -53,6 +56,7 @@ public class GuideReviewController {
                 .body(reviewService.getGuideReviewsByGuideId(tourGuideId, page, size, httpReq));
     }
 
+    @PreAuthorize("hasAnyRole('CUSTOMER', 'GUIDE', 'ADMIN')")
     @GetMapping("reviews/{reviewId}")
     public ResponseEntity<?> getReviewById(
             @PathVariable String guideId,
@@ -65,6 +69,7 @@ public class GuideReviewController {
                         reviewService.getGuideReviewById(reviewId, httpReq)));
     }
 
+    @PreAuthorize("hasAnyRole('CUSTOMER')")
     @PutMapping("reviews/{transactionId}")
     public ResponseEntity<?> putReview(
             @PathVariable String transactionId,

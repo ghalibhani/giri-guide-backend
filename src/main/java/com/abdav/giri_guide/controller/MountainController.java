@@ -3,6 +3,7 @@ package com.abdav.giri_guide.controller;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -34,6 +35,7 @@ import lombok.RequiredArgsConstructor;
 public class MountainController {
     private final MountainsService service;
 
+    @PreAuthorize("hasAnyRole('CUSTOMER', 'GUIDE', 'ADMIN')")
     @GetMapping("")
     public ResponseEntity<?> getMountainList(
             @RequestParam(required = false, defaultValue = "") String name,
@@ -47,6 +49,7 @@ public class MountainController {
                 .body(service.mountainList(name, city, page, size, httpReq));
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN')")
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> createMountain(
             @RequestParam String name,
@@ -70,6 +73,7 @@ public class MountainController {
                         service.createMountain(request, image, httpReq)));
     }
 
+    @PreAuthorize("hasAnyRole('CUSTOMER', 'GUIDE', 'ADMIN')")
     @GetMapping("{id}")
     public ResponseEntity<CommonResponse<?>> getMountainDetail(@PathVariable String id,
             HttpServletRequest httpReq) {
@@ -78,6 +82,7 @@ public class MountainController {
                         service.mountainDetail(id, httpReq)));
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN')")
     @PutMapping("{id}")
     public ResponseEntity<?> updateMountain(
             @PathVariable String id,
@@ -91,6 +96,7 @@ public class MountainController {
                         service.updateMountain(id, request, httpReq)));
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN')")
     @PatchMapping(path = "{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> updateMountainImage(
             @PathVariable String id,
@@ -103,6 +109,7 @@ public class MountainController {
                         service.updateMountainImage(id, image, httpReq)));
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN')")
     @DeleteMapping("{id}")
     public ResponseEntity<CommonResponse<?>> deleteMountain(@PathVariable String id) {
         service.deleteMountain(id);
@@ -110,12 +117,14 @@ public class MountainController {
                 .body(new CommonResponse<>("Data deleted successfully", null));
     }
 
+    @PreAuthorize("hasAnyRole('CUSTOMER', 'GUIDE', 'ADMIN')")
     @GetMapping("{mountainId}/hiking-points")
     public ResponseEntity<?> getHikingPoints(@PathVariable String mountainId) {
         return ResponseEntity.status(HttpStatus.OK)
                 .body(new CommonResponse<>("Data fetched", service.getHikingPoints(mountainId)));
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN')")
     @PostMapping("{mountainId}/hiking-points")
     public ResponseEntity<?> addHikingPoint(@PathVariable String mountainId,
             @RequestBody @Validated HikingPointRequest request
@@ -126,18 +135,21 @@ public class MountainController {
                         service.createHikingPoint(mountainId, request)));
     }
 
+    @PreAuthorize("hasAnyRole('CUSTOMER', 'GUIDE', 'ADMIN')")
     @GetMapping("hiking-points/{id}")
     public ResponseEntity<?> getHikingPoint(@PathVariable String id) {
         return ResponseEntity.status(HttpStatus.OK)
                 .body(new CommonResponse<>("Data Fetched", service.getHikingPoint(id)));
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN')")
     @PutMapping("hiking-points/{id}")
     public ResponseEntity<?> updateHikingPoint(@PathVariable String id, @RequestBody HikingPointRequest request) {
         return ResponseEntity.status(HttpStatus.OK)
                 .body(new CommonResponse<>("Data Updated", service.updateHikingPoint(id, request)));
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN')")
     @DeleteMapping("hiking-points/{id}")
     public ResponseEntity<?> deleteHikingPoint(@PathVariable String id) {
         service.deleteHikingPoint(id);

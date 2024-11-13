@@ -4,7 +4,7 @@ import com.abdav.giri_guide.constant.ERole;
 
 public record LoginResponse(
         String token,
-        String UserId,
+        String userId,
         String email,
         ERole role,
         String name

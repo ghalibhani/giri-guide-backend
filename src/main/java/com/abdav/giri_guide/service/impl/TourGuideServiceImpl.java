@@ -197,7 +197,7 @@ public class TourGuideServiceImpl implements TourGuideService {
         } else {
             HikingPoint hikingPoint = hikingPointRepository.findById(hikingPointId).orElse(null);
             Page<TourGuideHikingPoint> tourGuidePage = tourGuideHikingPointRepository
-                    .findByHikingPointAndIsActiveIsTrueAndTourGuideIsActiveIsTrueAndDeletedDateIsNull(
+                    .findByHikingPointAndIsActiveIsTrueAndTourGuideIsActiveIsTrueAndTourGuideDeletedDateIsNullAndDeletedDateIsNull(
                             hikingPoint, pageable);
             PagingResponse paging = new PagingResponse(
                     page,

@@ -2,6 +2,7 @@ package com.abdav.giri_guide.controller;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -27,6 +28,7 @@ import lombok.RequiredArgsConstructor;
 public class DepositController {
     private final DepositService depositService;
 
+    @PreAuthorize("hasAnyRole('GUIDE')")
     @GetMapping("/deposit/{userId}")
     public ResponseEntity<?> getUserDepositHistory(
             @PathVariable String userId,
@@ -38,6 +40,7 @@ public class DepositController {
                 .body(depositService.getUserDepositHistories(userId, size, page));
     }
 
+    @PreAuthorize("hasAnyRole('GUIDE')")
     @PostMapping("/deposit/{userId}/withdraw")
     public ResponseEntity<?> withdrawBalance(
             @PathVariable String userId,
@@ -51,6 +54,7 @@ public class DepositController {
                 .body(new CommonResponse<>(Message.DATA_CREATED, null));
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN')")
     @GetMapping("/deposit/pending/{tourGuideId}")
     public ResponseEntity<?> getPendingTourGuideDepositHistory(
             @PathVariable String tourGuideId,
@@ -62,6 +66,7 @@ public class DepositController {
                 .body(depositService.getTourGuideAllPendingWithdraw(tourGuideId, size, page));
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN')")
     @PostMapping("/deposit/add/{tourGuideId}")
     public ResponseEntity<?> sendMoney(
             @PathVariable String tourGuideId,
@@ -73,6 +78,7 @@ public class DepositController {
                 .body(new CommonResponse<>(Message.DATA_CREATED, null));
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN')")
     @PatchMapping("/deposits/{depositHistoryId}")
     public ResponseEntity<?> approveOrRejectWithdraw(
             @PathVariable String depositHistoryId,
@@ -84,6 +90,7 @@ public class DepositController {
                 .body(new CommonResponse<>(Message.DATA_UPDATED, null));
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN')")
     @GetMapping("/deposits")
     public ResponseEntity<?> getDepositList(
             @RequestParam(required = false, defaultValue = "") String name,
