@@ -81,7 +81,8 @@ public class GuideReviewServiceImpl implements GuideReviewService {
         TourGuide tourGuide = tourGuideRepository.findByIdAndDeletedDateIsNull(tourGuideId)
                 .orElseThrow(EntityNotFoundException::new);
         Page<GuideReview> reviews = reviewRepository
-                .findByTourGuideAndReviewIsNotNullAndDeletedDateIsNull(tourGuide, pageable);
+                .findByTourGuideAndReviewIsNotNullAndDeletedDateIsNullOrderByCreatedDateDesc(tourGuide,
+                        pageable);
 
         PagingResponse paging = new PagingResponse(
                 page,
