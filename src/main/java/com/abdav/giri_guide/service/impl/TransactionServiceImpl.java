@@ -90,7 +90,8 @@ public class TransactionServiceImpl implements TransactionService {
         }
         transactionHikerRepository.saveAllAndFlush(hikers);
         transaction.setTransactionHikers(hikers);
-        Long days = ChronoUnit.DAYS.between(transaction.getStartDate().toLocalDate(), transaction.getEndDate().toLocalDate());
+        Long days = ChronoUnit.DAYS.between(transaction.getStartDate().toLocalDate(),
+                transaction.getEndDate().toLocalDate());
 
         Long totalTourguidePrice = tourGuide.getPrice() * days;
         Long totalPorterPrice = calculatePorterPrice(tourGuide.getPricePorter(), transactionRequest.porterQty(), days);
@@ -129,11 +130,12 @@ public class TransactionServiceImpl implements TransactionService {
         }
         if (transactionStatus.equals(ETransactionStatus.DONE)) {
             reviewService.createBlankReview(transaction);
-            Long nominal = transaction.getTotalPorterPrice() + transaction.getTotalTourGuidePrice() + transaction.getAdditionalPriceTourGuide();
+            Long nominal = transaction.getTotalPorterPrice() + transaction.getTotalTourGuidePrice()
+                    + transaction.getAdditionalPriceTourGuide();
             depositService.addMoney(
                     transaction.getTourGuide().getDeposit(),
                     nominal,
-                    "Uang pelunasan pendakian " + transaction.getHikingPoint().getMountain().getName());
+                    "Uang jasa tour guide dan/atau porter " + transaction.getCustomer().getFullName());
         }
 
         return new TransactionStatusResponse(transaction.getStatus().toString(), null);
@@ -155,20 +157,23 @@ public class TransactionServiceImpl implements TransactionService {
         if (status == null) {
             transactionPage = transactionRepository.findAll(pageable);
             return transactionPage
-                    .map(transaction -> TransactionMapper.transactionToTransactionDetailResponse(transaction, getTotalPrice(transaction), httpReq));
+                    .map(transaction -> TransactionMapper.transactionToTransactionDetailResponse(transaction,
+                            getTotalPrice(transaction), httpReq));
         } else {
 
             ETransactionStatus eStatus = ETransactionStatus.valueOf(status.toUpperCase());
             transactionPage = transactionRepository.findAllByStatus(eStatus, pageable);
             return transactionPage
-                    .map(transaction -> TransactionMapper.transactionToTransactionDetailResponse(transaction, getTotalPrice(transaction), httpReq));
+                    .map(transaction -> TransactionMapper.transactionToTransactionDetailResponse(transaction,
+                            getTotalPrice(transaction), httpReq));
         }
     }
 
     @Override
     public TransactionDetailResponse getTransactionById(String id, HttpServletRequest httpReq) {
         Transaction transaction = getTransactionOrThrowNotFound(id);
-        return TransactionMapper.transactionToTransactionDetailResponse(transaction, getTotalPrice(transaction), httpReq);
+        return TransactionMapper.transactionToTransactionDetailResponse(transaction, getTotalPrice(transaction),
+                httpReq);
     }
 
     @Override
@@ -190,7 +195,8 @@ public class TransactionServiceImpl implements TransactionService {
                     .findAllByCustomerIdAndStatusInAndDeletedDateIsNullOrderByStartDateAsc(customer.getId(), eStatus,
                             pageable);
             return transactionPage
-                    .map(transaction -> TransactionMapper.transactionToTransactionResponse(transaction, getTotalPrice(transaction), httpReq));
+                    .map(transaction -> TransactionMapper.transactionToTransactionResponse(transaction,
+                            getTotalPrice(transaction), httpReq));
         } else if (eRole.equals(ERole.ROLE_GUIDE)) {
             TourGuide tourGuide = tourGuideRepository.findByUsersIdAndDeletedDateIsNull(userId)
                     .orElseThrow(() -> new EntityNotFoundException("Tour Guide " + Message.DATA_NOT_FOUND));
@@ -201,7 +207,8 @@ public class TransactionServiceImpl implements TransactionService {
                     .findAllByTourGuideIdAndStatusInAndDeletedDateIsNullOrderByStartDateAsc(tourGuide.getId(), eStatus,
                             pageable);
             return transactionPage
-                    .map(transaction -> TransactionMapper.transactionToTransactionResponse(transaction, getTotalPrice(transaction), httpReq));
+                    .map(transaction -> TransactionMapper.transactionToTransactionResponse(transaction,
+                            getTotalPrice(transaction), httpReq));
         } else {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
         }
@@ -210,7 +217,7 @@ public class TransactionServiceImpl implements TransactionService {
     @Override
     public CountTransactionResponse countAllStatusTransaction(Integer month, Integer year) {
         List<Transaction> allTransaction = transactionRepository.findAllByDeletedDateIsNull();
-        if(month == null || year == null){
+        if (month == null || year == null) {
             month = LocalDate.now().minusMonths(1).getMonthValue();
             year = LocalDate.now().getYear();
         }
@@ -219,18 +226,18 @@ public class TransactionServiceImpl implements TransactionService {
         Integer finalMonth = month;
 
         Map<ETransactionStatus, Long> countTransactionGroupByStatus = allTransaction.stream()
-                .filter(transaction -> transaction.getCreatedDate().getYear() == finalYear && transaction.getCreatedDate().getMonthValue() == finalMonth)
+                .filter(transaction -> transaction.getCreatedDate().getYear() == finalYear
+                        && transaction.getCreatedDate().getMonthValue() == finalMonth)
                 .collect(Collectors.groupingBy(Transaction::getStatus, Collectors.counting()));
 
-        for(ETransactionStatus status : ETransactionStatus.values()){
+        for (ETransactionStatus status : ETransactionStatus.values()) {
             countTransactionGroupByStatus.putIfAbsent(status, 0L);
         }
 
         return new CountTransactionResponse(
                 countTransactionGroupByStatus,
                 finalYear,
-                finalMonth
-        );
+                finalMonth);
     }
 
     private void getUpdateStatusInHistory(List<Transaction> transactions) {
@@ -261,7 +268,7 @@ public class TransactionServiceImpl implements TransactionService {
             depositService.addMoney(
                     transaction.getTourGuide().getDeposit(),
                     nominal,
-                    "Uang admin pendakian " + transaction.getHikingPoint().getMountain().getName());
+                    "Uang SIMAKSI dan uang pendakian  " + transaction.getCustomer().getFullName());
 
         } else if (status.equals("EXPIRED")) {
             transaction.setStatus(ETransactionStatus.REJECTED);
@@ -284,9 +291,11 @@ public class TransactionServiceImpl implements TransactionService {
         }
         return 0L;
     }
+
     @Override
-    public Long getTotalPrice(Transaction transaction){
-        return transaction.getTotalPorterPrice() + transaction.getTotalTourGuidePrice() + transaction.getAdditionalPriceTourGuide() +
-                transaction.getTotalEntryPrice() + transaction.getTotalSimaksiPrice() +transaction.getAdminCost();
+    public Long getTotalPrice(Transaction transaction) {
+        return transaction.getTotalPorterPrice() + transaction.getTotalTourGuidePrice()
+                + transaction.getAdditionalPriceTourGuide() +
+                transaction.getTotalEntryPrice() + transaction.getTotalSimaksiPrice() + transaction.getAdminCost();
     }
 }
