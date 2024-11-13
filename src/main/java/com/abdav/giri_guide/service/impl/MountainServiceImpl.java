@@ -94,7 +94,8 @@ public class MountainServiceImpl implements MountainsService {
         }
         Pageable pageable = PageRequest.of(page - 1, size);
         Page<Mountains> mountainsPage = mountainRepository
-                .findAllByNameContainingIgnoreCaseAndCityContainingIgnoreCaseAndDeletedDateIsNull(name, city, pageable);
+                .findAllByNameContainingIgnoreCaseAndCityContainingIgnoreCaseAndDeletedDateIsNullOrderByCreatedDateDesc(
+                        name, city, pageable);
 
         PagingResponse paging = new PagingResponse(
                 page,

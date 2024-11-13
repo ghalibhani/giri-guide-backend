@@ -1,15 +1,15 @@
 package com.abdav.giri_guide.controller;
 
+import com.abdav.giri_guide.model.request.LoginRequest;
+import com.abdav.giri_guide.model.request.RegisterRequest;
+import com.abdav.giri_guide.model.response.LoginResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import com.abdav.giri_guide.constant.Message;
 import com.abdav.giri_guide.constant.PathApi;
-import com.abdav.giri_guide.dto.request.LoginRequest;
-import com.abdav.giri_guide.dto.request.RegisterRequest;
-import com.abdav.giri_guide.dto.response.CommonResponse;
-import com.abdav.giri_guide.dto.response.LoginResponse;
+import com.abdav.giri_guide.model.response.CommonResponse;
 import com.abdav.giri_guide.service.AuthService;
 
 import lombok.RequiredArgsConstructor;

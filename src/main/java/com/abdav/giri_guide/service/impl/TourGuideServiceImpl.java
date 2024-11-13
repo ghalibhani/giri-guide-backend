@@ -172,14 +172,16 @@ public class TourGuideServiceImpl implements TourGuideService {
 
     @Override
     public CommonResponseWithPage<List<TourGuideListResponse>> getTourGuideList(
-            String hikingPointId, Integer size, Integer page, HttpServletRequest httpReq) {
+            String hikingPointId, String name, Integer size, Integer page, HttpServletRequest httpReq) {
         if (page <= 0) {
             page = 1;
         }
 
         Pageable pageable = PageRequest.of(page - 1, size);
         if (hikingPointId.equals("")) {
-            Page<TourGuide> tourGuidePage = tourGuideRepository.findAllByDeletedDateIsNull(pageable);
+            Page<TourGuide> tourGuidePage = tourGuideRepository
+                    .findAllByDeletedDateIsNullAndNameContainsIgnoreCaseOrderByCreatedDateDesc(
+                            name, pageable);
             PagingResponse paging = new PagingResponse(
                     page,
                     size,

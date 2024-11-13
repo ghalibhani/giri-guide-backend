@@ -178,13 +178,14 @@ public class TourGuideController {
     @GetMapping("")
     public ResponseEntity<?> getTourGuideList(
             @RequestParam(required = false, defaultValue = "") String hikingPoint,
+            @RequestParam(required = false, defaultValue = "") String name,
             @RequestParam(required = false, defaultValue = "1") Integer page,
             @RequestParam(required = false, defaultValue = "10") Integer size,
             HttpServletRequest httpReq
 
     ) {
         return ResponseEntity.status(HttpStatus.OK)
-                .body(tourGuideService.getTourGuideList(hikingPoint, size, page, httpReq));
+                .body(tourGuideService.getTourGuideList(hikingPoint, name, size, page, httpReq));
     }
 
     @GetMapping("profile/{userId}/hiking-points")
