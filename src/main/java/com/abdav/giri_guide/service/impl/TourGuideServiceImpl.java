@@ -248,6 +248,15 @@ public class TourGuideServiceImpl implements TourGuideService {
         if (request.bankAccount() != null) {
             tourGuide.setBankAccount(request.bankAccount());
         }
+        if (request.address() != null) {
+            tourGuide.setAddress(request.address());
+        }
+        if (request.gender() != null) {
+            tourGuide.setGender(request.gender());
+        }
+        if (request.birthDate() != null) {
+            tourGuide.setBirthDate(request.birthDate());
+        }
 
         tourGuide = tourGuideRepository.save(tourGuide);
         List<TourGuideHikingPoint> hikingPoints = tourGuideHikingPointRepository
