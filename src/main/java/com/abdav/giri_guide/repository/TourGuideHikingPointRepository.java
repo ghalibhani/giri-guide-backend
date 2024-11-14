@@ -17,7 +17,7 @@ public interface TourGuideHikingPointRepository extends JpaRepository<TourGuideH
     List<TourGuideHikingPoint> findByTourGuideAndDeletedDateIsNullOrderByHikingPointMountainNameAsc(
             TourGuide tourGuide);
 
-    Page<TourGuideHikingPoint> findByHikingPointAndIsActiveIsTrueAndTourGuideIsActiveIsTrueAndDeletedDateIsNull(
+    Page<TourGuideHikingPoint> findByHikingPointAndIsActiveIsTrueAndTourGuideIsActiveIsTrueAndTourGuideDeletedDateIsNullAndDeletedDateIsNull(
             HikingPoint hikingPoint,
             Pageable pageable);
 

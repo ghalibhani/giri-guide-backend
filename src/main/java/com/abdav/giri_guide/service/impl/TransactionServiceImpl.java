@@ -20,6 +20,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cglib.core.Local;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -251,6 +252,9 @@ public class TransactionServiceImpl implements TransactionService {
                     && transaction.getEndOfApprove().isBefore(LocalDateTime.now())) {
                 transaction.setStatus(ETransactionStatus.REJECTED);
                 transactionRepository.saveAndFlush(transaction);
+            } else if (transaction.getStatus() == ETransactionStatus.UPCOMING && transaction.getEndDate() != null && transaction.getEndDate().toLocalDate().plusDays(2).isBefore(LocalDate.now())) {
+                transaction.setStatus(ETransactionStatus.DONE);
+                transactionRepository.saveAndFlush(transaction);
             }
         }
     }
@@ -286,7 +290,9 @@ public class TransactionServiceImpl implements TransactionService {
 
     private Long calculateAdditionalPrice(TourGuide tourGuide, int hikerQty, Long days) {
         if (hikerQty > tourGuide.getMaxHiker()) {
-            int additionalHiker = hikerQty - tourGuide.getMaxHiker();
+            throw new DataIntegrityViolationException("Pendaki melebihi kapasitas");
+        } else if (hikerQty > 5) {
+            int additionalHiker = hikerQty - 5;
             return tourGuide.getAdditionalPrice() * additionalHiker * days;
         }
         return 0L;

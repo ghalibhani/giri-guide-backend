@@ -13,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Arrays;
@@ -27,6 +28,7 @@ public class TransactionController {
     private final TransactionPaymentService transactionPaymentService;
     private static String message;
 
+    @PreAuthorize("hasRole('CUSTOMER')")
     @PostMapping()
     ResponseEntity<?> createTransaction(@RequestBody TransactionRequest transactionRequest) {
         TransactionStatusResponse transactionStatusResponse = transactionService.createTransaction(transactionRequest);
@@ -38,6 +40,7 @@ public class TransactionController {
                 .body(response);
     }
 
+    @PreAuthorize("hasAnyRole('CUSTOMER', 'GUIDE')")
     @PutMapping("/{id}")
     ResponseEntity<?> updateTransactionStatus(@PathVariable String id, @RequestBody TransactionStatusUpdateRequest request)  {
         TransactionStatusResponse transactionStatusResponse = transactionService.updateTransactionStatus(id, request.status(), request.rejectedNote());
@@ -49,6 +52,7 @@ public class TransactionController {
                 .body(response);
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN')")
     @GetMapping
     ResponseEntity<?> transactionResponseCustomer(
             @RequestParam(required = false, defaultValue = "1") Integer page,
@@ -66,6 +70,7 @@ public class TransactionController {
                 .body(response);
     }
 
+    @PreAuthorize("hasAnyRole('CUSTOMER', 'GUIDE', 'ADMIN')")
     @GetMapping("/{id}")
     ResponseEntity<?> getTransactionById(@PathVariable String id, HttpServletRequest httpReq){
         TransactionDetailResponse transactionDetailResponse = transactionService.getTransactionById(id, httpReq);
@@ -77,6 +82,7 @@ public class TransactionController {
                 .body(response);
     }
 
+    @PreAuthorize("hasAnyRole('CUSTOMER', 'GUIDE')")
     @GetMapping(PathApi.HISTORY_TRANSACTION)
     ResponseEntity<?> transactionByStatus(
             @RequestParam(required = false, defaultValue = "1") Integer page,
@@ -97,6 +103,7 @@ public class TransactionController {
                 .body(response);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/dashboard/info-status")
     ResponseEntity<?> dashboardAdmin(
             @RequestParam(required = false) Integer month,
@@ -111,6 +118,7 @@ public class TransactionController {
                 .body(response);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/revenue")
     ResponseEntity<?> getRevenueOneYearBefore(){
         RevenueResponse revenueResponse = transactionPaymentService.getRevenue();
@@ -122,6 +130,7 @@ public class TransactionController {
                 .body(response);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/dashboard")
     ResponseEntity<?> getInfoDashboard(
             @RequestParam(required = false) Integer month,

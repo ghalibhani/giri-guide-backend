@@ -127,7 +127,7 @@ public class TransactionPaymentServiceImpl implements TransactionPaymentService 
                 })
                 .collect(Collectors.groupingBy(
                         transactionPayment -> YearMonth.from(transactionPayment.getDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate()),
-                        Collectors.summingLong(transactionPayment -> transactionPayment.getTransaction().getAdminCost()-4000)
+                        Collectors.summingLong(transactionPayment -> transactionPayment.getTransaction().getAdminCost())
                 ));
 
         actualRevenue.forEach(revenueOneYearBefore::put);
@@ -156,7 +156,7 @@ public class TransactionPaymentServiceImpl implements TransactionPaymentService 
         List<TransactionPayment> allTransactionPayment = transactionPaymentRepository.findAllByDeletedDateIsNull();
         Long totalIncome = allTransactionPayment.stream()
                 .filter(transactionPayment -> transactionPayment.getPayment() != null && transactionPayment.getPayment().getPaymentStatus().equals("PAID"))
-                .mapToLong(TransactionPayment::getAmount)
+                .mapToLong(transactionPayment -> transactionPayment.getTransaction().getAdminCost())
                 .sum();
         return totalIncome;
     }
@@ -173,7 +173,7 @@ public class TransactionPaymentServiceImpl implements TransactionPaymentService 
                     YearMonth yearMonthIncome = YearMonth.from(transactionPayment.getCreatedDate().toLocalDate());
                     return yearMonthIncome.equals(findYearMonth);
                 })
-                .mapToLong(TransactionPayment::getAmount)
+                .mapToLong(transactionPayment -> transactionPayment.getTransaction().getAdminCost())
                 .sum();
 
         return new IncomeYearMonthResponse(findYearMonth, income);
